@@ -41,7 +41,9 @@ Primary new sources:
 - AlphaEdit (Fang et al., 2025) — null-space constrained editing
 - Sparse memory finetuning (Lin et al., 2025)
 
-## Late addition: `memory/` folder convention
+## Late additions
+
+### `memory/` folder convention
 
 After the plans were committed, the user added a standing rule:
 > "所有要你记住的、和本repo相关的东西，写到本repo，都维护在memory文件夹里面"
@@ -52,6 +54,20 @@ This created `memory/{README,instructions,conventions,context}.md` as the new to
 3. Every session ends with a matrix entry + knowledge-sources update.
 
 Root README and `docs/workflow.md` updated to point at `memory/` as the first read.
+
+### Mirrored `ideas/` and `plans/` folders with directory READMEs
+
+User wanted both folders to have a TOC file with one-row meta per item. Moved `notes/inference-time-training-ideas.md` → `notes/ideas/inference-time-training.md`; added `notes/ideas/README.md` as the ideas catalog (50 rows) and rewrote `notes/plans/README.md` to match.
+
+### Symbol system for status / priority / phase / mode
+
+User asked for a notation set to record validation progress, project progress, phase/sequel relationships, and development mode. Created `memory/symbols.md` with four axes:
+- **S** — lifecycle: `? R F D P X W S M B K Z`
+- **★** — priority: `★ ★★ ★★★`
+- **φ** — phase/chain: `1/N`, `↪#NN`, `←#NN`, `≈#NN`
+- **M** — mode: `exp / proto / paper / thesis / prod / side` × `solo / collab / team / open`
+
+Applied across both `notes/ideas/README.md` (all 50 idea rows) and `notes/plans/README.md` (3 plan rows + per-plan meta blocks). Linked sequels-in-queue from each plan.
 
 ## Next steps
 

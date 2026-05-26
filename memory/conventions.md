@@ -35,9 +35,11 @@ The two folders `ideas/` and `plans/` mirror each other: both have a `README.md`
 
 Each of these acts as a *directory* of items. Required content:
 - A short header explaining what's in the folder.
-- One row per item with: ID, title, priority (★), status, link to detailed file (or plan folder), and a one-line meta description.
-- For plans: also a per-plan meta block with one-liner / validation hypothesis / primary channels / budget tier / kill criterion.
-- Statuses: `idea` · `drafted` · `running` · `shipped` · `killed`.
+- The four-axis legend block at the top (see [`memory/symbols.md`](symbols.md)).
+- One row per item with columns: **ID · Title · ★ · S · φ · M · Plan · Meta** (for ideas) or **# · Plan · Parent · ★ · S · φ · M · Cost · Time · Headline** (for plans).
+- For plans: also a per-plan meta block with one-liner / validation hypothesis / primary channels / budget tier / kill criterion / sequels-in-queue.
+
+All status / priority / phase / mode tokens are defined in [`memory/symbols.md`](symbols.md). Do not invent new codes silently.
 
 ## Plan folder template
 

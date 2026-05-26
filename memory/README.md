@@ -22,6 +22,7 @@ If a session needs a rule that should apply to all future sessions, it goes here
 |---|---|
 | [`instructions.md`](instructions.md) | Explicit user instructions ("from now on, always …") |
 | [`conventions.md`](conventions.md) | Repo conventions: file layouts, naming, formatting |
+| [`symbols.md`](symbols.md) | Notation for status / priority / phase / mode in TOCs |
 | [`context.md`](context.md) | Stable context about the user and active threads |
 
 ---
@@ -39,6 +40,7 @@ If a session needs a rule that should apply to all future sessions, it goes here
 2. `memory/instructions.md` — what the user told me to remember
 3. `memory/context.md` — who, what, where we are now
 4. `memory/conventions.md` — how to format / where to put things
-5. `docs/matrix/README.md` — what we've recently done
+5. `memory/symbols.md` — notation for status / priority / phase / mode
+6. `docs/matrix/README.md` — what we've recently done
 
-Only after these five should we start any new work.
+Only after these six should we start any new work.

@@ -28,6 +28,17 @@
 **Rule**: every working session must produce a dated entry in `docs/matrix/`, and any new papers / blogs / conversations referenced must be appended to `docs/matrix/knowledge-sources.md` (the "knowledge mother nest").
 **How to apply**: do this at the *end* of every session, before closing.
 
+### 2026-05-26 · Symbol system for ideas and plans
+**Source**: user instruction in 2026-05-26 session.
+**Verbatim**: "做一套符号，来记录idea验证进度、项目进度、有没有二期，开发模式等"
+**Rule**: every idea/plan in any TOC must carry the four-axis symbol set defined in [`memory/symbols.md`](symbols.md): Status `S`, Priority `★`, Phase `φ`, Mode `M`.
+**How to apply**:
+- Update the `S` column on every meaningful state transition (even to `B` blocked).
+- Use `φ` to record sequels: `1/N`, `↪#NN`, `←#NN`, `≈#NN`.
+- Use `M` to record dev mode: `paper,solo` / `thesis,collab` / etc.
+- The TOCs in `notes/ideas/README.md` and `notes/plans/README.md` are the single source of truth for these symbols.
+- Do not invent new codes silently; if a new axis or code is needed, update `memory/symbols.md` first.
+
 ---
 
 *If an instruction is later replaced, do NOT delete it. Add a `~~strikethrough~~ (superseded YYYY-MM-DD by …)` marker and the new entry below.*
