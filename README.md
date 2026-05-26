@@ -1,13 +1,44 @@
 # research-notes
 
-Personal research notebook — brainstorms, paper reading notes, idea lists.
+Personal research notebook — brainstorms, paper reading, idea lists, and project plans.
 
 Maintained by [Mingjia Shi](https://bdemo.github.io/homepage/) (@BDeMo).
 
-## Contents
+---
 
-- [`notes/inference-time-training-ideas.md`](notes/inference-time-training-ideas.md) — Ideas around inference-time training, the $X$-$W$ exchange framing, and a reading note on Sakana AI's Doc-to-LoRA.
+## Layout
+
+```
+research-notes/
+├── docs/
+│   ├── workflow.md                                  # methodology & operating principles
+│   └── matrix/                                      # session log + knowledge mother nest
+│       ├── README.md
+│       ├── knowledge-sources.md                     # running index of papers / blogs / etc
+│       └── YYYY-MM-DD-<topic>.md                    # one entry per working session
+└── notes/
+    ├── inference-time-training-ideas.md             # 50-idea brainstorm (X-W framing)
+    └── plans/                                       # detailed project plans
+        ├── 01-x-saturation-curve/                   # data curation by inference-time difficulty
+        ├── 03-w-space-best-of-n/                    # test-time search along the weights axis
+        └── 08-model-outputs-delta-w/                # self-modifying LLMs
+```
 
 ---
 
-*A living archive. Things here are speculative / WIP unless noted.*
+## Where to start
+
+- **New here?** Read [`docs/workflow.md`](docs/workflow.md). It explains how this notebook is supposed to work.
+- **Want to know what we've done?** Skim [`docs/matrix/`](docs/matrix/). The matrix is the long-term memory of this repo.
+- **Reading list?** See [`docs/matrix/knowledge-sources.md`](docs/matrix/knowledge-sources.md) — the "knowledge mother nest."
+- **What might we actually build?** See [`notes/plans/`](notes/plans/) for the 3 plans currently in draft.
+
+---
+
+## Active topics
+
+- **Inference-time training** — the $X \leftrightarrow W$ exchange. See the [2026-05-26 session](docs/matrix/2026-05-26-inference-time-training.md) for the starting point.
+
+---
+
+*Living document. Things here are speculative / WIP unless tagged otherwise.*
