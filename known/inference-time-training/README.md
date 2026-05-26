@@ -38,18 +38,21 @@ See [the main graph](../README.md#nearness-graph). Closest:
 - [t2l] **Text-to-LoRA** (ICML 2025) — task-description → LoRA.
 - [cartridges] **Cartridges** (Eyuboglu et al., 2025) — sleep-time CD via prefix-tuning.
 - [ttt-layers] **TTT Layers** (Sun, Li et al., 2024) — modern revival of TTT as architectural primitive.
+- [ttt-2020] **Test-Time Training** (Sun et al., ICML 2020) — original TTT formulation.
+- [tent] **Tent** (Wang et al., ICLR 2021) — entropy-minimization variant.
+- [memo] **MEMO** (Zhang, Levine, Finn, NeurIPS 2022).
 - [sparse-mem] **Sparse Memory Finetuning** (Lin et al., 2025) — minimal-disruption TTT.
 - [genadapter] **Generative Adapter** (Chen et al., ICLR 2025) — D2L's closest peer using NTP loss.
-- Sun et al. (ICML 2020) **Test-Time Training** — the original TTT formulation.
-- Wang, D. et al. (ICLR 2021) **Tent** — test-time entropy minimization.
+- [hypertune] **HyperTuning** (Phang et al., ICML 2023) — hypernet adaptation without backprop.
 - Wang, Y., Ma, D., Cai, D. (COLM 2024) **Inference-Time Training Helps Long Text Generation**.
 
 ## Open questions / live debates
 
 - **Where on the X-W trade-off curve does each task sit?** Some problems are X-bounded (more compute helps); others are W-bounded (need to change the model). No clean characterization yet — see [`known/inference-time-compute`](../inference-time-compute/) for the X-side parallel.
-- **Stability** — repeated inference-time updates risk catastrophic forgetting. AlphaEdit and Sparse Memory Finetuning are partial answers; none scale to thousands of updates yet.
+- **Stability** — repeated inference-time updates risk catastrophic forgetting. [alphaedit] and [sparse-mem] are partial answers; none scale to thousands of updates yet.
 - **Privacy** — per-request weight updates in a multi-tenant serving environment can leak between users if not carefully scoped. Unresolved.
-- **Theoretical equivalence** — when does TTT = implicit Bayesian inference = ICL with appropriate priors? (See Xie et al., 2022.)
+- **Theoretical equivalence** — when does TTT = implicit Bayesian inference = ICL with appropriate priors? See [icl-bayes] (Xie et al., 2022).
+- **Memory-in-weights vs memory-in-prompt** — the cluster around [memgpt] / [voyager] / [a-mem] keeps memory in the prompt-side. When is moving it into weights (plan 08) actually better?
 
 ## In this repo
 

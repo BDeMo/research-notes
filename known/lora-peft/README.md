@@ -32,16 +32,19 @@
 
 ## Foundational references
 
-- [lora] Hu, E. J., Shen, Y., Wallis, P. et al. (ICLR 2022). **LoRA: Low-Rank Adaptation.** The original.
-- Dettmers, T., Pagnoni, A., Holtzman, A., Zettlemoyer, L. (NeurIPS 2023). **QLoRA.**
-- Liu, S. et al. (2024). **DoRA: Weight-Decomposed Low-Rank Adaptation.**
+(IDs reference [`docs/matrix/knowledge-sources.md`](../../docs/matrix/knowledge-sources.md).)
+
+- [lora] **LoRA** (Hu et al., ICLR 2022) — the original.
+- Dettmers, T. et al. (NeurIPS 2023). **QLoRA.**
+- Liu, S. et al. (2024). **DoRA.**
 - Li, X. L., Liang, P. (ACL 2021). **Prefix-Tuning.**
 - Pfeiffer, J. et al. (EACL 2021). **AdapterFusion.**
 - Houlsby, N. et al. (ICML 2019). **Parameter-Efficient Transfer Learning (Adapter).**
-- Huang, C. et al. (2023). **LoRAHub.** [arXiv:2307.13269](https://arxiv.org/abs/2307.13269)
-- Wu, X. et al. (2024). **MoLE: Mixture of LoRA Experts.**
-- [s-lora] Sheng, Y. et al. (MLSys 2024). **S-LoRA.**
-- Chen, L. et al. (2023). **Punica.**
+- [lorahub] **LoRAHub** (Huang et al., 2023) — dynamic LoRA composition at train time.
+- [mole] **MoLE** (Wu et al., 2024) — Mixture of LoRA Experts at inference.
+- [s-lora] **S-LoRA** (Sheng et al., MLSys 2024) — serving thousands of LoRAs concurrently.
+- [punica] **Punica** (Chen et al., 2023) — multi-tenant LoRA serving (companion to S-LoRA).
+- [lots-of-loras] **Lots-of-LoRAs** (HuggingFace dataset) — ~479 task-specific LoRAs ready to use.
 
 ## Open questions / live debates
 

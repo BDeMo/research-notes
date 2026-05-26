@@ -31,17 +31,19 @@
 
 ## Foundational references
 
+(IDs reference [`docs/matrix/knowledge-sources.md`](../../docs/matrix/knowledge-sources.md).)
+
+- [ha-2016] **HyperNetworks** (Ha, Dai, Le, 2016) — the original.
 - [d2l] **Doc-to-LoRA** (Sakana AI, 2026) — context → LoRA.
 - [t2l] **Text-to-LoRA** (ICML 2025) — task-description → LoRA.
-- Ha, D., Dai, A., Le, Q. (2016). **HyperNetworks.** [arXiv:1609.09106](https://arxiv.org/abs/1609.09106). The original.
 - [genadapter] **Generative Adapter** (Chen et al., ICLR 2025) — context → LoRA with NTP loss; closest peer to D2L.
-- Phang, J., Mao, Y., He, P., Chen, W. (ICML 2023). **HyperTuning** — task-conditioned hypernet without backprop at test time.
-- Ivison, H. et al. (ACL 2023). **HINT: Hypernetwork instruction tuning.**
-- Lv, C. et al. (ACL Findings 2024). **HyperLoRA.**
-- Mitchell, E. et al. (ICLR 2022). **MEND** — hypernet for *model editing*.
-- Li, Y. et al. (ICLR 2024). **MEND (demo distillation)** — separate paper, same family, compresses few-shot examples.
-- Mu, J., Li, X., Goodman, N. (NeurIPS 2024). **Gisting** — learn to compress prompts into gist tokens via a hypernet-like mechanism.
-- von Oswald, J. et al. (ICLR 2020). **Continual learning with hypernetworks.**
+- [hypertune] **HyperTuning** (Phang et al., ICML 2023) — task-conditioned hypernet without test-time backprop.
+- [hint] **HINT** (Ivison et al., ACL 2023) — hypernet for instruction tuning.
+- [hyperlora] **HyperLoRA** (Lv et al., ACL Findings 2024) — cross-task LoRA generation.
+- [mend-edit] **MEND** (Mitchell et al., ICLR 2022) — hypernet for *model editing*.
+- [mend-demo] **MEND for demo distillation** (Li et al., ICLR 2024) — same family, compresses few-shot examples.
+- [gisting] **Gisting** (Mu, Li, Goodman, NeurIPS 2024) — learns to compress prompts into gist tokens.
+- [von-oswald-2020] **Continual learning with hypernetworks** (von Oswald et al., ICLR 2020).
 - Zhao, D., Kobayashi, S., Sacramento, J., von Oswald, J. (2020). **Meta-learning via hypernetworks.**
 
 ## Open questions / live debates

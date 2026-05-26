@@ -111,6 +111,23 @@ Initial audit at this point:
 - T1 total: ideas 154 + plans 86 + known 141 ≈ **381 lines**.
 - **Combined ≈ 1034 lines ≈ 13K tokens** — within the 1200-line budget. Every individual file under its hard cap. No pruning needed yet.
 
+### Knowledge-base consolidation (plans 01, 03, 08 → known/)
+
+After the three plans were drafted, their `references.md` files had accumulated dozens of citations that lived only inside plan folders. Per the "one source of truth" rule in [`docs/maintenance.md`](../maintenance.md), promoted the most cross-cutting ones into [`knowledge-sources.md`](knowledge-sources.md) with stable `[id]`s, and rewired the affected `known/<cat>/` READMEs to cite by `[id]` instead of duplicating bibliographic data.
+
+- **New IDs added to `knowledge-sources.md`** (now 377 lines, T2): `ttt-2020`, `tent`, `memo`, `von-oswald-2020`, `ha-2016`, `hypertune`, `mend-demo`, `gisting`, `self-cons`, `bon-prm`, `tot`, `restmcts`, `alphacode`, `math-shep`, `self-refine`, `reflexion`, `vstar`, `restem`, `self-reward`, `dpo`, `deita`, `less`, `calib`, `rome`, `memit`, `grace`, `icl-bayes`, `memgpt`, `voyager`, `a-mem`, `lamp`, `perltqa`, `punica`, `lorahub`, `mole`, `lots-of-loras`. Each entry has type / link / why-it-matters in our voice / tags.
+- **New `known/` category**: [`self-improvement/`](../../known/self-improvement/) — STaR family / Self-Refine / Reflexion / DPO / Self-Rewarding. Bridges X-axis sampling and W-axis updates. Genuine cluster not covered by existing categories. Updated `known/README.md` Mermaid graph and adjacency list to add 5 new edges (ITT–SI, CD–SI, ITC–SI, ME–SI; plus SI's own row).
+- **Rewired existing categories** to cite by `[id]`:
+  - `known/model-editing/` ← `[rome] [memit] [mend-edit] [alphaedit] [grace]`
+  - `known/hypernetworks/` ← `[ha-2016] [hypertune] [hint] [hyperlora] [mend-demo] [gisting] [von-oswald-2020]`
+  - `known/test-time-training/` ← `[ttt-2020] [tent] [memo] [ttt-layers]`
+  - `known/inference-time-compute/` ← `[self-cons] [bon-prm] [tot] [restmcts] [alphacode] [math-shep]`
+  - `known/lora-peft/` ← `[lorahub] [mole] [s-lora] [punica] [lots-of-loras]`
+  - `known/inference-time-training/` ← `[ttt-2020] [tent] [memo] [hypertune] [icl-bayes] [memgpt] [voyager] [a-mem]`
+  - `known/context-distillation/` ← `[gisting]` + tightened citations
+
+Result: each citation now lives once in `knowledge-sources.md`. The `known/<cat>/` READMEs reference by `[id]` only. Plan `references.md` files are unchanged (they're T2 detail; redundancy at the leaf is acceptable). No T0/T1 file moved over its hard cap.
+
 ## Next steps
 
 In priority order:

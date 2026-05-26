@@ -29,13 +29,15 @@
 
 ## Foundational references
 
-- Meng, K. et al. (NeurIPS 2022). **Locating and Editing Factual Associations in GPT (ROME).**
-- Meng, K. et al. (2023). **Mass-Editing Memory in a Transformer (MEMIT).**
-- Mitchell, E., Lin, C., Bosselut, A., Finn, C., Manning, C. (ICLR 2022). **Fast Model Editing at Scale (MEND).**
-- [alphaedit] Fang, J. et al. (ICLR 2025). **AlphaEdit: Null-space Constrained Editing.**
+(IDs reference [`docs/matrix/knowledge-sources.md`](../../docs/matrix/knowledge-sources.md).)
+
+- [rome] **ROME** (Meng et al., NeurIPS 2022) — locate-then-edit.
+- [memit] **MEMIT** (Meng et al., 2023) — mass-editing many facts at once.
+- [mend-edit] **MEND** (Mitchell et al., ICLR 2022) — hypernet that learns to edit.
+- [alphaedit] **AlphaEdit** (Fang et al., ICLR 2025) — null-space constrained editing.
+- [grace] **GRACE** (Hartvigsen et al., NeurIPS 2023) — continual editing via adaptive codebook.
 - Yao, Y. et al. (2023). **Editing Large Language Models: Problems, Methods, and Opportunities.** Survey.
 - Wang, S. et al. (2024). **Knowledge editing for LLMs.** Newer survey.
-- Hartvigsen, T. et al. (NeurIPS 2023). **GRACE: Continual editing via adaptive codebook.**
 
 ## Open questions / live debates
 
@@ -46,4 +48,5 @@
 
 ## In this repo
 
-- Plan 08 ([`notes/plans/08-model-outputs-delta-w/`](../../notes/plans/08-model-outputs-delta-w/)) inherits the *stability* problem from editing — solving it likely requires an AlphaEdit-style constraint on the emitted $\Delta W$.
+- **Plan 08** ([`notes/plans/08-model-outputs-delta-w/`](../../notes/plans/08-model-outputs-delta-w/)) inherits the *stability* problem from editing — solving it likely requires an [alphaedit]-style constraint on the emitted $\Delta W$. [memit]'s many-edits regime is the deployment scenario.
+- **Plan 03** ([`notes/plans/03-w-space-best-of-n/`](../../notes/plans/03-w-space-best-of-n/)) borrows the *locality* discipline: each per-request LoRA in WBoN must not corrupt base behavior across requests.

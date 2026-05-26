@@ -30,16 +30,19 @@
 
 ## Foundational references
 
-- Askell, A. et al. (2021). **A general language assistant as a laboratory for alignment.** [arXiv:2112.00861](https://arxiv.org/abs/2112.00861) — early use of CD for alignment internalization.
-- Snell, C. V., Klein, D., Zhong, R. (2023). **Learning by distilling context.** Conceptual framing.
+(IDs reference [`docs/matrix/knowledge-sources.md`](../../docs/matrix/knowledge-sources.md).)
+
+- Askell, A. et al. (2021). **A general language assistant as a laboratory for alignment.** — early use of CD for alignment internalization.
+- Snell, C. V., Klein, D., Zhong, R. (2023). **Learning by distilling context.**
 - Padmanabhan, S., Onoe, Y. et al. (NeurIPS 2023). **Propagating knowledge updates to LMs through distillation.**
 - Choi, E. et al. (ACL Findings 2023). **Fixed input parameterization for efficient prompting.**
 - Bhargava, A. et al. (2024). **Prompt baking.**
-- [cartridges] Eyuboglu, S. et al. (2025). **Cartridges.** [arXiv:2506.06266](https://arxiv.org/abs/2506.06266).
+- [cartridges] **Cartridges** (Eyuboglu et al., 2025) — sleep-time CD via prefix-tuning.
 - Caccia, L. et al. (COLM 2025). **Plug-and-play knowledge modules with deep context distillation.**
 - Kujanpää, K. et al. (TMLR 2025). **Efficient knowledge injection in LLMs via self-distillation.**
-- [d2l] **Doc-to-LoRA** (Sakana AI, 2026).
-- [genadapter] **Generative Adapter** (ICLR 2025).
+- [d2l] **Doc-to-LoRA** (Sakana AI, 2026) — amortized CD via hypernet.
+- [genadapter] **Generative Adapter** (Chen et al., ICLR 2025) — NTP-loss CD variant.
+- [gisting] **Gisting** (Mu, Li, Goodman, NeurIPS 2024) — prefix-side compression of context.
 - Qi, S. et al. (ICLR 2025). **In-context editing: Learning knowledge from self-induced distributions.**
 - Shin, H. et al. (NAACL 2025). **Generative prompt internalization.**
 

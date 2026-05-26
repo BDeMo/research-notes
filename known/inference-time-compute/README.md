@@ -31,17 +31,18 @@
 
 ## Foundational references
 
-- OpenAI (2024). **Introducing o1.** Defined the "long CoT" inference-time-compute regime.
-- [r1] DeepSeek-AI (2025). **DeepSeek-R1.** [arXiv:2501.12948](https://arxiv.org/abs/2501.12948). Open-weights RL-on-reasoning replication.
-- [scaling-tt] Snell, C., Lee, J., Xu, K., Kumar, A. (2024). **Scaling LLM Test-Time Compute Optimally.** [arXiv:2408.03314](https://arxiv.org/abs/2408.03314). The canonical scaling-law paper for this axis.
-- Wang, X., Wei, J. et al. (2022). **Self-Consistency.** [arXiv:2203.11171](https://arxiv.org/abs/2203.11171).
-- Lightman, H. et al. (2023). **Let's Verify Step by Step (PRM800k).** [arXiv:2305.20050](https://arxiv.org/abs/2305.20050).
-- Yao, S. et al. (2023). **Tree of Thoughts.** [arXiv:2305.10601](https://arxiv.org/abs/2305.10601).
-- Chen, Z. et al. (2024). **ReST-MCTS\*.**
-- Zelikman, E. et al. (NeurIPS 2022). **STaR: Bootstrapping Reasoning with Reasoning.**
-- Singh, A. et al. (2023). **ReST^EM.**
-- Madaan, A. et al. (NeurIPS 2023). **Self-Refine.**
-- Shinn, N. et al. (NeurIPS 2023). **Reflexion.**
+(IDs reference [`docs/matrix/knowledge-sources.md`](../../docs/matrix/knowledge-sources.md).)
+
+- [o1] OpenAI (2024). **Introducing o1.**
+- [r1] **DeepSeek-R1** (DeepSeek-AI, 2025) — open-weights RL-on-reasoning replication.
+- [scaling-tt] **Scaling LLM Test-Time Compute Optimally** (Snell et al., 2024) — canonical scaling-law paper for this axis.
+- [self-cons] **Self-Consistency** (Wang, Wei et al., 2022) — the original X-axis BoN.
+- [bon-prm] **Let's Verify Step by Step** (Lightman et al., 2023) — PRM-based BoN.
+- [tot] **Tree of Thoughts** (Yao et al., 2023).
+- [restmcts] **ReST-MCTS\*** (Chen et al., 2024).
+- [alphacode] **AlphaCode** (Li et al., 2022) — massive sampling + filtering.
+- [math-shep] **Math-Shepherd** (Wang et al., 2024) — PRM without human step labels.
+- Self-improvement loops as X-axis methods: see [`../self-improvement/`](../self-improvement/) — [star], [restem], [self-refine], [reflexion].
 
 ## Open questions / live debates
 

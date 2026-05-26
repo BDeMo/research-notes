@@ -24,6 +24,7 @@ A reference can live in both: it appears in `knowledge-sources.md` once with a s
 | [`lora-peft/`](lora-peft/) | Parameter-efficient adaptation via low-rank or small-prefix weight deltas. |
 | [`inference-time-compute/`](inference-time-compute/) | Scaling test-time *compute* along the X-axis (CoT, sampling, search). Sibling to inference-time-training (W-axis). |
 | [`long-context/`](long-context/) | Architectures, benchmarks, and limits of using long input sequences directly. |
+| [`self-improvement/`](self-improvement/) | Loops where the model generates its own training signal (STaR family, Self-Refine, Reflexion, DPO, Self-Rewarding). Bridges X-axis sampling and W-axis updates. |
 
 ---
 
@@ -41,11 +42,13 @@ graph LR
     LP[lora-peft]
     ITC[inference-time-compute]
     LC[long-context]
+    SI[self-improvement]
 
     ITT --- HN
     ITT --- CD
     ITT --- TTT
     ITT --- ITC
+    ITT --- SI
 
     HN --- CD
     HN --- ME
@@ -53,12 +56,15 @@ graph LR
 
     CD --- LC
     CD --- LP
+    CD --- SI
 
     TTT --- ME
 
     ME --- LP
+    ME --- SI
 
     ITC --- LC
+    ITC --- SI
 ```
 
 ### Per-category nearest neighbors (adjacency list)
@@ -67,14 +73,15 @@ The first few entries per category are the primary neighbors; ordering is rough 
 
 | Category | Nearest |
 |---|---|
-| `inference-time-training` | `hypernetworks` · `context-distillation` · `test-time-training` · `inference-time-compute` |
+| `inference-time-training` | `hypernetworks` · `context-distillation` · `test-time-training` · `inference-time-compute` · `self-improvement` |
 | `hypernetworks` | `inference-time-training` · `context-distillation` · `lora-peft` · `model-editing` |
-| `context-distillation` | `inference-time-training` · `hypernetworks` · `long-context` · `lora-peft` |
+| `context-distillation` | `inference-time-training` · `hypernetworks` · `long-context` · `lora-peft` · `self-improvement` |
 | `test-time-training` | `inference-time-training` · `model-editing` |
-| `model-editing` | `hypernetworks` · `lora-peft` · `test-time-training` |
+| `model-editing` | `hypernetworks` · `lora-peft` · `test-time-training` · `self-improvement` |
 | `lora-peft` | `hypernetworks` · `model-editing` · `context-distillation` |
-| `inference-time-compute` | `inference-time-training` · `long-context` |
+| `inference-time-compute` | `inference-time-training` · `long-context` · `self-improvement` |
 | `long-context` | `context-distillation` · `inference-time-compute` |
+| `self-improvement` | `inference-time-compute` · `inference-time-training` · `model-editing` · `context-distillation` |
 
 ### How to read the graph
 

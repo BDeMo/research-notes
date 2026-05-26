@@ -28,10 +28,12 @@
 
 ## Foundational references
 
-- Sun, Y., Wang, X., Liu, Z., Miller, J., Efros, A., Hardt, M. (ICML 2020). **Test-Time Training with Self-Supervision for Generalization under Distribution Shifts.**
-- Wang, D., Shelhamer, E., Liu, S., Olshausen, B., Darrell, T. (ICLR 2021). **Tent: Fully Test-time Adaptation by Entropy Minimization.**
-- Zhang, M., Levine, S., Finn, C. (NeurIPS 2022). **MEMO: Test time robustness via adaptation and augmentation.**
-- [ttt-layers] Sun, Y., Li, X., Dalal, K., et al. (2024). **Learning to (Learn at Test Time): RNNs with Expressive Hidden States.** [arXiv:2407.04620](https://arxiv.org/abs/2407.04620).
+(IDs reference [`docs/matrix/knowledge-sources.md`](../../docs/matrix/knowledge-sources.md).)
+
+- [ttt-2020] **Test-Time Training** (Sun, Wang, Liu, Miller, Efros, Hardt, ICML 2020) — the original.
+- [tent] **Tent** (Wang, D. et al., ICLR 2021) — fully test-time adaptation by entropy minimization.
+- [memo] **MEMO** (Zhang, Levine, Finn, NeurIPS 2022) — marginal entropy on augmented copies.
+- [ttt-layers] **TTT Layers** (Sun, Li et al., 2024) — TTT as an architectural primitive.
 - Wang, Y., Ma, D., Cai, D. (COLM 2024). **With Greater Text Comes Greater Necessity: Inference-Time Training Helps Long Text Generation.**
 - Liang, J., Hu, D., Feng, J. (2023). **Test-time adaptation survey.**
 
