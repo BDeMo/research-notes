@@ -10,6 +10,11 @@ Maintained by [Mingjia Shi](https://bdemo.github.io/homepage/) (@BDeMo).
 
 ```
 research-notes/
+├── memory/                                          # standing instructions — READ FIRST
+│   ├── README.md
+│   ├── instructions.md                              # explicit user instructions
+│   ├── conventions.md                               # repo conventions
+│   └── context.md                                   # stable user / project context
 ├── docs/
 │   ├── workflow.md                                  # methodology & operating principles
 │   └── matrix/                                      # session log + knowledge mother nest
@@ -28,8 +33,8 @@ research-notes/
 
 ## Where to start
 
-- **New here?** Read [`docs/workflow.md`](docs/workflow.md). It explains how this notebook is supposed to work.
-- **Want to know what we've done?** Skim [`docs/matrix/`](docs/matrix/). The matrix is the long-term memory of this repo.
+- **New here?** Read [`memory/README.md`](memory/README.md) **first** — it lists the standing rules. Then [`docs/workflow.md`](docs/workflow.md) for the methodology.
+- **Want to know what we've done?** Skim [`docs/matrix/`](docs/matrix/). The matrix is the chronological log of this repo.
 - **Reading list?** See [`docs/matrix/knowledge-sources.md`](docs/matrix/knowledge-sources.md) — the "knowledge mother nest."
 - **What might we actually build?** See [`notes/plans/`](notes/plans/) for the 3 plans currently in draft.
 

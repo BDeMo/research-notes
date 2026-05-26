@@ -2,6 +2,8 @@
 
 > Methodology and operating principles for this notebook.
 > Distilled from how we actually work, not aspirational.
+>
+> **Before reading this file, read [`../memory/README.md`](../memory/README.md) first.** That folder holds the standing rules; this file holds the *how*.
 
 ---
 

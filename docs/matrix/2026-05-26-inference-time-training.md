@@ -41,6 +41,18 @@ Primary new sources:
 - AlphaEdit (Fang et al., 2025) — null-space constrained editing
 - Sparse memory finetuning (Lin et al., 2025)
 
+## Late addition: `memory/` folder convention
+
+After the plans were committed, the user added a standing rule:
+> "所有要你记住的、和本repo相关的东西，写到本repo，都维护在memory文件夹里面"
+
+This created `memory/{README,instructions,conventions,context}.md` as the new top-priority read for every session. The first three persistent rules were recorded in `memory/instructions.md`:
+1. Maintain a `memory/` folder for everything to remember.
+2. Plans must include validation, channels, and budget — concretely.
+3. Every session ends with a matrix entry + knowledge-sources update.
+
+Root README and `docs/workflow.md` updated to point at `memory/` as the first read.
+
 ## Next steps
 
 In priority order:
