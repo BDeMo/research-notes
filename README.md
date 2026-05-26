@@ -18,6 +18,7 @@ research-notes/
 │   └── context.md                                   # stable user / project context
 ├── docs/
 │   ├── workflow.md                                  # methodology & operating principles
+│   ├── maintenance.md                               # context-budget & pruning policy
 │   └── matrix/                                      # session log + knowledge mother nest
 │       ├── README.md
 │       ├── knowledge-sources.md                     # running index of papers / blogs / etc
@@ -47,11 +48,12 @@ research-notes/
 
 ## Where to start
 
-- **New here?** Read [`memory/README.md`](memory/README.md) **first** — it lists the standing rules. Then [`docs/workflow.md`](docs/workflow.md) for the methodology.
+- **New here?** Read [`memory/README.md`](memory/README.md) **first** — it lists the standing rules and the session-start read order. Then [`docs/workflow.md`](docs/workflow.md) for the methodology.
 - **Want to know what we've done?** Skim [`docs/matrix/`](docs/matrix/). The matrix is the chronological log of this repo.
 - **What do we *know* about a topic?** Start at [`known/README.md`](known/README.md) — categories + nearness graph.
 - **Reading list?** See [`docs/matrix/knowledge-sources.md`](docs/matrix/knowledge-sources.md) — the "knowledge mother nest" (chronological intake log).
 - **What might we actually build?** See [`notes/plans/`](notes/plans/) for the 3 plans currently in draft.
+- **How is this repo kept small enough to read?** See [`docs/maintenance.md`](docs/maintenance.md) — tier system, size caps, pruning, archive paths, hygiene checklist.
 
 ---
 

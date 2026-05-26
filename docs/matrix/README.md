@@ -64,3 +64,20 @@ Topics that span multiple sessions and are still alive:
 ## Archived threads
 
 (empty)
+
+---
+
+## Maintenance
+
+Full policy: [`../maintenance.md`](../maintenance.md). Local rules for the matrix:
+
+- **This file is T0** — read every session. Soft cap **80 lines**, hard cap **120 lines**.
+- **Latest session entry is T0** — read every session. Soft cap **200 lines**, hard cap **300 lines**.
+- **Older session entries are T2** — read only when researching past decisions.
+- **knowledge-sources.md is T2** — read only when looking up a citation by `[id]`.
+- **Stable IDs**: source IDs in `knowledge-sources.md` are forever. Never renumber.
+- **Aging policy**:
+  - After **30 days**, a session entry should be reviewed: drop "Next steps" if completed, keep "Activities / Decisions / Output".
+  - After **90 days**, eligible for compression: collapse "Activities" to one line, keep "Decisions" + "Output" full.
+  - After **12 months**, eligible for archive: `git mv` to `_archive/YYYY-MM/`; in the session index above, replace its row with a compact `archived 2027-MM-DD → [link]` line, or move under an "Archived sessions" collapsible block.
+- **Active threads** list: cap at **10 rows**. Anything inactive > 6 months moves to Archived threads.

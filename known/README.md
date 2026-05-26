@@ -84,7 +84,18 @@ The first few entries per category are the primary neighbors; ordering is rough 
 
 ---
 
-## How to maintain
+## Maintenance
+
+Full policy: [`docs/maintenance.md`](../docs/maintenance.md). Local rules for this knowledge base:
+
+- **This file is T1** — read every session. Soft cap **200 lines**, hard cap **300 lines**.
+- **Each `known/<cat>/README.md` is T2** — read on demand. Soft cap **120 lines**, hard cap **200 lines**. If a category's README exceeds the hard cap, **factor**: convert `<cat>.md`'s body into `<cat>/{concepts,references,debates}.md`, keep README as nav-only.
+- **One source of truth**:
+  - Citations live in [`../docs/matrix/knowledge-sources.md`](../docs/matrix/knowledge-sources.md) with stable `[id]`s. Category READMEs reference by `[id]`, *not* duplicate the bibliographic data.
+  - Containment (parent / sub-topic) lives inside each category README, *not* here.
+  - Nearness lives **only** here (graph + adjacency list).
+- **Dormant category**: if a category has not been touched in 12 months and has no inbound link from active work → `git mv known/<cat>/ known/_archive/<cat>/`; remove from the Categories table; drop its node from the graph; update neighbors' rows.
+- **New category** (full checklist below). Be conservative: only add a category when ≥ 3 distinct sources / concepts are accumulating that don't fit existing categories.
 
 ### Adding a new category
 

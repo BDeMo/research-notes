@@ -138,3 +138,17 @@ M: exp · proto · paper · thesis · prod · side  +  solo · collab · team ·
 - The **source** column on top of this file points to the brainstorm document with full motivation, equations, risks.
 - The **Plan** column links to the project plan folder if one has been drafted.
 - When promoting an idea to a plan: bump `S` to `D` (or higher), populate Plan link, and add a `φ` mark if it's part of a chain.
+
+---
+
+## Maintenance
+
+Full policy: [`docs/maintenance.md`](../../docs/maintenance.md). Local rules for this index:
+
+- **This file is T1** — read every session. Soft cap **200 lines**, hard cap **300 lines**.
+- **Add an idea**: pick an unused letter+number (e.g. `J1`); add one row; if `★≥★★` and you'd actually pursue it, link a plan placeholder.
+- **Promote to plan**: `S` → `D`, add `Plan` link, add `φ` if part of a chain.
+- **Dormancy**: any idea with `S = ?` for **> 12 months** is eligible for archive.
+- **Archive**: `git mv` the source file to `notes/ideas/_archive/<topic>.md`, replace the source-table row with `archived <date>`, drop the per-idea rows or move them under a collapsed "Archive" section. Log the move in today's matrix entry.
+- **Split**: if a single brainstorm source file > 500 lines, factor into a folder per §4 of `maintenance.md`.
+- **Symbol legend** stays terse — full definitions live in [`memory/symbols.md`](../../memory/symbols.md), not here.

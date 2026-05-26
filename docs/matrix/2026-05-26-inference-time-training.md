@@ -83,6 +83,34 @@ Created `known/` with 8 initial categories, all drawn from this session's topics
 
 `known/README.md` maintains the **nearness graph** (Mermaid + adjacency list). Each category's own `README.md` maintains **containment** (Contained-by / Contains), key concepts, and foundational references that cross-reference `[id]`s in `knowledge-sources.md`. The standing rule is recorded as the fifth instruction in `memory/instructions.md`.
 
+### Maintenance & context-budget plan
+
+User added the sixth standing rule:
+> "在关键的地方写好这套维护方法，为了避免累积造成context过大，我们必须做好这个知识库、idea库的管理文件以及方案"
+
+Created [`docs/maintenance.md`](../maintenance.md) as the central, authoritative policy with:
+- **Tier system** — T0 (`memory/*` + matrix README + latest matrix entry), T1 (the three TOC files), T2 (on-demand), T3 (archive). Combined T0+T1 budget ≤ ~1200 lines ≈ 15K tokens.
+- **Per-file size caps** (soft / hard) for every T0/T1 file.
+- **Pruning rules** — summarize-don't-delete; collapse 90-day-old matrix entries; archive dormant ideas (`S=?` >12 mo), killed plans (`S=K`), and unvisited `known/<cat>/`.
+- **Factoring rules** — when a single doc carries multiple sub-topics, split into a folder.
+- **End-of-session hygiene checklist** (8 items).
+- **Anti-bloat principles** — one source of truth, stable IDs, indexes over prose, defer specifics.
+- **Escalation** — when even pruning fails, spin a topic into its own repo.
+
+Wired local **§ Maintenance** sections into all T1 entry points so they're discoverable from where you'd actually add new content:
+- `notes/ideas/README.md`
+- `notes/plans/README.md`
+- `known/README.md`
+- `docs/matrix/README.md`
+- `memory/conventions.md`
+
+Updated `memory/README.md` read-order section to make the T0/T1 tier explicit. Added the maintenance rule as instruction #6.
+
+Initial audit at this point:
+- T0 total: `memory/*` 443 + matrix README 83 + this entry 127 ≈ **653 lines**.
+- T1 total: ideas 154 + plans 86 + known 141 ≈ **381 lines**.
+- **Combined ≈ 1034 lines ≈ 13K tokens** — within the 1200-line budget. Every individual file under its hard cap. No pruning needed yet.
+
 ## Next steps
 
 In priority order:

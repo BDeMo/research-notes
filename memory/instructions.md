@@ -51,6 +51,17 @@
 - Cross-reference: cite knowledge-sources `[id]`s from any `known/<cat>/` that contains them.
 - This is *complementary* to `docs/matrix/knowledge-sources.md`: that is the chronological intake log; `known/` is the curated paradigm-level reference.
 
+### 2026-05-26 · Maintenance plan to prevent context bloat
+**Source**: user instruction in 2026-05-26 session.
+**Verbatim**: "在关键的地方写好这套维护方法，为了避免累积造成context过大，我们必须做好这个知识库、idea库的管理文件以及方案"
+**Rule**: the repo must carry an explicit, written maintenance plan that bounds session-start context. The plan is centralized in [`docs/maintenance.md`](../docs/maintenance.md). Every key entry point (the four T1 TOC files and `memory/conventions.md`) carries a local `## Maintenance` section linking back.
+**How to apply**:
+- Treat `docs/maintenance.md` as authoritative for tier definitions, file size caps, pruning triggers, archive paths, and the per-session hygiene checklist.
+- T0 = `memory/*` + `docs/matrix/README.md` + latest matrix entry. T1 = the three TOC files. Combined budget ≤ ~1200 lines ≈ 15K tokens.
+- When *any* T0/T1 file approaches its hard cap, prune (summarize + archive) before doing new work.
+- Archive paths use `<original-parent>/_archive/...`. `git mv` only.
+- Run the [hygiene checklist](../docs/maintenance.md#5-hygiene-checklist-per-session) at end of every session.
+
 ---
 
 *If an instruction is later replaced, do NOT delete it. Add a `~~strikethrough~~ (superseded YYYY-MM-DD by …)` marker and the new entry below.*

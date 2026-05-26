@@ -104,6 +104,19 @@ The canonical brainstorm doc (e.g., `notes/<topic>-ideas.md`) has these sections
 - Author writes/thinks in Chinese; English in code, headings, file names, and technical writing.
 - Markdown content can be either language but should be consistent within a file.
 
+## Maintenance & context-budget
+
+The repo accumulates content across sessions. Without active maintenance, session-start reads exceed any LLM context window. Full policy lives in [`../docs/maintenance.md`](../docs/maintenance.md). Summary of the rules that bind us:
+
+- **Tiered reading**: T0 (`memory/*` + matrix README + latest matrix entry) + T1 (the three TOC files: `notes/ideas/README.md`, `notes/plans/README.md`, `known/README.md`) is what gets read every session. **Combined budget ≤ 1200 lines ≈ 15K tokens.** Everything else is T2 (on demand) or T3 (archive).
+- **Per-file caps** (soft / hard, in lines): see [`maintenance.md §1–§2`](../docs/maintenance.md). If a T0/T1 file is over its hard cap, prune before the next session.
+- **Pruning over deletion**: replace verbose content with TL;DR + link to archived original. Never lose information; lose only volume.
+- **Archive paths**: `<original-parent>/_archive/...` (underscore prefix sorts archive to top, marks it as system).
+- **Stable IDs**: source `[id]`s, idea letter codes, plan `NN` numbers are forever. Rename via `git mv` only.
+- **End-of-session hygiene checklist**: see [`maintenance.md §5`](../docs/maintenance.md). If 2+ items unchecked, do housekeeping before closing.
+
+Every T1 file (the three TOC indexes + `docs/matrix/README.md`) carries its **own short Maintenance section** with its local size cap and local rules. Those sections link back to `maintenance.md`.
+
 ## When to deviate
 
 - Deviations from this file are allowed for one-off cases. **Do not change conventions silently.** Update this file with a dated note explaining the change.

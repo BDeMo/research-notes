@@ -70,3 +70,17 @@ NN-<slug>/
 Numbering matches the parent idea ID in [`../ideas/README.md`](../ideas/README.md). Two-digit padded.
 
 When a plan is killed, add `postmortem.md` to the folder and set `S = K` in the table above. Do not delete.
+
+---
+
+## Maintenance
+
+Full policy: [`docs/maintenance.md`](../../docs/maintenance.md). Local rules for this index:
+
+- **This file is T1** — read every session. Soft cap **100 lines**, hard cap **150 lines**.
+- **Plan files (`NN-<slug>/*.md`) are T2** — read only when working on that plan. No per-file cap; budget lives in the parent idea + workflow template.
+- **Add a plan**: pick `NN` matching the parent idea's promotion order; create folder from template; add row + meta block; bump parent idea's `S` to `D` and add Plan link.
+- **Phase relations**: when a sequel emerges, mark its idea with `←#NN` or `↪#NN` in [`../ideas/README.md`](../ideas/README.md) — do *not* duplicate the sequel content here. Only list "Sequels in queue" with idea IDs.
+- **Kill a plan**: add `postmortem.md`, set `S = K`, keep the folder; if the meta block grows verbose, condense it to one line "killed YYYY-MM-DD — see postmortem".
+- **Archive a killed plan**: only if the row + meta block contribute > 20 lines of stale content. `git mv NN-<slug>/ _archive/NN-<slug>/`, replace row with `archived YYYY-MM-DD → _archive/NN-<slug>/`.
+- **Meta-block size**: each per-plan meta block ≤ 10 lines. If a plan needs more, that content belongs in the plan's own `README.md`, not here.
