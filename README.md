@@ -22,8 +22,11 @@ research-notes/
 │       ├── knowledge-sources.md                     # running index of papers / blogs / etc
 │       └── YYYY-MM-DD-<topic>.md                    # one entry per working session
 └── notes/
-    ├── inference-time-training-ideas.md             # 50-idea brainstorm (X-W framing)
+    ├── ideas/                                       # idea catalog
+    │   ├── README.md                                # index (TOC with meta per idea)
+    │   └── inference-time-training.md               # 50-idea brainstorm (X-W framing)
     └── plans/                                       # detailed project plans
+        ├── README.md                                # index (TOC with meta per plan)
         ├── 01-x-saturation-curve/                   # data curation by inference-time difficulty
         ├── 03-w-space-best-of-n/                    # test-time search along the weights axis
         └── 08-model-outputs-delta-w/                # self-modifying LLMs

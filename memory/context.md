@@ -43,7 +43,8 @@
 
 ### Inference-time training (started 2026-05-26)
 - Central framing: $y = f(X; W)$, exhaust $X$, then look for best $W$.
-- Three plans drafted:
+- Brainstorm: 50 ideas, cataloged at [`notes/ideas/README.md`](../notes/ideas/README.md), full content at [`notes/ideas/inference-time-training.md`](../notes/ideas/inference-time-training.md).
+- Three plans drafted (catalog at [`notes/plans/README.md`](../notes/plans/README.md)):
   - **Plan 01** (`notes/plans/01-x-saturation-curve/`) — X-saturation curve curriculum. ~$6.5K. Drafting.
   - **Plan 03** (`notes/plans/03-w-space-best-of-n/`) — test-time search on weights axis. ~$4.8K. Drafting.
   - **Plan 08** (`notes/plans/08-model-outputs-delta-w/`) — self-modifying LLMs. ~$24K, PhD-scale. Drafting.

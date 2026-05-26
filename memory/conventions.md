@@ -13,16 +13,31 @@ research-notes/
 │   ├── workflow.md
 │   └── matrix/    # session log + knowledge-sources.md
 └── notes/
-    ├── <topic>-ideas.md       # brainstorm dumps
-    └── plans/<NN>-<slug>/     # detailed project plans
+    ├── ideas/                  # idea catalog
+    │   ├── README.md           # TOC with meta per idea (the directory file)
+    │   └── <topic>.md          # full brainstorm per topic
+    └── plans/                  # detailed project plans
+        ├── README.md           # TOC with meta per plan (the directory file)
+        └── <NN>-<slug>/        # one folder per plan
 ```
+
+The two folders `ideas/` and `plans/` mirror each other: both have a `README.md` acting as the directory/TOC, then one file (or sub-folder) per item.
 
 ## Naming
 
 - **Plan folders**: `NN-<slug>/` where `NN` is a zero-padded 2-digit index that **matches the brainstorm idea ID** (e.g., plan `01` = idea `I1`; plan `08` = idea `H6`).
+- **Idea brainstorm files**: `notes/ideas/<topic-slug>.md`, one file per major topic.
 - **Session entries**: `docs/matrix/YYYY-MM-DD-<topic-slug>.md`.
 - **Topic slugs**: lowercase, hyphenated, no spaces. e.g., `inference-time-training`, not `Inference Time Training`.
 - **Idea IDs in brainstorms**: `<LetterCategory><Number>`, e.g., `A1`, `I3`, `H6`. Categories: A supervision · B parameterization · C trigger · D search · E applications · F systems · G theory · H wild · I framing-derived. Use consistent letters across topics where possible.
+
+## Directory/TOC files (`README.md` in `notes/ideas/` and `notes/plans/`)
+
+Each of these acts as a *directory* of items. Required content:
+- A short header explaining what's in the folder.
+- One row per item with: ID, title, priority (★), status, link to detailed file (or plan folder), and a one-line meta description.
+- For plans: also a per-plan meta block with one-liner / validation hypothesis / primary channels / budget tier / kill criterion.
+- Statuses: `idea` · `drafted` · `running` · `shipped` · `killed`.
 
 ## Plan folder template
 

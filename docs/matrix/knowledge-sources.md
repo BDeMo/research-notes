@@ -21,7 +21,7 @@ Format:
 - **Type**: paper
 - **Link**: https://arxiv.org/abs/2602.15902 · [code](https://github.com/SakanaAI/doc-to-lora) · [project](https://pub.sakana.ai/doc-to-lora/)
 - **Why it matters**: Direct proof that a hypernetwork can produce a useful LoRA from a document in <1s. Establishes the "amortize the slow update into a forward pass" pattern. Sets a baseline + limitations (interference, add-only, perf gap) that several of our ideas attack.
-- **Used in**: `notes/inference-time-training-ideas.md`, plan 08, plan 01 (motivation)
+- **Used in**: `notes/ideas/inference-time-training.md`, plan 08, plan 01 (motivation)
 - **Tags**: #inference-time-training #hypernetwork #context-distillation #lora
 
 ### [t2l] Text-to-LoRA: Instant Transformer Adaption — Charakorn et al., ICML 2025
