@@ -39,6 +39,18 @@
 - The TOCs in `notes/ideas/README.md` and `notes/plans/README.md` are the single source of truth for these symbols.
 - Do not invent new codes silently; if a new axis or code is needed, update `memory/symbols.md` first.
 
+### 2026-05-26 · Maintain `known/` public knowledge base
+**Source**: user instruction in 2026-05-26 session.
+**Verbatim**: "维护一个公共知识库，作为一个文件夹，known，其需要按类别分类进不同的知识库，名字就是类别本身。然后里面要维护包含关系，以及最相近的知识库。维护这个"相近"关系的是known本身的目录"
+**Rule**: a `known/` folder at the repo root contains one subfolder per category (folder name = category name).
+- Each category's `README.md` maintains **containment** relations (Contained-by / Contains).
+- The top-level `known/README.md` maintains the **nearness** relations across categories (Mermaid graph + adjacency list).
+**How to apply**:
+- When a new topic is touched in any session, decide whether it fits an existing category or warrants a new one.
+- New category → create `known/<slug>/README.md` from the template, then update `known/README.md` (categories table + graph + adjacency list).
+- Cross-reference: cite knowledge-sources `[id]`s from any `known/<cat>/` that contains them.
+- This is *complementary* to `docs/matrix/knowledge-sources.md`: that is the chronological intake log; `known/` is the curated paradigm-level reference.
+
 ---
 
 *If an instruction is later replaced, do NOT delete it. Add a `~~strikethrough~~ (superseded YYYY-MM-DD by …)` marker and the new entry below.*

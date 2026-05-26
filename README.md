@@ -14,6 +14,7 @@ research-notes/
 │   ├── README.md
 │   ├── instructions.md                              # explicit user instructions
 │   ├── conventions.md                               # repo conventions
+│   ├── symbols.md                                   # notation for status/priority/phase/mode
 │   └── context.md                                   # stable user / project context
 ├── docs/
 │   ├── workflow.md                                  # methodology & operating principles
@@ -21,6 +22,16 @@ research-notes/
 │       ├── README.md
 │       ├── knowledge-sources.md                     # running index of papers / blogs / etc
 │       └── YYYY-MM-DD-<topic>.md                    # one entry per working session
+├── known/                                           # public knowledge base by category
+│   ├── README.md                                    # nearness graph + categories
+│   ├── inference-time-training/
+│   ├── hypernetworks/
+│   ├── context-distillation/
+│   ├── test-time-training/
+│   ├── model-editing/
+│   ├── lora-peft/
+│   ├── inference-time-compute/
+│   └── long-context/
 └── notes/
     ├── ideas/                                       # idea catalog
     │   ├── README.md                                # index (TOC with meta per idea)
@@ -38,7 +49,8 @@ research-notes/
 
 - **New here?** Read [`memory/README.md`](memory/README.md) **first** — it lists the standing rules. Then [`docs/workflow.md`](docs/workflow.md) for the methodology.
 - **Want to know what we've done?** Skim [`docs/matrix/`](docs/matrix/). The matrix is the chronological log of this repo.
-- **Reading list?** See [`docs/matrix/knowledge-sources.md`](docs/matrix/knowledge-sources.md) — the "knowledge mother nest."
+- **What do we *know* about a topic?** Start at [`known/README.md`](known/README.md) — categories + nearness graph.
+- **Reading list?** See [`docs/matrix/knowledge-sources.md`](docs/matrix/knowledge-sources.md) — the "knowledge mother nest" (chronological intake log).
 - **What might we actually build?** See [`notes/plans/`](notes/plans/) for the 3 plans currently in draft.
 
 ---

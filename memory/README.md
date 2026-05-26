@@ -12,6 +12,7 @@ Anything the user has explicitly asked to be remembered, *and* anything that sho
 In contrast:
 - [`docs/workflow.md`](../docs/workflow.md) = methodology (*how* we work).
 - [`docs/matrix/`](../docs/matrix/) = history (*what* we did, chronologically).
+- [`known/`](../known/) = curated knowledge by category (*what we know about a topic*).
 - [`memory/`](.) = standing rules (*what to remember*, durably).
 
 If a session needs a rule that should apply to all future sessions, it goes here.

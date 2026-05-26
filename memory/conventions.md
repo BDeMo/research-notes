@@ -12,6 +12,10 @@ research-notes/
 ├── docs/
 │   ├── workflow.md
 │   └── matrix/    # session log + knowledge-sources.md
+├── known/         # public knowledge base by category
+│   ├── README.md  # nearness graph between categories
+│   └── <cat>/     # one folder per category
+│       └── README.md  # definition + containment + key concepts + refs
 └── notes/
     ├── ideas/                  # idea catalog
     │   ├── README.md           # TOC with meta per idea (the directory file)
@@ -21,7 +25,8 @@ research-notes/
         └── <NN>-<slug>/        # one folder per plan
 ```
 
-The two folders `ideas/` and `plans/` mirror each other: both have a `README.md` acting as the directory/TOC, then one file (or sub-folder) per item.
+`ideas/` and `plans/` mirror each other: both have a `README.md` acting as the directory/TOC.
+`known/` mirrors this on the *knowledge* side: top-level `README.md` is the directory + nearness graph; each subfolder is one category.
 
 ## Naming
 
@@ -40,6 +45,15 @@ Each of these acts as a *directory* of items. Required content:
 - For plans: also a per-plan meta block with one-liner / validation hypothesis / primary channels / budget tier / kill criterion / sequels-in-queue.
 
 All status / priority / phase / mode tokens are defined in [`memory/symbols.md`](symbols.md). Do not invent new codes silently.
+
+## Public knowledge base (`known/`)
+
+`known/` is the **curated, paradigm-level** knowledge organized by topic. Distinct from `docs/matrix/knowledge-sources.md` which is the *chronological intake log*.
+
+- `known/README.md` maintains the **nearness graph** between categories (which categories are conceptually close), as both a Mermaid graph and a per-category adjacency list.
+- Each `known/<category>/README.md` is a category-specific knowledge entry containing: definition · **Contained by** (parents) · **Contains** (sub-topics) · key concepts · foundational references · open questions.
+- A reference (paper/blog/etc) is logged in `knowledge-sources.md` once with a stable `[id]`. Any number of `known/<cat>/README.md` files may then cite that `[id]`.
+- Adding a category requires updating both the new folder's README *and* the top-level `known/README.md` (categories table + Mermaid graph + adjacency list + reciprocal entries in any affected neighbor's README).
 
 ## Plan folder template
 

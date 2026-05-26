@@ -69,6 +69,20 @@ User asked for a notation set to record validation progress, project progress, p
 
 Applied across both `notes/ideas/README.md` (all 50 idea rows) and `notes/plans/README.md` (3 plan rows + per-plan meta blocks). Linked sequels-in-queue from each plan.
 
+### Public knowledge base `known/` initialized
+
+User added the structural rule:
+> "维护一个公共知识库，作为一个文件夹，known，其需要按类别分类进不同的知识库… 然后里面要维护包含关系，以及最相近的知识库。维护这个'相近'关系的是known本身的目录"
+
+Created `known/` with 8 initial categories, all drawn from this session's topics:
+- `inference-time-training/` (central)
+- `hypernetworks/` · `context-distillation/` · `test-time-training/` (close cluster around the central topic)
+- `lora-peft/` · `model-editing/` (W-axis machinery)
+- `inference-time-compute/` (the X-axis sibling)
+- `long-context/` (the problem the W-axis addresses)
+
+`known/README.md` maintains the **nearness graph** (Mermaid + adjacency list). Each category's own `README.md` maintains **containment** (Contained-by / Contains), key concepts, and foundational references that cross-reference `[id]`s in `knowledge-sources.md`. The standing rule is recorded as the fifth instruction in `memory/instructions.md`.
+
 ## Next steps
 
 In priority order:

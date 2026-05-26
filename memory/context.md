@@ -28,8 +28,13 @@
 
 - **Name**: `BDeMo/research-notes` (private).
 - **Remote**: `git@github.com:BDeMo/research-notes.git` (SSH).
-- **Purpose**: personal research notebook — brainstorms, paper reading, idea lists, project plans.
+- **Purpose**: personal research notebook — brainstorms, paper reading, idea lists, project plans, and a curated knowledge base.
 - **History root**: this repo was started 2026-05-26.
+- **Four pillars**:
+  1. `memory/` — standing rules and what-to-remember.
+  2. `docs/` — methodology (`workflow.md`) + history (`matrix/`).
+  3. `known/` — public knowledge base organized by category with nearness graph.
+  4. `notes/` — actual brainstorms and plans (the working output).
 
 ## Environment
 

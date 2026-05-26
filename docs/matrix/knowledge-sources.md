@@ -1,7 +1,10 @@
 # Knowledge mother nest
 
-> Running index of papers, blogs, codebases, and conversations that seed ideas in this repo.
+> Running **chronological intake log** of papers, blogs, codebases, and conversations that seed ideas in this repo.
 > Every entry has: ID, citation, why it matters here, and the tags that connect it to topics.
+>
+> Distinct from [`../../known/`](../../known/) — that folder is the *curated, by-category* knowledge base.
+> Entries here are referenced by `[id]` from `known/<category>/README.md` files.
 
 Format:
 ```
