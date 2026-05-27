@@ -23,4 +23,24 @@
 
 \input{brief/project/2026-05-w04.tex}
 
+% Standalone demo-introduction slide for 2026-05-27.
+% To present only this demo intro, comment out the \input line above.
+\begin{frame}{Demo Introduction: RCA-Code Long-Context Memory}
+  \begin{block}{Goal}
+    Show how RCA-Code moves from standard RCA SFT experiments toward a
+    frozen-base model with wrapper memory for long-context debugging and RCA.
+  \end{block}
+
+  \begin{itemize}
+    \item \textbf{Why this demo}: RCA-demo showed that SFT can teach RCA behavior,
+      but direct model finetuning is not stable enough for long-context RCA.
+    \item \textbf{What we will show}: one public RCA/debug case evaluated through
+      full context, summary, retrieval, and wrapper-memory style compression.
+    \item \textbf{What to look for}: answer quality, evidence grounding, format
+      stability, and context/KV cost reduction.
+    \item \textbf{Current status}: demo path and metrics are defined; the next
+      step is to run one end-to-end public case and package the comparison.
+  \end{itemize}
+\end{frame}
+
 \end{document}
