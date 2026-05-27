@@ -1,0 +1,235 @@
+% Week naming rule:
+% 2026-05-w04 means the Monday of this report week is in May 2026,
+% and it is the 4th Monday in that month. This week starts on 2026-05-25.
+
+\begin{frame}
+  \titlepage
+  \vspace{-1.0em}
+  \begin{center}
+    \small Reporting period: May 2026, Week 4 \\
+    \scriptsize Month/week is determined by the Monday of the reporting week.
+  \end{center}
+\end{frame}
+
+\begin{frame}{One-Slide Summary}
+  \begin{itemize}
+    \item We are narrowing Plan 08 into a practical v0: a frozen 7B/8B base model plus a trainable memory wrapper.
+    \item The wrapper compresses long context into an updateable state:
+      \[
+        m_t = G_\phi(m_{t-1}, c_t), \qquad y_t = F_\theta(q_t, m_t)
+      \]
+    \item We do not directly fine-tune the base model in v0, because we do not have the original pretraining mixture and want to avoid catastrophic forgetting.
+    \item Two deliverables:
+      \begin{enumerate}
+        \item Research paper: new architecture for next-state memory prediction.
+        \item Open-source RCA-Code model: public debugging / trace-based RCA model with wrapper memory.
+      \end{enumerate}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Motivation: Long Context Is Not Enough}
+  \begin{itemize}
+    \item RCA and debugging tasks often contain long evidence bundles:
+      logs, traces, stack traces, test failures, code context, topology, and prior observations.
+    \item Direct long-context prompting has three problems:
+      \begin{itemize}
+        \item high prefill and KV-cache cost;
+        \item lost-in-the-middle / context rot;
+        \item no persistent learning between chunks or turns.
+      \end{itemize}
+    \item Direct SFT on a small RCA/debug dataset risks degrading the base model.
+    \item Our hypothesis: learn a small wrapper memory while keeping the base model frozen.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Core Architecture}
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \begin{block}{Memory update}
+        \[
+          m_t = G_\phi(m_{t-1}, c_t)
+        \]
+        \[
+          y_t = F_\theta(q_t, m_t)
+        \]
+      \end{block}
+      \begin{itemize}
+        \item $F_\theta$: frozen 7B/8B base model.
+        \item $G_\phi$: trainable wrapper.
+        \item $m_t$: compact memory state.
+        \item $c_t$: new context chunk or tool observation.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.44\textwidth}
+      \begin{block}{V0 memory type}
+        Start with explicit memory tokens.
+      \end{block}
+      \begin{itemize}
+        \item Easy to train and ablate.
+        \item Compatible with frozen decoder models.
+        \item Safer than writing into weights.
+        \item Hidden-state memory and LoRA memory are later ablations.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Why Freeze the 8B Base?}
+  \begin{itemize}
+    \item We start around 8B because it is strong enough for reasoning and still feasible for repeated experiments.
+    \item Candidate bases:
+      \begin{itemize}
+        \item Qwen3-8B / Qwen3-8B-Instruct for long-context and reasoning experiments.
+        \item Llama-3.1-8B-Instruct as a secondary validation base.
+        \item Qwen2.5-Coder-7B or similar for RCA-Code.
+      \end{itemize}
+    \item The base remains frozen in v0.
+    \item Training only the wrapper limits catastrophic forgetting and makes the contribution easier to isolate.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Two Tracks}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Track A: Research Paper}
+        \begin{itemize}
+          \item New memory-wrapper architecture.
+          \item Next-state prediction over memory states.
+          \item Evaluate on long-context memory benchmarks.
+          \item Main claim: compact learned memory can replace part of long prompt context.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Track B: RCA-Code Model}
+        \begin{itemize}
+          \item Public debugging / trace RCA model.
+          \item Use code issues, stack traces, failing tests, patches.
+          \item Direct prediction and agentic tool-use modes.
+          \item Release model, report, and demo.
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Dataset Plan}
+  \begin{table}
+    \small
+    \begin{tabular}{p{0.26\textwidth} p{0.28\textwidth} p{0.36\textwidth}}
+      \toprule
+      Track & Datasets & Purpose \\
+      \midrule
+      Base long-context & LoCoMo, LongBench, RULER, Needle-in-a-Haystack, Qasper, NarrativeQA & Prove wrapper memory before domain-specific RCA. \\
+      RCA-Code & SWE-bench Verified, BugsInPy, Defects4J, QuixBugs, curated CodeNet/APPS traces & Learn debugging and trace-based root-cause reasoning from public data. \\
+      RCA domain & Nezha, OpenRCA-500, RCAEval, lincyaw/rca & Transfer compression method to RCA evidence bundles. \\
+      Internal probe & Liang / Nokia DTS & Qualitative validation only; not for public release. \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+\begin{frame}{Evaluation Modes}
+  \begin{block}{Direct prediction}
+    Input: issue text, code context, stack trace, logs, failing test output.\\
+    Output: root cause, evidence, fix recommendation.
+  \end{block}
+
+  \begin{block}{Agentic RCA}
+    The model can call tools such as search, open file, run tests, and inspect traces.\\
+    Test-time training updates the wrapper from tool observations; the frozen base does not change.
+  \end{block}
+
+  \begin{block}{Baseline comparison}
+    Full context vs. summary vs. retrieval vs. learned memory.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Success Metrics}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Quality}
+        \begin{itemize}
+          \item RCA / debug root-cause accuracy.
+          \item Fix recommendation quality.
+          \item Evidence grounding.
+          \item JSON / schema stability for RCA outputs.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Compression}
+        \begin{itemize}
+          \item Token and KV-cache reduction.
+          \item Latency reduction.
+          \item Early / middle / late evidence retention.
+          \item Robustness to chunk order and distractors.
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Budget Estimate}
+  \begin{table}
+    \small
+    \begin{tabular}{p{0.25\textwidth} r r r p{0.24\textwidth}}
+      \toprule
+      Scope & Time & GPUh & Cost & Output \\
+      \midrule
+      Lean MVP & 4--7 wks & 1,420--2,950 & \$4.3k--\$8.9k & One wrapper, smoke + RCA-Code demo. \\
+      Paper-quality v0 & 7--13 wks & 2,820--5,750 & \$8.5k--\$17.3k & Long-context + RCA-Code + ablations. \\
+      Strong release & 10--16 wks & 5,000--9,000 & \$15k--\$27k & Multiple seeds, model card, polished report. \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.4em}
+  Cost model: H100 at \$3 per GPU-hour.
+\end{frame}
+
+\begin{frame}{Execution Timeline}
+  \begin{table}
+    \small
+    \begin{tabular}{p{0.19\textwidth} p{0.28\textwidth} p{0.42\textwidth}}
+      \toprule
+      Phase & Duration & Decision gate \\
+      \midrule
+      0. Smoke & 3--5 days & Wrapper beats same-length summary on synthetic / NIAH. \\
+      1. Long-context & 2--3 weeks & Beats summary on LoCoMo / LongBench / RULER. \\
+      2. RCA-Code & 2--4 weeks & Improves direct root-cause / fix prediction on public debug traces. \\
+      3. RCA domain & 1--2 weeks & Works on public RCA datasets with at least 4x compression. \\
+      4. Release polish & 1--2 weeks & Ablations, demo, model card, technical report. \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+\begin{frame}{Current Status}
+  \begin{itemize}
+    \item Plan 08 v0 has been scoped as a learned-memory wrapper project.
+    \item English and Chinese notes are maintained in the research notes repo.
+    \item Budget is separated from the full self-modifying-LLM version.
+    \item RCA-Code path is defined around public coding/debug datasets.
+    \item Initial RCA compression scripts and report templates are drafted in the RCA demo repo.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Next Steps}
+  \begin{enumerate}
+    \item Build the first LoCoMo / NIAH smoke benchmark for wrapper memory.
+    \item Run frozen 8B base baselines: full context, summary, retrieval.
+    \item Train the first explicit memory-token wrapper.
+    \item Convert public coding/debug data into RCA-Code format.
+    \item Prepare a small demo comparing full context vs. learned memory.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Ask / Discussion}
+  \begin{itemize}
+    \item Is frozen-base + wrapper the right first milestone?
+    \item Which 8B base should be the first public model target?
+    \item Should the first paper emphasize long-context memory, RCA-Code, or both?
+    \item Which demo case would be most convincing for external readers?
+  \end{itemize}
+\end{frame}
