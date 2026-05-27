@@ -1,15 +1,15 @@
 % Standalone demo-introduction slides for 2026-05-27.
 
-\begin{frame}{Background: What RCA Means}
+\begin{frame}{Background: About RCA}
   \begin{itemize}
-    \item \textbf{RCA}: root-cause analysis identifies the failing service,
-      fault type, supporting evidence, confidence, severity, and recommended fix.
-    \item RCA is useful for incident response because it turns noisy operational
-      evidence into an actionable diagnosis and recovery recommendation.
-    \item An RCA case can include incident symptoms, service topology, logs,
-      traces, fault reports, historical cases, and human-written summaries.
-    \item The model must do more than answer a question: it must connect evidence
-      to cause, keep output structure, and explain what should be fixed.
+    \item \textbf{Core need}: turn noisy operational evidence into an actionable
+      root-cause diagnosis and recovery recommendation.
+    \item RCA outputs are structured: failing service, fault type, evidence,
+      confidence, severity, and recommended fix.
+    \item Inputs are evidence-heavy: symptoms, service topology, logs, traces,
+      fault reports, historical cases, and human summaries.
+    \item A useful RCA model must connect evidence to cause, not only generate
+      fluent incident text.
   \end{itemize}
 \end{frame}
 
@@ -62,19 +62,31 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Current Capability: What Improved}
+\begin{frame}{Key Evidence: SFT Can Learn RCA}
+  \scriptsize
+  \begin{table}
+    \begin{tabular}{p{0.27\textwidth} p{0.28\textwidth} p{0.32\textwidth}}
+      \toprule
+      Signal & Result & Reading \\
+      \midrule
+      Recommendation quality & $q25_{mix}$ reached 0.733 `recommendation\_f1`
+      on RCAEval & Joint SFT can teach useful RCA recommendation behavior. \\
+      Service-level RCA & $q25_{curr\_4}$ reached 0.563 lincyaw
+      `service\_set\_f1` after re-eval & Curriculum can transfer service
+      identification across RCA datasets. \\
+      Evidence extraction & $q25_{curr\_4}$ recovered Nezha
+      `evidence\_overlap` to 0.578 & RCA SFT can learn to cite supporting
+      evidence, not only output labels. \\
+      Demo usability & `rca-chat` loads matrix checkpoints and public RCA cases
+      & We can show behavior case-by-case, not only as aggregate tables. \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{-0.4em}
   \begin{itemize}
-    \item The trained model can learn RCA-specific behavior that the base model
-      does not consistently produce.
-    \item Observed improvements include:
-      \begin{itemize}
-        \item more structured RCA JSON outputs;
-        \item better service-level root-cause identification;
-        \item stronger fault / severity fields on public RCA benchmarks;
-        \item more useful fix recommendation text.
-      \end{itemize}
-    \item The chat probe makes these changes visible case by case, while the
-      matrix shows the quantitative trend.
+    \item \textbf{Conclusion}: the first deliverable is a real RCA-capable model
+    probe, not only a dataset or evaluation script.
   \end{itemize}
 \end{frame}
 
@@ -86,13 +98,14 @@
     \item This happens because our RCA data is much smaller than the original
       pretraining corpus; we cannot fully protect the base model by simply
       mixing in all original data.
-    \item In our setting, forgetting can show up as:
-      \begin{itemize}
-        \item worse performance on earlier RCA datasets after later training;
-        \item valid JSON with missing evidence fields;
-        \item format collapse after LoRA updates;
-        \item drops on general benchmarks such as reasoning or instruction following.
-      \end{itemize}
+    \item \textbf{Observed in v2}: lincyaw `service\_set\_f1` dropped
+      0.563 $\rightarrow$ 0.233 after the anti-forget quick-win retrain.
+    \item \textbf{Observed in v2}: Nezha `evidence\_overlap` dropped
+      0.578 $\rightarrow$ 0.000 even though JSON parseability improved.
+    \item \textbf{Observed on q3}: cumulative checkpoints showed format collapse,
+      with RCAEval `json\_parseable` down to 0.113 at $q3_{curr\_4}$.
+    \item \textbf{Observed on general benchmarks}: $q25_{mix}$ dropped GSM8K
+      0.795 $\rightarrow$ 0.715 and TruthfulQA 0.647 $\rightarrow$ 0.589.
   \end{itemize}
 \end{frame}
 
