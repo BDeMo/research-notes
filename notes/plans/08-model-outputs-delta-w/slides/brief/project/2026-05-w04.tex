@@ -39,6 +39,24 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Benchmark Evidence from RCA-Demo}
+  \begin{itemize}
+    \item \textbf{Done / verified}: matrix evaluated 12 checkpoints across 4 RCA datasets and 5 general benchmarks.
+    \item \textbf{SFT can help}: `q25_mix` reached `recommendation_f1 = 0.733` on RCAEval, about 18x over `q25_base`.
+    \item \textbf{Curriculum has signal}: after fixing evaluation, `q25_curr_4_lincyaw` showed real service-identification gains on lincyaw.
+    \item \textbf{But SFT is bounded}: q3 cumulative checkpoints showed format fragility; anti-forget v2 failed its retention gate.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Benchmark Takeaway for Project}
+  \begin{itemize}
+    \item Standard SFT is a useful initialization experiment, not the final RCA-Code architecture.
+    \item We should not keep pushing base-model SFT as the only solution.
+    \item Project direction: freeze the base model and move adaptation into wrapper memory.
+    \item Immediate delivery remains a demo: compare full context, summary, retrieval, and wrapper memory on one public RCA/debug case.
+  \end{itemize}
+\end{frame}
+
 \begin{frame}{First Delivery: Demo}
   \begin{enumerate}
     \item Pick one public RCA/debug case with long evidence.
