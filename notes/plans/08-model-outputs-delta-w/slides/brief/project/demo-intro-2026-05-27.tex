@@ -48,21 +48,57 @@
 
 \begin{frame}{Deliverables: What We Have Built}
   \begin{itemize}
-    \item Trained RCA-capable model checkpoints from open-source base models.
-    \item Built an RCA SFT matrix over:
+    \item \textbf{Main deliverable}: an RCA-capable foundation-model checkpoint
+      trained from open-source base models on public RCA datasets.
+    \item The model can be used as an internal RCA probe:
       \begin{itemize}
-        \item two base families: Qwen2.5-7B-Instruct and Qwen3-8B;
-        \item curriculum vs. joint-mix training;
-        \item four public RCA datasets;
-        \item five general benchmarks for capability-retention checks.
+        \item load checkpoint in `rca-chat`;
+        \item run public RCA cases for reproducible evaluation;
+        \item run private RCA cases only for internal qualitative inspection.
       \end{itemize}
-    \item Built `rca-chat`, a Gradio probe to load checkpoints and inspect
-      qualitative behavior on RCA cases.
-    \item Packaged matrix reports, provenance notes, and project brief slides.
+    \item Supporting deliverables:
+      \begin{itemize}
+        \item RCA SFT matrix over Qwen2.5 / Qwen3, curriculum / joint-mix,
+          4 public RCA datasets, and 5 general benchmarks;
+        \item matrix reports and provenance notes;
+        \item project brief slides for stakeholder communication.
+      \end{itemize}
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Key Evidence: SFT Can Learn RCA}
+\begin{frame}{Training Design: Curriculum vs. Mix}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Curriculum Line}
+        \begin{itemize}
+          \item Train sequentially by dataset order:
+            Nezha $\rightarrow$ OpenRCA-500 $\rightarrow$ RCAEval $\rightarrow$ lincyaw.
+          \item Each later step starts from the previous trained checkpoint.
+          \item Goal: test whether RCA capability can accumulate across datasets.
+          \item Key property: exposes retention / forgetting after each new RCA domain.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Mix Line}
+        \begin{itemize}
+          \item Combine all public RCA datasets into one shuffled training set.
+          \item Train one model with balanced exposure to all RCA domains.
+          \item Goal: get the strongest single RCA checkpoint across datasets.
+          \item Key property: stronger average RCA behavior, but can still affect general ability.
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+
+  \vspace{0.4em}
+  \begin{itemize}
+    \item This two-line design lets us separate two questions: can RCA skills
+      accumulate over time, and what is the best single checkpoint for a demo?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Broader Evidence: Matrix Results}
   \scriptsize
   \begin{table}
     \begin{tabular}{p{0.27\textwidth} p{0.28\textwidth} p{0.32\textwidth}}
