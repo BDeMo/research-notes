@@ -44,6 +44,8 @@ Rules:
 
 - The month is determined by the Monday of the reporting week.
 - The week number is the ordinal Monday inside that month.
+- Each week covers Monday through Sunday. Write the exact date range with
+  weekdays in the title slide and in a top-of-file comment.
 - If a week crosses a month boundary, still use the month of that week's Monday.
 - `main.tex` should not contain weekly slide content directly. It should include
   exactly one weekly file with `\input{weekly/YYYY-MM-wNN.tex}`.
@@ -51,15 +53,16 @@ Rules:
   `brief/research/YYYY-MM-wNN.tex`.
 - `main_brief_project.tex` should include exactly one file from
   `brief/project/YYYY-MM-wNN.tex`.
-- Each weekly file should show the reporting month and week on the title slide.
+- Each weekly/brief file should show the reporting month, week number, and
+  Monday-Sunday date range with weekdays on the title slide.
 
 Examples:
 
-- Monday 2026-05-04 -> `weekly/2026-05-w01.tex`
-- Monday 2026-05-11 -> `weekly/2026-05-w02.tex`
-- Monday 2026-05-18 -> `weekly/2026-05-w03.tex`
-- Monday 2026-05-25 -> `weekly/2026-05-w04.tex`
-- Monday 2026-06-01 -> `weekly/2026-06-w01.tex`
+- Monday 2026-05-04 -> `weekly/2026-05-w01.tex`, date range `Mon 2026-05-04 to Sun 2026-05-10`
+- Monday 2026-05-11 -> `weekly/2026-05-w02.tex`, date range `Mon 2026-05-11 to Sun 2026-05-17`
+- Monday 2026-05-18 -> `weekly/2026-05-w03.tex`, date range `Mon 2026-05-18 to Sun 2026-05-24`
+- Monday 2026-05-25 -> `weekly/2026-05-w04.tex`, date range `Mon 2026-05-25 to Sun 2026-05-31`
+- Monday 2026-06-01 -> `weekly/2026-06-w01.tex`, date range `Mon 2026-06-01 to Sun 2026-06-07`
 
 ## Compile
 
