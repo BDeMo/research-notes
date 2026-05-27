@@ -1,19 +1,96 @@
-% Standalone demo-introduction slide for 2026-05-27.
+% Standalone demo-introduction slides for 2026-05-27.
 
-\begin{frame}{Demo Introduction: RCA Demo and Long-Context RCA}
-  \begin{block}{Goal}
-    Show what we have built in `rca-demo`, what the SFT experiments taught us,
-    and why the next demo should test long-context RCA compression.
-  \end{block}
-
+\begin{frame}{Background: Why RCA Needs a Demo}
   \begin{itemize}
-    \item \textbf{What we built}: an RCA SFT matrix over Qwen2.5 / Qwen3 bases,
-      curriculum vs. mix checkpoints, 4 public RCA datasets, and 5 general benchmarks.
-    \item \textbf{Demo asset}: `rca-chat` can load matrix checkpoints and sample
-      RCA cases to inspect JSON format, evidence use, and qualitative behavior.
-    \item \textbf{What we learned}: SFT can teach RCA signals, but direct
-      finetuning has format stability, evidence grounding, and retention risks.
-    \item \textbf{Next demo}: compare full context, summary, retrieval, and
-      compressed-memory RCA on the same public RCA case.
+    \item Root-cause analysis is evidence-heavy: incidents include symptoms,
+      service context, logs, traces, fault taxonomies, and recommendations.
+    \item A single RCA answer is not enough; the model must preserve evidence,
+      produce a structured output, and identify the right service-level cause.
+    \item We used `rca-demo` as the initialization path to test whether standard
+      SFT can teach these RCA behaviors.
+    \item The demo is therefore not only a UI demo; it is a way to show what RCA
+      capability has been learned and where the current method breaks.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Significance: What This Proves}
+  \begin{itemize}
+    \item \textbf{For the RCA direction}: validate whether open-source LLMs can
+      learn RCA structure from public RCA datasets.
+    \item \textbf{For product use}: expose model behavior through a chat probe,
+      not only through aggregate metric tables.
+    \item \textbf{For the next research step}: decide whether long-context
+      compression is needed beyond direct SFT.
+    \item \textbf{For release safety}: separate public RCA data and private
+      Nokia DTS probes so public artifacts remain clean.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{What We Built: RCA SFT Matrix}
+  \begin{itemize}
+    \item Built a matrix over two base families: Qwen2.5-7B-Instruct and Qwen3-8B.
+    \item Compared base, curriculum, joint-mix, and anti-forget variants.
+    \item Evaluated on four public RCA datasets:
+      \begin{itemize}
+        \item Nezha;
+        \item OpenRCA-500;
+        \item RCAEval;
+        \item lincyaw/rca.
+      \end{itemize}
+    \item Added five general benchmarks to measure whether RCA SFT damages
+      non-RCA capability.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{What We Built: RCA Chat Probe}
+  \begin{itemize}
+    \item Built `rca-chat`, a Gradio probe for loading matrix checkpoints.
+    \item The probe supports base, curriculum, and mix checkpoints from the RCA
+      matrix.
+    \item It can sample public RCA cases and optionally load private Liang DTS
+      cases for internal-only qualitative inspection.
+    \item The purpose is to inspect behavior that tables hide:
+      \begin{itemize}
+        \item JSON format stability;
+        \item evidence citation;
+        \item service-level root-cause prediction;
+        \item qualitative answer usefulness.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{What We Learned From the Demo}
+  \begin{itemize}
+    \item SFT can teach useful RCA signals: service identification,
+      fault/severity fields, recommendations, and structured JSON behavior.
+    \item Direct SFT is not always robust:
+      \begin{itemize}
+        \item some checkpoints learn RCA but lose output format;
+        \item anti-forget v2 improved surface JSON but lost evidence grounding;
+        \item general capability can move when training only on RCA data.
+      \end{itemize}
+    \item Conclusion: the RCA demo supports SFT as an initialization step, but
+      not as the final long-context RCA solution.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Next Demo: Long-Context RCA Compression}
+  \begin{itemize}
+    \item Next, use one public RCA case to compare four input strategies:
+      \begin{enumerate}
+        \item full context;
+        \item summary;
+        \item retrieval;
+        \item compressed-memory RCA.
+      \end{enumerate}
+    \item Report the same axes across all four strategies:
+      \begin{itemize}
+        \item RCA answer quality;
+        \item evidence grounding;
+        \item output format stability;
+        \item context / KV cost reduction.
+      \end{itemize}
+    \item Decision gate: continue toward wrapper memory only if it beats a cheap
+      baseline on at least one meaningful axis.
   \end{itemize}
 \end{frame}
