@@ -89,7 +89,7 @@
         \begin{itemize}
           \item Select first demo case.
           \item Generate four prompt variants.
-          \item Run `q25_base` / `q25_mix`.
+          \item Run $q25_{base}$ / $q25_{mix}$.
           \item Score demo outputs.
           \item Package comparison table.
         \end{itemize}
@@ -114,13 +114,13 @@
 
 \begin{frame}{SFT Wins: The Model Can Learn RCA Signals}
   \begin{itemize}
-    \item `q25_mix` became the strongest complete row by `recommendation_f1`:
+    \item $q25_{mix}$ became the strongest complete row by `recommendation_f1`:
       \begin{itemize}
         \item OpenRCA-500: 0.305
         \item RCAEval: 0.733
         \item lincyaw: 0.242
       \end{itemize}
-    \item After base-mismatch re-eval, `q25_curr_4_lincyaw` showed real cumulative curriculum signal:
+    \item After base-mismatch re-eval, $q25_{curr\_4\_lincyaw}$ showed real cumulative curriculum signal:
       \begin{itemize}
         \item lincyaw `service_set_f1`: 0.272 pre-fix $\rightarrow$ 0.563 post-fix.
         \item lincyaw `primary_service_match`: 0.454 $\rightarrow$ 0.723.
@@ -134,7 +134,7 @@
   \begin{itemize}
     \item Qwen3 is fragile under the current LoRA/curriculum recipe:
       \begin{itemize}
-        \item `q3_curr_2` post-fix `json_parseable`: 0.408 / 0.582 / 0.804 / 0.755.
+        \item $q3_{curr\_2}$ post-fix `json_parseable`: 0.408 / 0.582 / 0.804 / 0.755.
         \item Later cumulative Qwen3 checkpoints continue the format-collapse pattern.
       \end{itemize}
     \item Anti-forget v2 quick-win failed its decision gate:
@@ -257,8 +257,8 @@
   \begin{itemize}
     \item \textbf{Done}: `rca-chat` Gradio probe exists and can load matrix checkpoints:
       \begin{itemize}
-        \item `q25_base`, `q25_mix`, `q25_curr_*`;
-        \item `q3_base`, `q3_mix`, `q3_curr_*`;
+        \item $q25_{base}$, $q25_{mix}$, $q25_{curr\_*}$;
+        \item $q3_{base}$, $q3_{mix}$, $q3_{curr\_*}$;
         \item public RCA datasets plus optional private Liang DTS bundle.
       \end{itemize}
     \item \textbf{Done}: long-context builder script exists:
@@ -360,13 +360,13 @@ python3 scripts/compression/prepare_compression_eval.py \
 
 \begin{frame}{Demo Model Choice}
   \begin{itemize}
-    \item \textbf{Baseline model for first demo}: `q25_mix`.
+    \item \textbf{Baseline model for first demo}: $q25_{mix}$.
       \begin{itemize}
         \item Existing matrix says it is the strongest complete RCA row by `recommendation_f1`.
         \item RCAEval `recommendation_f1` = 0.733.
         \item JSON format is stable in the public RCA matrix.
       \end{itemize}
-    \item \textbf{Control model}: `q25_base`.
+    \item \textbf{Control model}: $q25_{base}$.
       \begin{itemize}
         \item Shows how much RCA behavior came from SFT.
       \end{itemize}
