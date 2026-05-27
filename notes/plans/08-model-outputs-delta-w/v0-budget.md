@@ -9,7 +9,7 @@
 - Base model: open-source 7B/8B class model, kept frozen.
 - Trainable component: memory wrapper only.
 - Hardware cost model: H100 at `$3 / GPU-hour`, matching the main Plan 08 budget.
-- Main deliverables: research-paper prototype, RCA-Code public model, technical
+- Main deliverables: research-paper prototype, RCA foundation model, technical
   report, and demo.
 - Private RCA / Nokia DTS data is not part of public release cost.
 
@@ -17,8 +17,8 @@
 
 | Scope | Wall-clock | GPU-hours | H100 cloud cost | What it buys |
 |---|---:|---:|---:|---|
-| Lean MVP | 4-7 weeks | 1,420-2,950 | $4.3k-$8.9k | One 8B base, one wrapper, smoke + RCA-Code demo. |
-| Paper-quality v0 | 7-13 weeks | 2,820-5,750 | $8.5k-$17.3k | General long-context benchmarks, RCA-Code, RCA domain eval, ablations. |
+| Lean MVP | 4-7 weeks | 1,420-2,950 | $4.3k-$8.9k | One 8B base, one wrapper, smoke + RCA demo. |
+| Paper-quality v0 | 7-13 weeks | 2,820-5,750 | $8.5k-$17.3k | General long-context benchmarks, RCA foundation model, RCA domain eval, ablations. |
 | Strong paper / model release | 10-16 weeks | 5,000-9,000 | $15k-$27k | Multiple seeds, larger sweeps, polished model card and report. |
 
 On a dedicated 8xH100 node, the paper-quality v0 GPU budget is roughly 15-30
@@ -31,10 +31,10 @@ debugging, evaluation, and report writing do not parallelize perfectly.
 |---|---:|---:|---:|---|
 | 0. Scope + smoke | 3-5 days | 120-250 | $360-$750 | Wrapper trains on synthetic / NIAH smoke. |
 | 1. Base long-context track | 2-3 weeks | 600-1,200 | $1.8k-$3.6k | Wrapper beats summary on LoCoMo / LongBench / RULER at matched budget. |
-| 2. RCA-Code data + wrapper | 2-4 weeks | 900-1,800 | $2.7k-$5.4k | Public debug traces produce useful direct RCA predictions. |
+| 2. Public debug traces + wrapper | 2-4 weeks | 900-1,800 | $2.7k-$5.4k | Public debug traces produce useful direct RCA predictions. |
 | 3. RCA domain transfer + demo | 1-2 weeks | 400-900 | $1.2k-$2.7k | RCA compression works on Nezha / OpenRCA / RCAEval / lincyaw. |
 | 4. Ablations + release polish | 1-2 weeks | 800-1,600 | $2.4k-$4.8k | Memory length, chunk order, summary/retrieval baselines, model card. |
-| Total paper-quality v0 | 7-13 weeks | 2,820-5,750 | $8.5k-$17.3k | Decide whether to write the paper and release RCA-Code. |
+| Total paper-quality v0 | 7-13 weeks | 2,820-5,750 | $8.5k-$17.3k | Decide whether to write the paper and release the RCA foundation model. |
 
 ## Phase Details
 
@@ -77,9 +77,9 @@ Budget: `600-1,200 GPU-hours`.
 Pass if wrapper memory is within 5-10 points of full context and beats summary
 at matched token budget on at least two benchmark families.
 
-### Phase 2 — RCA-Code data + wrapper
+### Phase 2 — Public debug traces + wrapper
 
-Goal: build the public coding/debug model path.
+Goal: extend the RCA foundation model path to public coding/debug traces.
 
 Datasets:
 
@@ -91,7 +91,7 @@ Datasets:
 
 Includes:
 
-- converting public traces into RCA-Code long-context items;
+- converting public traces into long-context RCA/debug items;
 - direct prediction evaluation;
 - agentic trace collection for a small subset;
 - wrapper continued training on trace / test-output / code-context chunks.
@@ -134,7 +134,7 @@ Includes:
 - memory size ablation;
 - chunk order ablation;
 - early/middle/late evidence retention;
-- direct vs agentic RCA-Code comparison;
+- direct vs agentic public-debug RCA comparison;
 - model card;
 - technical report;
 - public-data-only release package.
@@ -162,14 +162,14 @@ application, RL, rollback, and agent integration. V0 avoids most of that:
 - no LoRA/weight output in the first version;
 - no RL in the first version;
 - wrapper training is cheaper than full model training;
-- RCA-Code release can be built from public debug data and public RCA datasets.
+- RCA foundation-model release can be built from public debug data and public RCA datasets.
 
 ## Off-Ramps
 
 - Stop after Phase 0 if learned memory cannot beat summary on smoke tasks.
 - Stop after Phase 1 if LoCoMo / LongBench / RULER show no advantage over
   retrieval or summary at matched token budget.
-- Stop after Phase 2 if RCA-Code direct prediction does not improve over summary
+- Stop after Phase 2 if public-debug direct prediction does not improve over summary
   / retrieval baselines.
 - Do not escalate to LoRA/weight memory until explicit memory tokens show a
   clear advantage.

@@ -28,7 +28,7 @@
       \[
         m_t = G_\phi(m_{t-1}, c_t), \qquad y_t = F_\theta(q_t, m_t)
       \]
-    \item \textbf{Product value}: build an RCA-Code model for public debugging / trace-based RCA, with lower context cost and better evidence retention.
+    \item \textbf{Product value}: build an RCA foundation model for structured root-cause analysis, with lower context cost and better evidence retention.
     \item \textbf{Risk control}: train only the wrapper in v0, keeping the base model frozen to reduce catastrophic forgetting.
     \item \textbf{Community impact}: release a model, benchmark protocol, demo, and technical report rather than only internal experiment logs.
   \end{itemize}
@@ -37,15 +37,15 @@
 \begin{frame}{Progress / Fact Record}
   \begin{itemize}
     \item \textbf{Done}: scoped Plan 08 v0 as a learned-memory wrapper project rather than full self-modifying model training.
-    \item \textbf{Done}: read the `rca-demo` SFT results as project initialization: SFT can teach RCA signals, but it is not always a win and is not enough for robust RCA-Code capability.
+    \item \textbf{Done}: read the `rca-demo` SFT results as project initialization: SFT can teach RCA signals, but it is not always a win and is not enough for robust RCA foundation-model capability.
     \item \textbf{Done}: defined two deliverable tracks:
       \begin{enumerate}
         \item Research paper: new architecture for memory-state next prediction.
-        \item Open-source RCA-Code model: public debugging / trace RCA with wrapper memory.
+        \item RCA foundation model: public RCA datasets first, with public debug traces as a later extension.
       \end{enumerate}
     \item \textbf{Done}: added English and Chinese notes plus a dedicated v0 budget.
     \item \textbf{Done}: created the progress/fact-record slide structure.
-    \item \textbf{Not verified yet}: no wrapper training result, LoCoMo result, RCA-Code result, or demo metric has landed yet.
+    \item \textbf{Not verified yet}: no wrapper training result, LoCoMo result, public debug-trace result, or compression demo metric has landed yet.
   \end{itemize}
 \end{frame}
 
@@ -78,7 +78,7 @@
         \begin{itemize}
           \item Frozen 8B base + wrapper path.
           \item LoCoMo / LongBench scaling.
-          \item RCA-Code public model path.
+          \item RCA foundation-model path.
           \item Trainable wrapper memory.
           \item Research paper after validation.
         \end{itemize}
@@ -161,7 +161,7 @@
         \item wrapper absorbs long context, tool observations, and RCA/debug traces;
         \item failures can be isolated to memory compression instead of the whole model.
       \end{itemize}
-    \item This turns `rca-demo` from a final SFT path into evidence for the RCA-Code architecture choice.
+    \item This turns `rca-demo` from a final SFT path into evidence for the RCA foundation-model architecture choice.
   \end{itemize}
 \end{frame}
 
@@ -239,7 +239,7 @@
         \item more complete causal reasoning than retrieval-only;
         \item no base-model finetuning required.
       \end{itemize}
-    \item \textbf{Decision gate}: only scale to LoCoMo / LongBench / RCA-Code after the demo beats cheap baselines on at least one meaningful axis.
+    \item \textbf{Decision gate}: only scale to LoCoMo / LongBench / public debug traces after the demo beats cheap baselines on at least one meaningful axis.
   \end{itemize}
 \end{frame}
 
@@ -413,7 +413,7 @@ python3 scripts/compression/prepare_compression_eval.py \
       \begin{itemize}
         \item Qwen3-8B / Qwen3-8B-Instruct for long-context and reasoning experiments.
         \item Llama-3.1-8B-Instruct as a secondary validation base.
-        \item Qwen2.5-Coder-7B or similar for RCA-Code.
+        \item Qwen2.5-Coder-7B or similar for public debug-trace extension.
       \end{itemize}
     \item The base remains frozen in v0.
     \item Training only the wrapper limits catastrophic forgetting and makes the contribution easier to isolate.
@@ -433,9 +433,9 @@ python3 scripts/compression/prepare_compression_eval.py \
       \end{block}
     \end{column}
     \begin{column}{0.48\textwidth}
-      \begin{block}{Track B: RCA-Code Model}
+      \begin{block}{Track B: RCA Foundation Model}
         \begin{itemize}
-          \item Public debugging / trace RCA model.
+          \item Public RCA model with internal qualitative probe support.
           \item Use code issues, stack traces, failing tests, patches.
           \item Direct prediction and agentic tool-use modes.
           \item Release model, report, and demo.
@@ -453,7 +453,7 @@ python3 scripts/compression/prepare_compression_eval.py \
       Track & Datasets & Purpose \\
       \midrule
       Base long-context & LoCoMo, LongBench, RULER, Needle-in-a-Haystack, Qasper, NarrativeQA & Prove wrapper memory before domain-specific RCA. \\
-      RCA-Code & SWE-bench Verified, BugsInPy, Defects4J, QuixBugs, curated CodeNet/APPS traces & Learn debugging and trace-based root-cause reasoning from public data. \\
+      Public debug traces & SWE-bench Verified, BugsInPy, Defects4J, QuixBugs, curated CodeNet/APPS traces & Later extension for debugging and trace-based root-cause reasoning. \\
       RCA domain & Nezha, OpenRCA-500, RCAEval, lincyaw/rca & Transfer compression method to RCA evidence bundles. \\
       Internal probe & Liang / Nokia DTS & Qualitative validation only; not for public release. \\
       \bottomrule
@@ -509,8 +509,8 @@ python3 scripts/compression/prepare_compression_eval.py \
       \toprule
       Scope & Time & GPUh & Cost & Output \\
       \midrule
-      Lean MVP & 4--7 wks & 1,420--2,950 & \$4.3k--\$8.9k & One wrapper, smoke + RCA-Code demo. \\
-      Paper-quality v0 & 7--13 wks & 2,820--5,750 & \$8.5k--\$17.3k & Long-context + RCA-Code + ablations. \\
+      Lean MVP & 4--7 wks & 1,420--2,950 & \$4.3k--\$8.9k & One wrapper, smoke + RCA demo. \\
+      Paper-quality v0 & 7--13 wks & 2,820--5,750 & \$8.5k--\$17.3k & Long-context + RCA foundation model + ablations. \\
       Strong release & 10--16 wks & 5,000--9,000 & \$15k--\$27k & Multiple seeds, model card, polished report. \\
       \bottomrule
     \end{tabular}
@@ -529,7 +529,7 @@ python3 scripts/compression/prepare_compression_eval.py \
       \midrule
       0. Smoke & 3--5 days & Wrapper beats same-length summary on synthetic / NIAH. \\
       1. Long-context & 2--3 weeks & Beats summary on LoCoMo / LongBench / RULER. \\
-      2. RCA-Code & 2--4 weeks & Improves direct root-cause / fix prediction on public debug traces. \\
+      2. Public debug traces & 2--4 weeks & Improves direct root-cause / fix prediction on public debug traces. \\
       3. RCA domain & 1--2 weeks & Works on public RCA datasets with at least 4x compression. \\
       4. Release polish & 1--2 weeks & Ablations, demo, model card, technical report. \\
       \bottomrule
@@ -542,9 +542,9 @@ python3 scripts/compression/prepare_compression_eval.py \
     \item Plan 08 v0 has been scoped as a learned-memory wrapper project.
     \item English and Chinese notes are maintained in the research notes repo.
     \item Budget is separated from the full self-modifying-LLM version.
-    \item RCA-Code path is defined around public coding/debug datasets.
+    \item RCA foundation-model path is defined around public RCA datasets first, with public coding/debug data as a later extension.
     \item Initial RCA compression scripts and report templates are drafted in the RCA demo repo.
-    \item RCA-demo SFT initialization has identified the boundary: useful RCA learning exists, but direct SFT is not robust enough as the final RCA-Code route.
+    \item RCA-demo SFT initialization has identified the boundary: useful RCA learning exists, but direct SFT is not robust enough as the final RCA foundation-model route.
   \end{itemize}
 \end{frame}
 
@@ -554,7 +554,7 @@ python3 scripts/compression/prepare_compression_eval.py \
     \item Run frozen 8B base baselines: full context, summary, retrieval.
     \item Add wrapper-memory path for the same case.
     \item Package the demo table and qualitative walkthrough.
-    \item After demo validation, scale to LoCoMo / LongBench and RCA-Code datasets.
+    \item After demo validation, scale to LoCoMo / LongBench and public debug-trace datasets.
   \end{enumerate}
 \end{frame}
 
@@ -562,7 +562,7 @@ python3 scripts/compression/prepare_compression_eval.py \
   \begin{itemize}
     \item Is frozen-base + wrapper the right first milestone?
     \item Which 8B base should be the first public model target?
-    \item Should the first paper emphasize long-context memory, RCA-Code, or both?
+    \item Should the first paper emphasize long-context memory, RCA foundation modeling, or both?
     \item Which demo case would be most convincing for external readers?
   \end{itemize}
 \end{frame}

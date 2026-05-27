@@ -1,6 +1,6 @@
 # Plan 08 v0 Slides
 
-Progress / fact-record slides for Plan 08 v0: learned memory wrapper plus RCA-Code.
+Progress / fact-record slides for Plan 08 v0: learned memory wrapper plus the RCA foundation-model demo.
 These are maintained in weekly files for traceability, but the content is a
 progress and fact record rather than a traditional weekly status report.
 
@@ -11,9 +11,9 @@ progress and fact record rather than a traditional weekly status report.
 - `main_brief_research.tex`: high-level research delivery deck. It should only
   explain the research question, architecture, hypothesis, evaluation, and paper
   path.
-- `main_brief_project.tex`: high-level project delivery deck. It should only
-  explain RCA-Code, product value, public datasets, demo, model release, and
-  execution plan.
+- `main_brief_project.tex`: high-level project delivery deck. It should explain
+  the RCA foundation model, product value, public datasets, demo, model release,
+  and execution plan.
 - `weekly/`: combined weekly reports.
 - `brief/research/`: research-only brief content.
 - `brief/project/`: project-only brief content.
@@ -31,8 +31,8 @@ Maintain three decks separately:
   details except as motivation. Keep it high-level and focus on the research
   contribution. Target 4-5 slides.
 - **Project brief** (`main_brief_project.tex`): do not spend time on paper-level
-  novelty except as rationale. Keep it high-level and focus on RCA-Code delivery
-  and adoption. Target 4-5 slides.
+  novelty except as rationale. Keep it high-level and focus on RCA foundation
+  model delivery and adoption. Target 4-8 slides depending on demo scope.
 
 When updating content, edit the corresponding `weekly/`, `brief/research/`, or
 `brief/project/` file, not the main wrapper unless switching active week.

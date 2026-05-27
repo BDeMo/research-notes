@@ -14,7 +14,7 @@ This directory now has two scopes:
 
 - **Practical v0**: frozen 7B/8B base model + trainable learned-memory wrapper.
   This is the version to execute first for a research paper prototype and the
-  RCA-Code open-source model.
+  RCA foundation-model demo.
 - **Full Plan 08**: model-emitted weight deltas and verifier-gated
   self-modification. This remains the long-term research direction.
 

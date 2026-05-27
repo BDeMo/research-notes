@@ -28,7 +28,7 @@ Recommended starting bases:
 - Qwen3-8B or Qwen3-8B-Instruct for reasoning and long-context experiments.
 - Llama-3.1-8B-Instruct as a secondary baseline if licensing / tooling makes it
   easier.
-- Qwen2.5-Coder-7B or a similar 7B/8B coder for the RCA-Code branch.
+- Qwen2.5-Coder-7B or a similar 7B/8B coder for the later public debug-trace extension.
 
 The base model should remain frozen in v0. This is intentional: direct SFT of
 the base risks catastrophic forgetting because we do not have the original
@@ -44,15 +44,15 @@ There are two expected outcomes, and they should be evaluated separately:
    prediction over memory states. The core contribution is not another RCA
    benchmark result; it is a general method for learning `m_t = G_phi(m_{t-1},
    c_t)` and using `m_t` as compact context.
-2. **Open-source model / community impact**: an RCA-Code model built on a public
-   7B/8B base plus trained wrapper. This should be useful to the community for
-   debugging, trace reasoning, and long-context RCA.
+2. **Open-source model / community impact**: an RCA foundation model built on a
+   public 7B/8B base plus trained wrapper. This should be useful for structured
+   RCA, evidence-heavy incident analysis, and later public debug-trace reasoning.
 
-## RCA-Demo Findings Behind the RCA-Code Direction
+## RCA-Demo Findings Behind the RCA Foundation Model Direction
 
-The RCA-Code branch is motivated by what the `rca-demo` experiments already
-showed. SFT can teach RCA behavior, but it is not stable enough to be the main
-long-context strategy by itself.
+The RCA foundation-model direction is motivated by what the `rca-demo`
+experiments already showed. SFT can teach RCA behavior, but it is not stable
+enough to be the main long-context strategy by itself.
 
 | Demo finding | Evidence / symptom | Interpretation | Impact on v0 design |
 |---|---|---|---|
@@ -123,8 +123,8 @@ experiments, but not required for v0.
 
 ## Base Long-Context Dataset Track
 
-Before the RCA-Code branch, run wrapper experiments on general long-context and
-memory benchmarks:
+Before extending to public debug traces, run wrapper experiments on general
+long-context and memory benchmarks:
 
 | Dataset | Use | Why |
 |---|---|---|
