@@ -1,6 +1,8 @@
 # Plan 08 v0 Slides
 
-Weekly progress slides for Plan 08 v0: learned memory wrapper plus RCA-Code.
+Progress / fact-record slides for Plan 08 v0: learned memory wrapper plus RCA-Code.
+These are maintained in weekly files for traceability, but the content is a
+progress and fact record rather than a traditional weekly status report.
 
 ## Files
 
@@ -20,12 +22,17 @@ Weekly progress slides for Plan 08 v0: learned memory wrapper plus RCA-Code.
 
 Maintain three decks separately:
 
-- **Combined weekly progress** (`main.tex`): useful for internal weekly status.
-  It can mention both research and project, but should stay outcome-first.
+- **Combined progress / fact record** (`main.tex`): useful for internal progress
+  tracking and factual context.
+  It can mention both research and project. It may be denser and include
+  evidence, numbers, boundary cases, and implementation details, but should stay
+  outcome-first.
 - **Research brief** (`main_brief_research.tex`): do not mix in project delivery
-  details except as motivation. Focus on the research contribution.
+  details except as motivation. Keep it high-level and focus on the research
+  contribution. Target 4-5 slides.
 - **Project brief** (`main_brief_project.tex`): do not spend time on paper-level
-  novelty except as rationale. Focus on RCA-Code delivery and adoption.
+  novelty except as rationale. Keep it high-level and focus on RCA-Code delivery
+  and adoption. Target 4-5 slides.
 
 When updating content, edit the corresponding `weekly/`, `brief/research/`, or
 `brief/project/` file, not the main wrapper unless switching active week.
@@ -91,6 +98,15 @@ pdflatex main.tex
   - Each slide should answer one management question: why it matters, what was
     decided, what was done, what changed, what is blocked, or what decision is
     needed.
+- Explicitly label status:
+  - `Done`: implemented, documented, or measured from existing artifacts.
+  - `Verified`: backed by a completed run, metric, or reproducible output.
+  - `Planned`: design direction or future milestone, not necessarily immediate.
+  - `TODO`: near-term action to execute next; should be actionable this week or
+    next week.
+  - `Not verified yet`: proposed or partially implemented, but no metric/result
+    has landed.
+- Do not present plans, hypotheses, or intended demos as verified results.
 - Keep this deck high-level. Put detailed calculations in `../v0-budget.md`.
 - Update the budget slide only after changing `../v0-budget.md`.
 - Keep private RCA/Nokia DTS details out of the slides unless the audience is internal.

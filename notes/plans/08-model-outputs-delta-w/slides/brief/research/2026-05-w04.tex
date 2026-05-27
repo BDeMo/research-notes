@@ -37,30 +37,15 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Research Scope}
+\begin{frame}{Research Scope and Validation}
   \begin{itemize}
     \item Base model: frozen 7B/8B open-source model.
     \item Trainable object: wrapper / explicit memory tokens.
     \item First benchmarks: LoCoMo, LongBench, RULER, Needle-in-a-Haystack.
     \item Later ablations: hidden-state memory, LoRA/weight memory, Doc-to-LoRA comparison.
+    \item Success target: approach full-context quality while beating summary at matched token budget.
     \item Do not claim self-modifying LLM yet; v0 is learned memory compression.
   \end{itemize}
-\end{frame}
-
-\begin{frame}{Evaluation Criteria}
-  \begin{table}
-    \small
-    \begin{tabular}{p{0.30\textwidth} p{0.58\textwidth}}
-      \toprule
-      Question & Metric \\
-      \midrule
-      Does memory preserve quality? & Within 5--10 points of full context. \\
-      Does it beat cheap compression? & Better than summary at matched token budget. \\
-      Does it really compress? & At least 4x token/KV reduction. \\
-      Does sequential update forget? & Early evidence retention drop no more than 5 points. \\
-      \bottomrule
-    \end{tabular}
-  \end{table}
 \end{frame}
 
 \begin{frame}{Research Deliverable}

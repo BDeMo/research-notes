@@ -34,16 +34,343 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Weekly Progress}
+\begin{frame}{Progress / Fact Record}
   \begin{itemize}
-    \item Scoped Plan 08 v0 as a learned-memory wrapper project rather than full self-modifying model training.
-    \item Defined two deliverable tracks:
+    \item \textbf{Done}: scoped Plan 08 v0 as a learned-memory wrapper project rather than full self-modifying model training.
+    \item \textbf{Done}: read the `rca-demo` SFT results as project initialization: SFT can teach RCA signals, but it is not always a win and is not enough for robust RCA-Code capability.
+    \item \textbf{Done}: defined two deliverable tracks:
       \begin{enumerate}
         \item Research paper: new architecture for memory-state next prediction.
         \item Open-source RCA-Code model: public debugging / trace RCA with wrapper memory.
       \end{enumerate}
-    \item Added English and Chinese notes plus a dedicated v0 budget.
-    \item Created the weekly slide structure so progress can be reported consistently.
+    \item \textbf{Done}: added English and Chinese notes plus a dedicated v0 budget.
+    \item \textbf{Done}: created the progress/fact-record slide structure.
+    \item \textbf{Not verified yet}: no wrapper training result, LoCoMo result, RCA-Code result, or demo metric has landed yet.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Status Legend}
+  \begin{itemize}
+    \item \textbf{Done}: implemented, documented, or measured from existing artifacts.
+    \item \textbf{Verified}: backed by a completed run, metric, or reproducible output.
+    \item \textbf{Planned}: design direction or future milestone, not necessarily immediate.
+    \item \textbf{TODO}: near-term action to execute next; should be actionable this week / next week.
+    \item This deck separates project facts from plans so readers do not confuse proposals with results.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Status Summary}
+  \begin{columns}[T]
+    \begin{column}{0.32\textwidth}
+      \begin{block}{Done}
+        \begin{itemize}
+          \item Plan 08 v0 scoped.
+          \item RCA-demo SFT boundary read.
+          \item Research/project tracks defined.
+          \item EN/ZH notes and v0 budget written.
+          \item Slide structure created.
+          \item Demo scripts identified.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \begin{block}{Planned}
+        \begin{itemize}
+          \item Frozen 8B base + wrapper path.
+          \item LoCoMo / LongBench scaling.
+          \item RCA-Code public model path.
+          \item Trainable wrapper memory.
+          \item Research paper after validation.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.32\textwidth}
+      \begin{block}{TODO}
+        \begin{itemize}
+          \item Select first demo case.
+          \item Generate four prompt variants.
+          \item Run `q25_base` / `q25_mix`.
+          \item Score demo outputs.
+          \item Package comparison table.
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{RCA-Demo Initialization: SFT Boundary Search}
+  \begin{itemize}
+    \item Goal: use `rca-demo` to find how far standard SFT can push a general model toward RCA behavior.
+    \item Setup:
+      \begin{itemize}
+        \item 2 base families: Qwen2.5-7B-Instruct (`q25`) and Qwen3-8B (`q3`).
+        \item 4 RCA datasets: Nezha, OpenRCA-500, RCAEval, lincyaw/rca.
+        \item Training schedules: base, curriculum chain, joint mix, and anti-forget v2.
+        \item Evaluation matrix: RCA metrics + general capability benchmarks.
+      \end{itemize}
+    \item Project role: this is not the final solution; it is the initialization phase that maps the SFT capability boundary.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{SFT Wins: The Model Can Learn RCA Signals}
+  \begin{itemize}
+    \item `q25_mix` became the strongest complete row by `recommendation_f1`:
+      \begin{itemize}
+        \item OpenRCA-500: 0.305
+        \item RCAEval: 0.733
+        \item lincyaw: 0.242
+      \end{itemize}
+    \item After base-mismatch re-eval, `q25_curr_4_lincyaw` showed real cumulative curriculum signal:
+      \begin{itemize}
+        \item lincyaw `service_set_f1`: 0.272 pre-fix $\rightarrow$ 0.563 post-fix.
+        \item lincyaw `primary_service_match`: 0.454 $\rightarrow$ 0.723.
+        \item RCAEval `severity_match`: 0.041 $\rightarrow$ 0.818.
+      \end{itemize}
+    \item Takeaway: SFT is useful for injecting RCA structure, service identification, and recommendation behavior.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{SFT Boundaries: Not Always a Win}
+  \begin{itemize}
+    \item Qwen3 is fragile under the current LoRA/curriculum recipe:
+      \begin{itemize}
+        \item `q3_curr_2` post-fix `json_parseable`: 0.408 / 0.582 / 0.804 / 0.755.
+        \item Later cumulative Qwen3 checkpoints continue the format-collapse pattern.
+      \end{itemize}
+    \item Anti-forget v2 quick-win failed its decision gate:
+      \begin{itemize}
+        \item RCA retention failed 4/4; lincyaw `service_set_f1` dropped 0.563 $\rightarrow$ 0.233.
+        \item Nezha `json_parseable` improved 0.857 $\rightarrow$ 1.000, but `evidence_overlap` collapsed 0.578 $\rightarrow$ 0.000.
+        \item General anchor helped GSM8K but did not protect all general capability.
+      \end{itemize}
+    \item Takeaway: more SFT and simple data mixing are not enough to guarantee robust RCA ability.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Why Wrapper Memory Follows From RCA-Demo}
+  \begin{itemize}
+    \item Direct base-model SFT exposes three project risks:
+      \begin{enumerate}
+        \item capability drift without the original pretraining distribution;
+        \item output-format fragility under LoRA updates;
+        \item evidence-grounding loss even when JSON surface form improves.
+      \end{enumerate}
+    \item Frozen base + wrapper separates concerns:
+      \begin{itemize}
+        \item base model keeps general reasoning and coding capability;
+        \item wrapper absorbs long context, tool observations, and RCA/debug traces;
+        \item failures can be isolated to memory compression instead of the whole model.
+      \end{itemize}
+    \item This turns `rca-demo` from a final SFT path into evidence for the RCA-Code architecture choice.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{First Delivery: A Demo, Not the Full System}
+  \begin{itemize}
+    \item \textbf{Planned}: first delivery is a small, convincing demo, not a full paper-quality model release.
+    \item The demo is intended to test the direction:
+      \begin{enumerate}
+        \item long context is expensive / brittle;
+        \item simple SFT has a capability boundary;
+        \item frozen base + wrapper memory is a plausible next step;
+        \item the same incident can be compared across full context, summary, retrieval, and memory.
+      \end{enumerate}
+    \item \textbf{TODO}: produce one reproducible case, one comparison table, and one qualitative walkthrough as the next delivery.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Demo Segment 1: Problem Setup}
+  \begin{itemize}
+    \item \textbf{TODO}: pick one RCA/debug case with enough evidence to be genuinely long-context.
+    \item Show the raw context shape:
+      \begin{itemize}
+        \item issue or incident description;
+        \item logs / traces / failing test output;
+        \item code or service context;
+        \item distractor evidence.
+      \end{itemize}
+    \item \textbf{Not verified yet}: we have not selected the demo case or measured its token/KV footprint.
+    \item Management question: can the model identify root cause without reading everything directly?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Demo Segment 2: Baseline Comparison}
+  \begin{itemize}
+    \item \textbf{TODO}: run the frozen 8B base with three non-learning strategies:
+      \begin{enumerate}
+        \item full context;
+        \item fixed-budget summary;
+        \item retrieval top-k chunks.
+      \end{enumerate}
+    \item \textbf{TODO}: measure:
+      \begin{itemize}
+        \item answer quality and evidence grounding;
+        \item prompt tokens / estimated KV cost;
+        \item format stability.
+      \end{itemize}
+    \item \textbf{Not verified yet}: no full-context / summary / retrieval result has been run for the demo case.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Demo Segment 3: Wrapper Memory Path}
+  \begin{itemize}
+    \item \textbf{Planned}: process the same context as a chunk stream:
+      \[
+        m_t = G_\phi(m_{t-1}, c_t)
+      \]
+    \item \textbf{Planned}: generate the RCA/debug answer from compressed memory:
+      \[
+        y_t = F_\theta(q_t, m_t)
+      \]
+    \item \textbf{TODO}: use deterministic memory compression for the immediate demo path.
+    \item \textbf{Planned}: replace deterministic memory with trained explicit memory tokens after the demo.
+    \item \textbf{Not verified yet}: no trained wrapper output has been measured.
+    \item Constraint: keep the base model frozen; all adaptation happens in the wrapper.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Demo Segment 4: What We Need to Show}
+  \begin{itemize}
+    \item The demo does not need to beat every benchmark yet.
+    \item \textbf{Target, not verified}: it needs to show a credible direction:
+      \begin{itemize}
+        \item lower prompt/KV cost than full context;
+        \item better evidence retention than naive summary;
+        \item more complete causal reasoning than retrieval-only;
+        \item no base-model finetuning required.
+      \end{itemize}
+    \item \textbf{Decision gate}: only scale to LoCoMo / LongBench / RCA-Code after the demo beats cheap baselines on at least one meaningful axis.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Demo Segment 5: Deliverable Package}
+  \begin{itemize}
+    \item \textbf{TODO}: demo script that builds one long-context case and produces four prompts.
+    \item \textbf{TODO}: output table comparing full context, summary, retrieval, and wrapper memory.
+    \item \textbf{TODO}: qualitative page showing where each strategy succeeds or fails.
+    \item \textbf{TODO}: short technical note explaining whether the result motivates wrapper training.
+    \item \textbf{Decision}: continue to wrapper training only if the demo beats the cheap baselines on at least one meaningful axis.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Demo Assets Already Available in RCA-Demo}
+  \begin{itemize}
+    \item \textbf{Done}: `rca-chat` Gradio probe exists and can load matrix checkpoints:
+      \begin{itemize}
+        \item `q25_base`, `q25_mix`, `q25_curr_*`;
+        \item `q3_base`, `q3_mix`, `q3_curr_*`;
+        \item public RCA datasets plus optional private Liang DTS bundle.
+      \end{itemize}
+    \item \textbf{Done}: long-context builder script exists:
+      \begin{itemize}
+        \item `scripts/compression/build_long_context_rca_benchmark.py`;
+        \item converts prepared `cases.jsonl` into chunked RCA items with distractors.
+      \end{itemize}
+    \item \textbf{Done}: prompt-strategy preparation script exists:
+      \begin{itemize}
+        \item `scripts/compression/prepare_compression_eval.py`;
+        \item emits `full_context`, `summary`, `retrieval`, and `learned_memory` prompt rows.
+      \end{itemize}
+    \item \textbf{Not verified yet}: no end-to-end generation/score run has been completed for this demo path.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Demo Case Selection}
+  \begin{itemize}
+    \item \textbf{Preferred public demo}: one RCAEval case.
+      \begin{itemize}
+        \item It has microservice fault-injection structure.
+        \item It supports service/fault-type metrics.
+        \item It is public and suitable for release.
+      \end{itemize}
+    \item \textbf{Alternative public demo}: one OpenRCA-500 case.
+      \begin{itemize}
+        \item Wider service vocabulary.
+        \item Good for showing service-level root-cause ranking.
+      \end{itemize}
+    \item \textbf{Internal-only qualitative demo}: Liang / Nokia DTS.
+      \begin{itemize}
+        \item Useful for realism.
+        \item Not releasable; do not include raw prompts or per-case outputs in public slides.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Demo Build Commands}
+  \small
+  \textbf{Step 1: build long-context RCA items}
+  \begin{verbatim}
+python3 scripts/compression/build_long_context_rca_benchmark.py \
+  --cases runs/rcaeval_v1/prepared/cases.jsonl \
+  --out runs/long_context_rca_demo/items.jsonl \
+  --chunk-chars 1800 \
+  --overlap-chars 150 \
+  --distractors 2
+  \end{verbatim}
+
+  \textbf{Step 2: prepare four prompt strategies}
+  \begin{verbatim}
+python3 scripts/compression/prepare_compression_eval.py \
+  --input runs/long_context_rca_demo/items.jsonl \
+  --out runs/long_context_rca_demo/prompts.jsonl \
+  --summary-chunks 8 \
+  --retrieval-k 8 \
+  --memory-records 8
+  \end{verbatim}
+\end{frame}
+
+\begin{frame}{Demo Four-Way Comparison}
+  \begin{table}
+    \small
+    \begin{tabular}{p{0.23\textwidth} p{0.33\textwidth} p{0.34\textwidth}}
+      \toprule
+      Strategy & What it uses & What we learn \\
+      \midrule
+      Full context & All chunks in prompt & Upper-bound quality, high token/KV cost. \\
+      Summary & Fixed-budget compressed text & Cheap baseline; may lose evidence details. \\
+      Retrieval & Top-k salient chunks & Good for evidence lookup; may miss causal synthesis. \\
+      Learned memory & Rendered wrapper memory state & Whether memory can retain evidence at lower context cost. \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \vspace{0.4em}
+  \textbf{Not verified yet}: the current `learned_memory` row is a deterministic memory-compressor baseline until the trainable wrapper is run.
+\end{frame}
+
+\begin{frame}{Demo Output Layout and Metrics}
+  \begin{itemize}
+    \item \textbf{Planned output layout} mirrors matrix cells:
+      \begin{itemize}
+        \item `runs/long_context_rca_demo/eval/<model_id>/<strategy>/predictions.jsonl`
+        \item `metrics.json`
+        \item `case_scores.jsonl`
+        \item `eval_command.txt`
+      \end{itemize}
+    \item \textbf{Metrics to report}:
+      \begin{itemize}
+        \item RCA quality: `recommendation_f1`, `root_cause_f1`, `primary_service_match`, `service_set_f1`;
+        \item grounding: `evidence_overlap`;
+        \item format: `json_parseable`, `json_repaired`, `degenerate`;
+        \item compression: prompt token estimate, compression ratio, latency if available.
+      \end{itemize}
+    \item \textbf{TODO}: wire `prompts.jsonl` into generation and scoring.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Demo Model Choice}
+  \begin{itemize}
+    \item \textbf{Baseline model for first demo}: `q25_mix`.
+      \begin{itemize}
+        \item Existing matrix says it is the strongest complete RCA row by `recommendation_f1`.
+        \item RCAEval `recommendation_f1` = 0.733.
+        \item JSON format is stable in the public RCA matrix.
+      \end{itemize}
+    \item \textbf{Control model}: `q25_base`.
+      \begin{itemize}
+        \item Shows how much RCA behavior came from SFT.
+      \end{itemize}
+    \item \textbf{Do not use q3 as first demo model}: q3 cumulative SFT currently has format-collapse risk.
   \end{itemize}
 \end{frame}
 
@@ -217,16 +544,17 @@
     \item Budget is separated from the full self-modifying-LLM version.
     \item RCA-Code path is defined around public coding/debug datasets.
     \item Initial RCA compression scripts and report templates are drafted in the RCA demo repo.
+    \item RCA-demo SFT initialization has identified the boundary: useful RCA learning exists, but direct SFT is not robust enough as the final RCA-Code route.
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Next Steps}
   \begin{enumerate}
-    \item Build the first LoCoMo / NIAH smoke benchmark for wrapper memory.
+    \item Build the first demo case and four prompt strategies.
     \item Run frozen 8B base baselines: full context, summary, retrieval.
-    \item Train the first explicit memory-token wrapper.
-    \item Convert public coding/debug data into RCA-Code format.
-    \item Prepare a small demo comparing full context vs. learned memory.
+    \item Add wrapper-memory path for the same case.
+    \item Package the demo table and qualitative walkthrough.
+    \item After demo validation, scale to LoCoMo / LongBench and RCA-Code datasets.
   \end{enumerate}
 \end{frame}
 

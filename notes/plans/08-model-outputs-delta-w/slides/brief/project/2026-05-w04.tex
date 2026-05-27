@@ -29,43 +29,23 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Project Scope}
+\begin{frame}{Project Scope and Boundary}
   \begin{itemize}
     \item Base: frozen 7B/8B coder or reasoning model.
     \item Trainable module: wrapper memory.
-    \item Public coding/debug data:
-      \begin{itemize}
-        \item SWE-bench / SWE-bench Verified
-        \item BugsInPy
-        \item Defects4J
-        \item QuixBugs
-        \item curated CodeNet / APPS traces when root cause can be derived
-      \end{itemize}
+    \item Public coding/debug data: SWE-bench, BugsInPy, Defects4J, QuixBugs.
     \item RCA data: Nezha, OpenRCA-500, RCAEval, lincyaw/rca.
+    \item RCA-demo initialization showed SFT can learn RCA signals, but direct SFT is not robust enough as the final RCA-Code route.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Evaluation Modes}
-  \begin{block}{Direct prediction}
-    Input trace/log/code context, then predict root cause, evidence, and fix recommendation.
-  \end{block}
-
-  \begin{block}{Agentic RCA}
-    Allow tool use: search files, inspect traces, run tests, then produce an RCA report.
-  \end{block}
-
-  \begin{block}{Wrapper TTT}
-    Test-time training updates wrapper memory from trace/tool observations. The base model remains frozen.
-  \end{block}
-\end{frame}
-
-\begin{frame}{Delivery Plan}
+\begin{frame}{First Delivery: Demo}
   \begin{enumerate}
-    \item Build public RCA-Code long-context benchmark.
-    \item Run frozen-base baselines: full context, summary, retrieval.
-    \item Train wrapper memory and compare at matched token/KV budget.
-    \item Build demo case showing answer quality and context reduction.
-    \item Release model card, technical report, benchmark manifest, and demo instructions.
+    \item Pick one public RCA/debug case with long evidence.
+    \item Compare full context, summary, retrieval, and wrapper memory.
+    \item Show answer quality, evidence grounding, and context reduction.
+    \item Use the demo to decide whether to scale to full RCA-Code benchmark runs.
+    \item After the demo works, package model card, technical report, benchmark manifest, and release plan.
   \end{enumerate}
 \end{frame}
 
