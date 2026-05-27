@@ -1,6 +1,6 @@
 % Project brief for May 2026, Week 4.
 % Date range: Mon 2026-05-25 to Sun 2026-05-31.
-% Focus: RCA-Code model, public datasets, demo, and release.
+% Focus: RCA demo, public RCA datasets, long-context compression, and release.
 
 \begin{frame}
   \titlepage
@@ -13,16 +13,16 @@
 
 \begin{frame}{Recap}
   \begin{itemize}
-    \item Used RCA-demo as the initialization phase for RCA-Code, turning SFT results into project evidence.
+    \item Used `rca-demo` as the initialization phase for the RCA model direction, turning SFT results into project evidence.
     \item Verified the boundary: SFT teaches RCA behavior, but format, evidence, and retention remain unstable.
-    \item Set the project direction: frozen base model plus wrapper memory for long-context RCA/debug traces.
+    \item Set the project direction: frozen base model plus wrapper memory for long-context RCA evidence.
     \item First delivery is demo-first: one public case, complete metrics, and clear pass/fail evidence.
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Project Significance}
   \begin{itemize}
-    \item \textbf{Community impact}: release a usable RCA-Code model built on public data.
+    \item \textbf{Community impact}: release a usable RCA model / demo built on public data.
     \item \textbf{Industrial relevance}: debugging workflows already look like RCA over long traces and tool outputs.
     \item \textbf{Safety}: freeze the base model and train wrapper memory to avoid damaging original capabilities.
     \item \textbf{Demo value}: compare full context, summary, retrieval, and learned memory on the same bug/RCA case.
@@ -31,7 +31,7 @@
 
 \begin{frame}{Background}
   \begin{itemize}
-    \item RCA-Code targets debugging and trace-based root-cause analysis.
+    \item The RCA demo targets root-cause analysis over incident evidence, traces, and service context.
     \item Inputs can include issue text, stack traces, failing tests, code context, logs, patches, and tool observations.
     \item A direct long-context prompt is expensive and brittle for these evidence-heavy tasks.
     \item The project goal is a public model/demo, not just an internal experiment.
@@ -54,7 +54,7 @@
     \item Trainable module: wrapper memory.
     \item Public coding/debug data: SWE-bench, BugsInPy, Defects4J, QuixBugs.
     \item RCA data: Nezha, OpenRCA-500, RCAEval, lincyaw/rca.
-    \item RCA-demo initialization showed SFT can learn RCA signals, but direct SFT is not robust enough as the final RCA-Code route.
+    \item `rca-demo` initialization showed SFT can learn RCA signals, but direct SFT is not robust enough as the final long-context RCA route.
   \end{itemize}
 \end{frame}
 
@@ -167,13 +167,13 @@
   \end{table}
   \begin{itemize}
     \item \textbf{Verdict}: quick-win failed; oversample + anchor improved surface format but damaged evidence/service retention.
-    \item \textbf{Decision}: do not keep scaling direct SFT as the only RCA-Code path.
+    \item \textbf{Decision}: do not keep scaling direct SFT as the only RCA path.
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Details: Benchmark Takeaway}
   \begin{itemize}
-    \item Standard SFT is a useful initialization experiment, not the final RCA-Code architecture.
+    \item Standard SFT is a useful initialization experiment, not the final long-context RCA architecture.
     \item We should not keep pushing base-model SFT as the only solution.
     \item Project direction: freeze the base model and move adaptation into wrapper memory.
     \item Immediate delivery remains a demo: compare full context, summary, retrieval, and wrapper memory on one public RCA/debug case.

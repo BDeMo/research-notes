@@ -1,19 +1,19 @@
 % Standalone demo-introduction slide for 2026-05-27.
 
-\begin{frame}{Demo Introduction: RCA-Code Long-Context Memory}
+\begin{frame}{Demo Introduction: RCA Demo and Long-Context RCA}
   \begin{block}{Goal}
-    Show how RCA-Code moves from standard RCA SFT experiments toward a
-    frozen-base model with wrapper memory for long-context debugging and RCA.
+    Show what we have built in `rca-demo`, what the SFT experiments taught us,
+    and why the next demo should test long-context RCA compression.
   \end{block}
 
   \begin{itemize}
-    \item \textbf{Why this demo}: RCA-demo showed that SFT can teach RCA behavior,
-      but direct model finetuning is not stable enough for long-context RCA.
-    \item \textbf{What we will show}: one public RCA/debug case evaluated through
-      full context, summary, retrieval, and wrapper-memory style compression.
-    \item \textbf{What to look for}: answer quality, evidence grounding, format
-      stability, and context/KV cost reduction.
-    \item \textbf{Current status}: demo path and metrics are defined; the next
-      step is to run one end-to-end public case and package the comparison.
+    \item \textbf{What we built}: an RCA SFT matrix over Qwen2.5 / Qwen3 bases,
+      curriculum vs. mix checkpoints, 4 public RCA datasets, and 5 general benchmarks.
+    \item \textbf{Demo asset}: `rca-chat` can load matrix checkpoints and sample
+      RCA cases to inspect JSON format, evidence use, and qualitative behavior.
+    \item \textbf{What we learned}: SFT can teach RCA signals, but direct
+      finetuning has format stability, evidence grounding, and retention risks.
+    \item \textbf{Next demo}: compare full context, summary, retrieval, and
+      compressed-memory RCA on the same public RCA case.
   \end{itemize}
 \end{frame}
