@@ -48,6 +48,22 @@ There are two expected outcomes, and they should be evaluated separately:
    7B/8B base plus trained wrapper. This should be useful to the community for
    debugging, trace reasoning, and long-context RCA.
 
+## RCA-Demo Findings Behind the RCA-Code Direction
+
+The RCA-Code branch is motivated by what the `rca-demo` experiments already
+showed. SFT can teach RCA behavior, but it is not stable enough to be the main
+long-context strategy by itself.
+
+| Demo finding | Evidence / symptom | Interpretation | Impact on v0 design |
+|---|---|---|---|
+| RCA capability is learnable through SFT, but only partially. | `q25_mix` reached `recommendation_f1 = 0.733` on RCAEval, far above `q25_base`; post-fix `q25_curr_4_lincyaw` improved lincyaw `service_set_f1` from 0.272 to 0.563. | SFT can inject RCA structure, service identification, and recommendation behavior. | Treat SFT as initialization / capability probing, not the final architecture. |
+| SFT is not always a win. | Mix and curriculum results flip depending on dataset, base, and evaluation path; base-mismatch re-evaluation changed the closure narrative. | More SFT or more data mixing does not reliably solve RCA. | Compare against compression baselines instead of only extending SFT recipes. |
+| Qwen3 is format-fragile under the current LoRA recipe. | q3 cumulative checkpoints had low `json_parseable` after depth 2/3; the issue was not only `q3_mix`. | The base + LoRA delta + JSON-only output constraint is unstable. | Use q25-class checkpoints for the first demo; keep q3 as a separate recipe problem. |
+| Anti-forgetting quick-win failed. | v2 oversample + 5% general anchor degraded lincyaw `service_set_f1` from 0.563 to 0.233 and collapsed Nezha `evidence_overlap` from 0.578 to 0.000. | Well-formed JSON can mask empty or ungrounded RCA evidence. | Track evidence-grounding metrics, not only parseability. |
+| General capability regresses under direct SFT. | `q25_mix` dropped on GSM8K and TruthfulQA versus `q25_base`. | We do not have the original pretraining distribution, so small RCA mixes cannot fully protect the base. | Freeze the base model and train only the wrapper in v0. |
+| Evaluation and release paths can silently fail. | Adapter/base mismatch, dataset-cache version mismatch, and final-step merge issues changed or invalidated results. | RCA claims need strict provenance and post-conditions. | Keep the v0 demo small, reproducible, and metric-backed. |
+| The compression path is scaffolded but not yet end-to-end verified. | Scripts exist for long-context item building and full/summary/retrieval/learned-memory prompt preparation, but generation + scoring still needs a verified demo run. | The next milestone is a concrete public case, not a broad benchmark sweep. | First demo: full context vs summary vs retrieval vs wrapper memory on a public RCA case. |
+
 ## Default Memory Type
 
 V0 starts with explicit memory tokens:
