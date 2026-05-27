@@ -1,15 +1,15 @@
 % Standalone demo-introduction slides for 2026-05-27.
 
-\begin{frame}{Background: Why RCA Needs a Demo}
+\begin{frame}{Background: RCA and Long-Context Evidence}
   \begin{itemize}
-    \item Root-cause analysis is evidence-heavy: incidents include symptoms,
-      service context, logs, traces, fault taxonomies, and recommendations.
-    \item A single RCA answer is not enough; the model must preserve evidence,
-      produce a structured output, and identify the right service-level cause.
-    \item We used `rca-demo` as the initialization path to test whether standard
-      SFT can teach these RCA behaviors.
-    \item The demo is therefore not only a UI demo; it is a way to show what RCA
-      capability has been learned and where the current method breaks.
+    \item \textbf{RCA}: root-cause analysis identifies the failing service,
+      fault type, supporting evidence, confidence, severity, and recommended fix.
+    \item \textbf{Evidence bundle}: an RCA case can include incident symptoms,
+      service topology, logs, traces, fault reports, and historical context.
+    \item \textbf{Long-context challenge}: useful evidence may be spread across
+      many noisy chunks, while direct prompting increases context and KV cost.
+    \item \textbf{Compressed-memory RCA}: the model should answer from a compact
+      memory state while preserving root-cause quality and evidence grounding.
   \end{itemize}
 \end{frame}
 
