@@ -11,12 +11,12 @@
   \end{center}
 \end{frame}
 
-\begin{frame}{Background}
+\begin{frame}{Recap}
   \begin{itemize}
-    \item RCA-Code targets debugging and trace-based root-cause analysis.
-    \item Inputs can include issue text, stack traces, failing tests, code context, logs, patches, and tool observations.
-    \item A direct long-context prompt is expensive and brittle for these evidence-heavy tasks.
-    \item The project goal is a public model/demo, not just an internal experiment.
+    \item Used RCA-demo as the initialization phase for RCA-Code, turning SFT results into project evidence.
+    \item Verified the boundary: SFT teaches RCA behavior, but format, evidence, and retention remain unstable.
+    \item Set the project direction: frozen base model plus wrapper memory for long-context RCA/debug traces.
+    \item First delivery is demo-first: one public case, complete metrics, and clear pass/fail evidence.
   \end{itemize}
 \end{frame}
 
@@ -29,7 +29,26 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Project Scope and Boundary}
+\begin{frame}{Background}
+  \begin{itemize}
+    \item RCA-Code targets debugging and trace-based root-cause analysis.
+    \item Inputs can include issue text, stack traces, failing tests, code context, logs, patches, and tool observations.
+    \item A direct long-context prompt is expensive and brittle for these evidence-heavy tasks.
+    \item The project goal is a public model/demo, not just an internal experiment.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Deliverables}
+  \begin{enumerate}
+    \item Select one public RCA/debug case with long evidence.
+    \item Run four strategies on the same case: full context, summary, retrieval, and wrapper memory.
+    \item Report four metrics: answer quality, evidence grounding, format stability, and context reduction.
+    \item Decide scale-up only if wrapper memory beats a cheap baseline on at least one meaningful axis.
+    \item Package the release path: model card, technical report, benchmark manifest, and demo instructions.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Details: Scope and Boundary}
   \begin{itemize}
     \item Base: frozen 7B/8B coder or reasoning model.
     \item Trainable module: wrapper memory.
@@ -39,7 +58,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Evidence View: RCA Recommendation-F1 Matrix}
+\begin{frame}{Experiments: RCA Recommendation-F1 Matrix}
   \tiny
   \begin{table}
     \begin{tabular}{lrrrr}
@@ -73,7 +92,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Evidence View: Service, Evidence, and Format}
+\begin{frame}{Experiments: Service, Evidence, and Format}
   \scriptsize
   \begin{table}
     \begin{tabular}{p{0.22\textwidth} p{0.25\textwidth} r r p{0.20\textwidth}}
@@ -95,7 +114,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Evidence View: General Capability Matrix}
+\begin{frame}{Experiments: General Capability Matrix}
   \tiny
   \begin{table}
     \begin{tabular}{lrrrr}
@@ -129,7 +148,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Evidence View: Anti-Forget v2 Decision Gate}
+\begin{frame}{Experiments: Anti-Forget v2 Decision Gate}
   \scriptsize
   \begin{table}
     \begin{tabular}{p{0.42\textwidth}rrp{0.22\textwidth}}
@@ -152,7 +171,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Benchmark Takeaway for Project}
+\begin{frame}{Details: Benchmark Takeaway}
   \begin{itemize}
     \item Standard SFT is a useful initialization experiment, not the final RCA-Code architecture.
     \item We should not keep pushing base-model SFT as the only solution.
@@ -161,17 +180,7 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{First Delivery: Demo}
-  \begin{enumerate}
-    \item Pick one public RCA/debug case with long evidence.
-    \item Compare full context, summary, retrieval, and wrapper memory.
-    \item Show answer quality, evidence grounding, and context reduction.
-    \item Use the demo to decide whether to scale to full RCA-Code benchmark runs.
-    \item After the demo works, package model card, technical report, benchmark manifest, and release plan.
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}{Project Risks and Controls}
+\begin{frame}{Details: Project Risks and Controls}
   \begin{itemize}
     \item Risk: learned memory compresses style but loses evidence grounding. Control: evidence metrics and qualitative failure cases.
     \item Risk: direct SFT hurts base capability. Control: frozen base in v0.

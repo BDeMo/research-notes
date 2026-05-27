@@ -11,12 +11,12 @@
   \end{center}
 \end{frame}
 
-\begin{frame}{Background}
+\begin{frame}{Recap}
   \begin{itemize}
-    \item Long-context LLMs still pay high prefill/KV cost and often fail to use all context effectively.
-    \item Prompt summaries and RAG are external memory mechanisms; they do not give the model an internal updateable state.
-    \item Full self-modifying weight updates are attractive but too risky as a first milestone.
-    \item Research v0 asks a narrower question: can a wrapper learn compact next-state memory while the base model stays frozen?
+    \item Narrowed Plan 08 into an executable v0 instead of keeping it as a speculative self-modifying LLM idea.
+    \item The long-term direction remains self-modifying / weight-memory LLMs.
+    \item First milestone is safer: a frozen 7B/8B base plus a trainable memory wrapper.
+    \item Research question is now concrete: datasets, baselines, and pass/fail criteria are defined.
   \end{itemize}
 \end{frame}
 
@@ -37,7 +37,25 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Research Scope and Validation}
+\begin{frame}{Background}
+  \begin{itemize}
+    \item Long-context LLMs still pay high prefill/KV cost and often fail to use all context effectively.
+    \item Prompt summaries and RAG are external memory mechanisms; they do not give the model an internal updateable state.
+    \item Full self-modifying weight updates are attractive but too risky as a first milestone.
+    \item Research v0 asks a narrower question: can a wrapper learn compact next-state memory while the base model stays frozen?
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Research Deliverables}
+  \begin{itemize}
+    \item Produce a paper framing learned memory wrapper as next-state prediction.
+    \item Run core comparisons: full context, summary, retrieval, fixed/gist tokens, learned memory.
+    \item Target result: memory wrapper beats summary/retrieval at matched budget while approaching full-context quality.
+    \item Stop condition: if memory tokens cannot beat summary, do not escalate to LoRA/weight memory.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Details and Validation Plan}
   \begin{itemize}
     \item Base model: frozen 7B/8B open-source model.
     \item Trainable object: wrapper / explicit memory tokens.
@@ -45,14 +63,5 @@
     \item Later ablations: hidden-state memory, LoRA/weight memory, Doc-to-LoRA comparison.
     \item Success target: approach full-context quality while beating summary at matched token budget.
     \item Do not claim self-modifying LLM yet; v0 is learned memory compression.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Research Deliverable}
-  \begin{itemize}
-    \item Paper framing: learned memory wrapper as next-state prediction.
-    \item Core comparisons: full context, summary, retrieval, fixed/gist tokens, learned memory.
-    \item Main result target: memory wrapper beats summary/retrieval at matched budget while approaching full-context quality.
-    \item Risk: if memory tokens cannot beat summary, stop before LoRA/weight-memory escalation.
   \end{itemize}
 \end{frame}
