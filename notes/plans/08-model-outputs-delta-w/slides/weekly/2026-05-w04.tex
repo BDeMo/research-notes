@@ -11,34 +11,37 @@
   \end{center}
 \end{frame}
 
-\begin{frame}{One-Slide Summary}
+\begin{frame}{Background}
   \begin{itemize}
-    \item We are narrowing Plan 08 into a practical v0: a frozen 7B/8B base model plus a trainable memory wrapper.
-    \item The wrapper compresses long context into an updateable state:
-      \[
-        m_t = G_\phi(m_{t-1}, c_t), \qquad y_t = F_\theta(q_t, m_t)
-      \]
-    \item We do not directly fine-tune the base model in v0, because we do not have the original pretraining mixture and want to avoid catastrophic forgetting.
-    \item Two deliverables:
-      \begin{enumerate}
-        \item Research paper: new architecture for next-state memory prediction.
-        \item Open-source RCA-Code model: public debugging / trace-based RCA model with wrapper memory.
-      \end{enumerate}
+    \item RCA and debugging tasks are becoming long-context problems: logs, traces, stack traces, test failures, code context, topology, and prior observations often exceed a practical prompt budget.
+    \item Direct long-context prompting is expensive and brittle: high prefill cost, large KV cache, lost-in-the-middle behavior, and no persistent learning between chunks.
+    \item Directly fine-tuning an 8B base on our small RCA/debug data is risky because we do not have the original pretraining mix needed to protect the base model's general capability.
+    \item This project starts from a frozen 7B/8B open-source base and trains a separate wrapper memory module.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Motivation: Long Context Is Not Enough}
+\begin{frame}{Significance}
   \begin{itemize}
-    \item RCA and debugging tasks often contain long evidence bundles:
-      logs, traces, stack traces, test failures, code context, topology, and prior observations.
-    \item Direct long-context prompting has three problems:
-      \begin{itemize}
-        \item high prefill and KV-cache cost;
-        \item lost-in-the-middle / context rot;
-        \item no persistent learning between chunks or turns.
-      \end{itemize}
-    \item Direct SFT on a small RCA/debug dataset risks degrading the base model.
-    \item Our hypothesis: learn a small wrapper memory while keeping the base model frozen.
+    \item \textbf{Research value}: formulate long-context compression as next-state prediction over learned memory states:
+      \[
+        m_t = G_\phi(m_{t-1}, c_t), \qquad y_t = F_\theta(q_t, m_t)
+      \]
+    \item \textbf{Product value}: build an RCA-Code model for public debugging / trace-based RCA, with lower context cost and better evidence retention.
+    \item \textbf{Risk control}: train only the wrapper in v0, keeping the base model frozen to reduce catastrophic forgetting.
+    \item \textbf{Community impact}: release a model, benchmark protocol, demo, and technical report rather than only internal experiment logs.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Weekly Progress}
+  \begin{itemize}
+    \item Scoped Plan 08 v0 as a learned-memory wrapper project rather than full self-modifying model training.
+    \item Defined two deliverable tracks:
+      \begin{enumerate}
+        \item Research paper: new architecture for memory-state next prediction.
+        \item Open-source RCA-Code model: public debugging / trace RCA with wrapper memory.
+      \end{enumerate}
+    \item Added English and Chinese notes plus a dedicated v0 budget.
+    \item Created the weekly slide structure so progress can be reported consistently.
   \end{itemize}
 \end{frame}
 

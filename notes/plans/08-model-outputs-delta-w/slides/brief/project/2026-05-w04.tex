@@ -1,0 +1,77 @@
+% Project brief for May 2026, Week 4.
+% Focus: RCA-Code model, public datasets, demo, and release.
+
+\begin{frame}
+  \titlepage
+  \vspace{-1.0em}
+  \begin{center}
+    \small Project brief: May 2026, Week 4
+  \end{center}
+\end{frame}
+
+\begin{frame}{Background}
+  \begin{itemize}
+    \item RCA-Code targets debugging and trace-based root-cause analysis.
+    \item Inputs can include issue text, stack traces, failing tests, code context, logs, patches, and tool observations.
+    \item A direct long-context prompt is expensive and brittle for these evidence-heavy tasks.
+    \item The project goal is a public model/demo, not just an internal experiment.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Project Significance}
+  \begin{itemize}
+    \item \textbf{Community impact}: release a usable RCA-Code model built on public data.
+    \item \textbf{Industrial relevance}: debugging workflows already look like RCA over long traces and tool outputs.
+    \item \textbf{Safety}: freeze the base model and train wrapper memory to avoid damaging original capabilities.
+    \item \textbf{Demo value}: compare full context, summary, retrieval, and learned memory on the same bug/RCA case.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Project Scope}
+  \begin{itemize}
+    \item Base: frozen 7B/8B coder or reasoning model.
+    \item Trainable module: wrapper memory.
+    \item Public coding/debug data:
+      \begin{itemize}
+        \item SWE-bench / SWE-bench Verified
+        \item BugsInPy
+        \item Defects4J
+        \item QuixBugs
+        \item curated CodeNet / APPS traces when root cause can be derived
+      \end{itemize}
+    \item RCA data: Nezha, OpenRCA-500, RCAEval, lincyaw/rca.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Evaluation Modes}
+  \begin{block}{Direct prediction}
+    Input trace/log/code context, then predict root cause, evidence, and fix recommendation.
+  \end{block}
+
+  \begin{block}{Agentic RCA}
+    Allow tool use: search files, inspect traces, run tests, then produce an RCA report.
+  \end{block}
+
+  \begin{block}{Wrapper TTT}
+    Test-time training updates wrapper memory from trace/tool observations. The base model remains frozen.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Delivery Plan}
+  \begin{enumerate}
+    \item Build public RCA-Code long-context benchmark.
+    \item Run frozen-base baselines: full context, summary, retrieval.
+    \item Train wrapper memory and compare at matched token/KV budget.
+    \item Build demo case showing answer quality and context reduction.
+    \item Release model card, technical report, benchmark manifest, and demo instructions.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Project Risks and Controls}
+  \begin{itemize}
+    \item Risk: learned memory compresses style but loses evidence grounding. Control: evidence metrics and qualitative failure cases.
+    \item Risk: direct SFT hurts base capability. Control: frozen base in v0.
+    \item Risk: private data leaks into release. Control: public-only release boundary; private DTS only internal.
+    \item Risk: project becomes only a benchmark report. Control: ship model + demo + technical report.
+  \end{itemize}
+\end{frame}
