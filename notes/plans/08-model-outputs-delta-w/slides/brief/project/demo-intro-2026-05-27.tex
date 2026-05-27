@@ -1,96 +1,114 @@
 % Standalone demo-introduction slides for 2026-05-27.
 
-\begin{frame}{Background: RCA and Long-Context Evidence}
+\begin{frame}{Background: What RCA Means}
   \begin{itemize}
     \item \textbf{RCA}: root-cause analysis identifies the failing service,
       fault type, supporting evidence, confidence, severity, and recommended fix.
-    \item \textbf{Evidence bundle}: an RCA case can include incident symptoms,
-      service topology, logs, traces, fault reports, and historical context.
-    \item \textbf{Long-context challenge}: useful evidence may be spread across
-      many noisy chunks, while direct prompting increases context and KV cost.
-    \item \textbf{Compressed-memory RCA}: the model should answer from a compact
-      memory state while preserving root-cause quality and evidence grounding.
+    \item RCA is useful for incident response because it turns noisy operational
+      evidence into an actionable diagnosis and recovery recommendation.
+    \item An RCA case can include incident symptoms, service topology, logs,
+      traces, fault reports, historical cases, and human-written summaries.
+    \item The model must do more than answer a question: it must connect evidence
+      to cause, keep output structure, and explain what should be fixed.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Significance: What This Proves}
+\begin{frame}{Significance: Why an RCA Foundation Model}
   \begin{itemize}
-    \item \textbf{For the RCA direction}: validate whether open-source LLMs can
-      learn RCA structure from public RCA datasets.
-    \item \textbf{For product use}: expose model behavior through a chat probe,
-      not only through aggregate metric tables.
-    \item \textbf{For the next research step}: decide whether long-context
-      compression is needed beyond direct SFT.
-    \item \textbf{For release safety}: separate public RCA data and private
-      Nokia DTS probes so public artifacts remain clean.
+    \item General LLMs have strong language ability, but they are not specialized
+      for structured RCA outputs or service-level diagnosis.
+    \item An RCA foundation model should provide a reusable base capability for:
+      \begin{itemize}
+        \item root-cause identification;
+        \item evidence extraction and grounding;
+        \item fault / severity / confidence classification;
+        \item fix recommendation generation.
+      \end{itemize}
+    \item The goal is not only a demo UI; the goal is to train a model with
+      reusable RCA capability.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{What We Built: RCA SFT Matrix}
+\begin{frame}{Main Goal: Train an RCA Foundation Model}
   \begin{itemize}
-    \item Built a matrix over two base families: Qwen2.5-7B-Instruct and Qwen3-8B.
-    \item Compared base, curriculum, joint-mix, and anti-forget variants.
-    \item Evaluated on four public RCA datasets:
+    \item Start from existing open-source pretrained models.
+    \item Train them on RCA-style data so they learn domain behavior that the
+      original pretrained model does not reliably have.
+    \item Use public RCA datasets as the core training/evaluation source:
       \begin{itemize}
         \item Nezha;
         \item OpenRCA-500;
         \item RCAEval;
         \item lincyaw/rca.
       \end{itemize}
-    \item Added five general benchmarks to measure whether RCA SFT damages
-      non-RCA capability.
+    \item Use a small internal RCA dataset only as an internal qualitative probe,
+      not as a public release artifact.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{What We Built: RCA Chat Probe}
+\begin{frame}{Deliverables: What We Have Built}
   \begin{itemize}
-    \item Built `rca-chat`, a Gradio probe for loading matrix checkpoints.
-    \item The probe supports base, curriculum, and mix checkpoints from the RCA
-      matrix.
-    \item It can sample public RCA cases and optionally load private Liang DTS
-      cases for internal-only qualitative inspection.
-    \item The purpose is to inspect behavior that tables hide:
+    \item Trained RCA-capable model checkpoints from open-source base models.
+    \item Built an RCA SFT matrix over:
       \begin{itemize}
-        \item JSON format stability;
-        \item evidence citation;
-        \item service-level root-cause prediction;
-        \item qualitative answer usefulness.
+        \item two base families: Qwen2.5-7B-Instruct and Qwen3-8B;
+        \item curriculum vs. joint-mix training;
+        \item four public RCA datasets;
+        \item five general benchmarks for capability-retention checks.
+      \end{itemize}
+    \item Built `rca-chat`, a Gradio probe to load checkpoints and inspect
+      qualitative behavior on RCA cases.
+    \item Packaged matrix reports, provenance notes, and project brief slides.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Current Capability: What Improved}
+  \begin{itemize}
+    \item The trained model can learn RCA-specific behavior that the base model
+      does not consistently produce.
+    \item Observed improvements include:
+      \begin{itemize}
+        \item more structured RCA JSON outputs;
+        \item better service-level root-cause identification;
+        \item stronger fault / severity fields on public RCA benchmarks;
+        \item more useful fix recommendation text.
+      \end{itemize}
+    \item The chat probe makes these changes visible case by case, while the
+      matrix shows the quantitative trend.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Future Problem: Catastrophic Forgetting}
+  \begin{itemize}
+    \item The largest research issue is \textbf{catastrophic forgetting}.
+    \item Definition: after training a pretrained model on new RCA data, the model
+      may lose capability learned from earlier RCA datasets or from pretraining.
+    \item This happens because our RCA data is much smaller than the original
+      pretraining corpus; we cannot fully protect the base model by simply
+      mixing in all original data.
+    \item In our setting, forgetting can show up as:
+      \begin{itemize}
+        \item worse performance on earlier RCA datasets after later training;
+        \item valid JSON with missing evidence fields;
+        \item format collapse after LoRA updates;
+        \item drops on general benchmarks such as reasoning or instruction following.
       \end{itemize}
   \end{itemize}
 \end{frame}
 
-\begin{frame}{What We Learned From the Demo}
+\begin{frame}{Future Work: How We Are Trying to Solve It}
   \begin{itemize}
-    \item SFT can teach useful RCA signals: service identification,
-      fault/severity fields, recommendations, and structured JSON behavior.
-    \item Direct SFT is not always robust:
+    \item We already compared multiple training strategies:
       \begin{itemize}
-        \item some checkpoints learn RCA but lose output format;
-        \item anti-forget v2 improved surface JSON but lost evidence grounding;
-        \item general capability can move when training only on RCA data.
+        \item sequential curriculum training;
+        \item joint-mix training across RCA datasets;
+        \item anti-forget v2 with data balancing and a small general anchor.
       \end{itemize}
-    \item Conclusion: the RCA demo supports SFT as an initialization step, but
-      not as the final long-context RCA solution.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Next Demo: Long-Context RCA Compression}
-  \begin{itemize}
-    \item Next, use one public RCA case to compare four input strategies:
-      \begin{enumerate}
-        \item full context;
-        \item summary;
-        \item retrieval;
-        \item compressed-memory RCA.
-      \end{enumerate}
-    \item Report the same axes across all four strategies:
-      \begin{itemize}
-        \item RCA answer quality;
-        \item evidence grounding;
-        \item output format stability;
-        \item context / KV cost reduction.
-      \end{itemize}
-    \item Decision gate: continue toward wrapper memory only if it beats a cheap
-      baseline on at least one meaningful axis.
+    \item Early conclusion: direct SFT is useful for initializing RCA capability,
+      but it is not stable enough as the final answer.
+    \item Next research focus: keep the base model more stable and move
+      adaptation into memory / wrapper mechanisms.
+    \item Next demo: compare full context, summary, retrieval, and
+      compressed-memory RCA on the same public RCA case.
   \end{itemize}
 \end{frame}
