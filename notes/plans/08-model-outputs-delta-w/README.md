@@ -8,6 +8,27 @@
 
 ---
 
+## Reader guide
+
+This directory now has two scopes:
+
+- **Practical v0**: frozen 7B/8B base model + trainable learned-memory wrapper.
+  This is the version to execute first for a research paper prototype and the
+  RCA-Code open-source model.
+- **Full Plan 08**: model-emitted weight deltas and verifier-gated
+  self-modification. This remains the long-term research direction.
+
+Start here for v0:
+
+- [`v0-learned-memory-wrapper.md`](v0-learned-memory-wrapper.md) — concise
+  English note for the executable v0.
+- [`v0-learned-memory-wrapper_zh.md`](v0-learned-memory-wrapper_zh.md) — Chinese
+  version.
+- [`v0-budget.md`](v0-budget.md) — v0 budget and decision gates.
+- [`v0-budget_zh.md`](v0-budget_zh.md) — Chinese budget.
+
+Then read the original files for the full self-modifying-LLM version.
+
 ## Problem
 
 Current LLMs are static at inference: the same query, the same conversation history, the same weights. Memory lives in either (a) the prompt (volatile, expensive, lost at session end) or (b) external memory tools (RAG, vector DBs — bolt-on, not native).
@@ -79,6 +100,10 @@ Kill criteria:
 
 ## Files in this plan
 - [`README.md`](README.md) — this file
+- [`v0-learned-memory-wrapper.md`](v0-learned-memory-wrapper.md) — practical v0 scope
+- [`v0-learned-memory-wrapper_zh.md`](v0-learned-memory-wrapper_zh.md) — Chinese v0 scope
+- [`v0-budget.md`](v0-budget.md) — practical v0 budget
+- [`v0-budget_zh.md`](v0-budget_zh.md) — Chinese v0 budget
 - [`validation.md`](validation.md) — experimental protocol, baselines
 - [`channels.md`](channels.md) — benchmarks, datasets
 - [`budget.md`](budget.md) — costs by phase
