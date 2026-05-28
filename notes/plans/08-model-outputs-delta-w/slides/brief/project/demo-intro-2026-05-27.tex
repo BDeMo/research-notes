@@ -1,163 +1,257 @@
-% Standalone demo-introduction slides for 2026-05-27.
+% Standalone 10-minute RCA foundation-model demo slides.
+% Updated for 2026-05-28.
 
-\begin{frame}{Background: About RCA}
-  \begin{itemize}
-    \item \textbf{Core need}: turn noisy operational evidence into an actionable
-      root-cause diagnosis and recovery recommendation.
-    \item RCA outputs are structured: failing service, fault type, evidence,
-      confidence, severity, and recommended fix.
-    \item Inputs are evidence-heavy: symptoms, service topology, logs, traces,
-      fault reports, historical cases, and human summaries.
-    \item A useful RCA model must connect evidence to cause, not only generate
-      fluent incident text.
-  \end{itemize}
+\begin{frame}{Demo Flow: 10 Minutes}
+  \begin{enumerate}
+    \item Motivation: why Nokia needs an RCA foundation model.
+    \item Path: why existing general LLMs are not enough.
+    \item Data: why domain data is the core bottleneck.
+    \item Pipeline: SFT, RL / PPO, and on-policy distillation.
+    \item Current status: public RCA SFT results and remaining gaps.
+    \item Next deliverables: model GUI, training GUI, and harness iteration.
+  \end{enumerate}
 \end{frame}
 
-\begin{frame}{Significance: Why an RCA Foundation Model}
+\begin{frame}{Motivation: Why RCA Foundation Model}
   \begin{itemize}
-    \item General LLMs have strong language ability, but they are not specialized
-      for structured RCA outputs or service-level diagnosis.
-    \item An RCA foundation model should provide a reusable base capability for:
+    \item RCA turns noisy operational evidence into root cause, supporting
+      evidence, confidence, severity, and recommended fix.
+    \item For Nokia, this matters in three places:
       \begin{itemize}
-        \item root-cause identification;
-        \item evidence extraction and grounding;
-        \item fault / severity / confidence classification;
-        \item fix recommendation generation.
+        \item internal development: faster debugging and less manual triage;
+        \item industrial LLM deployment: models must operate over tools, traces,
+          logs, tickets, and service topology;
+        \item telecom operations: failures are complex, multi-service, and
+          evidence-heavy.
       \end{itemize}
-    \item The goal is not only a demo UI; the goal is to train a model with
-      reusable RCA capability.
+    \item Goal: make complex RCA workflows easier for humans to operate and
+      easier for models to assist.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Main Goal: Train an RCA Foundation Model}
+\begin{frame}{Problem: Do We Already Have an RCA LLM?}
   \begin{itemize}
-    \item Start from existing open-source pretrained models.
-    \item Train them on RCA-style data so they learn domain behavior that the
-      original pretrained model does not reliably have.
-    \item Use public RCA datasets as the core training/evaluation source:
+    \item Most strong public LLMs are optimized for broad consumer and office use:
+      chat, writing, coding, math, and general reasoning.
+    \item RCA is a specialized industrial domain:
       \begin{itemize}
-        \item Nezha;
-        \item OpenRCA-500;
-        \item RCAEval;
-        \item lincyaw/rca.
+        \item evidence is long, noisy, and multi-source;
+        \item outputs must be structured and actionable;
+        \item correctness depends on service-level grounding, not fluent text.
       \end{itemize}
-    \item Use a small internal RCA dataset only as an internal qualitative probe,
-      not as a public release artifact.
+    \item Since the largest AI companies cover the largest markets first, RCA
+      capability is not usually a first-class target.
+    \item Therefore the practical question is: can we train an RCA foundation
+      model from open-source bases?
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Deliverables: What We Have Built}
-  \begin{itemize}
-    \item \textbf{Main deliverable}: an RCA-capable foundation-model checkpoint
-      trained from open-source base models on public RCA datasets.
-    \item The model can be used as an internal RCA probe:
-      \begin{itemize}
-        \item load checkpoint in `rca-chat`;
-        \item run public RCA cases for reproducible evaluation;
-        \item run private RCA cases only for internal qualitative inspection.
-      \end{itemize}
-    \item Supporting deliverables:
-      \begin{itemize}
-        \item RCA SFT matrix over Qwen2.5 / Qwen3, curriculum / joint-mix,
-          4 public RCA datasets, and 5 general benchmarks;
-        \item matrix reports and provenance notes;
-        \item project brief slides for stakeholder communication.
-      \end{itemize}
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Training Design: Curriculum vs. Mix}
-  \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Curriculum Line}
-        \begin{itemize}
-          \item Train sequentially by dataset order:
-            Nezha $\rightarrow$ OpenRCA-500 $\rightarrow$ RCAEval $\rightarrow$ lincyaw.
-          \item Each later step starts from the previous trained checkpoint.
-          \item Goal: test whether RCA capability can accumulate across datasets.
-          \item Key property: exposes retention / forgetting after each new RCA domain.
-        \end{itemize}
-      \end{block}
-    \end{column}
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Mix Line}
-        \begin{itemize}
-          \item Combine all public RCA datasets into one shuffled training set.
-          \item Train one model with balanced exposure to all RCA domains.
-          \item Goal: get the strongest single RCA checkpoint across datasets.
-          \item Key property: stronger average RCA behavior, but can still affect general ability.
-        \end{itemize}
-      \end{block}
-    \end{column}
-  \end{columns}
-
-  \vspace{0.4em}
-  \begin{itemize}
-    \item This two-line design lets us separate two questions: can RCA skills
-      accumulate over time, and what is the best single checkpoint for a demo?
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Broader Evidence: Matrix Results}
-  \scriptsize
+\begin{frame}{Public RCA Benchmark: Base Models}
+  \tiny
   \begin{table}
-    \begin{tabular}{p{0.27\textwidth} p{0.28\textwidth} p{0.32\textwidth}}
+    \begin{tabular}{lrrrr}
       \toprule
-      Signal & Result & Reading \\
+      Checkpoint & Nezha & OpenRCA-500 & RCAEval & lincyaw \\
       \midrule
-      Recommendation quality & $q25_{mix}$ reached 0.733 `recommendation\_f1`
-      on RCAEval & Joint SFT can teach useful RCA recommendation behavior. \\
-      Service-level RCA & $q25_{curr\_4}$ reached 0.563 lincyaw
-      `service\_set\_f1` after re-eval & Curriculum can transfer service
-      identification across RCA datasets. \\
-      Evidence extraction & $q25_{curr\_4}$ recovered Nezha
-      `evidence\_overlap` to 0.578 & RCA SFT can learn to cite supporting
-      evidence, not only output labels. \\
-      Demo usability & `rca-chat` loads matrix checkpoints and public RCA cases
-      & We can show behavior case-by-case, not only as aggregate tables. \\
+      $q25_{base}$ recommendation F1 & 0.013 & 0.045 & 0.041 & 0.023 \\
+      $q3_{base}$ recommendation F1 & 0.009 & 0.079 & 0.049 & 0.064 \\
       \bottomrule
     \end{tabular}
   \end{table}
-
-  \vspace{-0.4em}
+  \normalsize
   \begin{itemize}
-    \item \textbf{Conclusion}: the first deliverable is a real RCA-capable model
-    probe, not only a dataset or evaluation script.
+    \item Reading: open-source base models have language and reasoning ability,
+      but weak specialized RCA behavior on public RCA benchmarks.
+    \item The gap is not only format; the model must identify the right service,
+      evidence chain, root cause, and fix recommendation.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Future Problem: Catastrophic Forgetting}
+\begin{frame}{After SFT: RCA Capability Improves}
+  \tiny
+  \begin{table}
+    \begin{tabular}{lrrrr}
+      \toprule
+      Checkpoint & Nezha & OpenRCA-500 & RCAEval & lincyaw \\
+      \midrule
+      $q25_{base}$ & 0.013 & 0.045 & 0.041 & 0.023 \\
+      $q25_{curr\_4}$ & 0.008 & 0.142 & 0.324 & 0.124 \\
+      $q25_{mix}$ & \textbf{0.034} & \textbf{0.305} & \textbf{0.733} & \textbf{0.242} \\
+      $q3_{base}$ & 0.009 & 0.079 & 0.049 & 0.064 \\
+      $q3_{mix}$ & 0.012 & 0.043 & 0.000 & 0.016 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \normalsize
   \begin{itemize}
-    \item The largest research issue is \textbf{catastrophic forgetting}.
-    \item Definition: after training a pretrained model on new RCA data, the model
-      may lose capability learned from earlier RCA datasets or from pretraining.
-    \item This happens because our RCA data is much smaller than the original
-      pretraining corpus; we cannot fully protect the base model by simply
-      mixing in all original data.
-    \item \textbf{Observed in v2}: lincyaw `service\_set\_f1` dropped
-      0.563 $\rightarrow$ 0.233 after the anti-forget quick-win retrain.
-    \item \textbf{Observed in v2}: Nezha `evidence\_overlap` dropped
-      0.578 $\rightarrow$ 0.000 even though JSON parseability improved.
-    \item \textbf{Observed on q3}: cumulative checkpoints showed format collapse,
-      with RCAEval `json\_parseable` down to 0.113 at $q3_{curr\_4}$.
-    \item \textbf{Observed on general benchmarks}: $q25_{mix}$ dropped GSM8K
-      0.795 $\rightarrow$ 0.715 and TruthfulQA 0.647 $\rightarrow$ 0.589.
+    \item Result: $q25_{mix}$ is the strongest complete recommendation row.
+    \item Conclusion: SFT can inject RCA behavior, but the effect depends on
+      base model, data mix, and training recipe.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Future Work: How We Are Trying to Solve It}
+\begin{frame}{Why Data Is the Center of the Project}
   \begin{itemize}
-    \item We already compared multiple training strategies:
+    \item If no ready-to-use RCA foundation model exists, the core asset becomes
+      RCA data.
+    \item High-quality data sampling controls domain generalization:
       \begin{itemize}
-        \item sequential curriculum training;
-        \item joint-mix training across RCA datasets;
-        \item anti-forget v2 with data balancing and a small general anchor.
+        \item broad cases teach coverage across services and fault types;
+        \item precise labels teach what the correct root cause should be;
+        \item evidence labels teach the model not to hallucinate;
+        \item preference / reward data teaches which answer is better.
       \end{itemize}
-    \item Early conclusion: direct SFT is useful for initializing RCA capability,
-      but it is not stable enough as the final answer.
-    \item Next research focus: keep the base model more stable and move
-      adaptation into memory / wrapper mechanisms.
-    \item Next demo: compare full context, summary, retrieval, and
-      compressed-memory RCA on the same public RCA case.
+    \item Domain data is also the largest bottleneck: RCA gold answers are
+      expensive, expert-heavy, and often private.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Post-Training Pipeline: Data Needed at Each Stage}
+  \scriptsize
+  \begin{table}
+    \begin{tabular}{p{0.18\textwidth}p{0.32\textwidth}p{0.38\textwidth}}
+      \toprule
+      Stage & Data needed & What it teaches \\
+      \midrule
+      SFT & Human-labeled gold RCA answers & Output schema, RCA vocabulary, service/root-cause mapping. \\
+      RL / PPO & Reward model or task evaluator for RCA outputs & Prefer grounded, correct, actionable RCA answers over fluent but shallow ones. \\
+      On-policy distillation & Current model samples plus evaluator-selected better answers & Adjust the model's own generation distribution and reduce exposure bias. \\
+      Preference / DPO-style training & Pairwise better/worse RCA answers & Learn quality ranking without only copying one gold answer. \\
+      Tool / agent training & Logs, traces, tool calls, and success criteria & Learn when to inspect evidence before final RCA prediction. \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+\begin{frame}{Simple Example: SFT vs On-Policy Training}
+  \begin{block}{Evidence}
+    Service A is slow. Service B has timeout errors. Database C shows
+    connection failures.
+  \end{block}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{SFT target}
+        Root cause: Database C connection failure.\\
+        Evidence: B timeout plus DB connection error.\\
+        Fix: inspect DB network and connection pool.
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{On-policy correction}
+        Model sample A: blame Service B.\\
+        Model sample B: blame Database C.\\
+        Evaluator rewards B, then RL/PPO or distillation increases B-style answers.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{0.4em}
+  \begin{itemize}
+    \item SFT teaches the RCA language; on-policy training teaches the model to
+      behave correctly under its own generation distribution.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Current Status: We Finished the SFT Stage}
+  \begin{itemize}
+    \item Done:
+      \begin{itemize}
+        \item trained public RCA SFT checkpoints over Qwen2.5 and Qwen3 bases;
+        \item compared curriculum and joint-mix training;
+        \item built RCA benchmark matrix and \texttt{rca-chat} inspection path;
+        \item showed domain generalization on public RCA datasets.
+      \end{itemize}
+    \item Not done yet:
+      \begin{itemize}
+        \item enough expert RCA gold answers for broader coverage;
+        \item non-human RCA task evaluator / reward model;
+        \item reliable RCA teacher model for distillation;
+        \item full RL/PPO or on-policy distillation stage.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Current Difficulty: SFT Is Not Enough}
+  \scriptsize
+  \begin{table}
+    \begin{tabular}{p{0.34\textwidth}rrp{0.22\textwidth}}
+      \toprule
+      Criterion & Before & After & Reading \\
+      \midrule
+      lincyaw service F1, anti-forget v2 & 0.563 & 0.233 & Retention dropped. \\
+      Nezha evidence overlap, anti-forget v2 & 0.578 & 0.000 & Evidence grounding collapsed. \\
+      RCAEval JSON parse, $q3_{curr\_4}$ & 1.000 & 0.113 & Format became fragile. \\
+      GSM8K, $q25_{base}$ to $q25_{mix}$ & 0.795 & 0.715 & General ability moved. \\
+      TruthfulQA, $q25_{base}$ to $q25_{mix}$ & 0.647 & 0.589 & General ability moved. \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \normalsize
+  \begin{itemize}
+    \item Main lesson: valid JSON or higher RCA score in one cell is not enough.
+    \item We need a full post-training system with evaluators, feedback, and
+      iterative updates.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Next Deliverable 1: Model GUI and Minimal Harness}
+  \begin{itemize}
+    \item Provide a simple RCA model-use GUI:
+      \begin{itemize}
+        \item load selected checkpoints;
+        \item run public RCA cases or internal qualitative cases;
+        \item show structured output, evidence, confidence, and recommendation.
+      \end{itemize}
+    \item Provide a minimal model-management harness:
+      \begin{itemize}
+        \item track base model, adapter, dataset version, and metric version;
+        \item make each demo result reproducible;
+        \item prevent silent mismatch between model and evaluation path.
+      \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Next Deliverable 2: RCA Training GUI}
+  \begin{itemize}
+    \item Build a training GUI for internal RCA iteration.
+    \item Internal users should be able to assemble training modules:
+      \begin{itemize}
+        \item standard SFT;
+        \item RLHF / reward-model training;
+        \item off-policy training from historical logs;
+        \item on-policy + RL / distillation / preference / SFT loops;
+        \item tool-calling, skills, and MCP-style evidence tools.
+      \end{itemize}
+    \item Goal: treat model improvement like software development: iterative
+      releases, regression checks, and controlled updates.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Next Deliverable 3: Harness Iteration System}
+  \begin{itemize}
+    \item RCA foundation model quality depends on the model and the tools around
+      it.
+    \item When the base model updates, the harness must also track:
+      \begin{itemize}
+        \item tool-calling schemas;
+        \item skill prompts and reusable RCA procedures;
+        \item MCP / external tool interfaces;
+        \item evaluation sets and reward models;
+        \item regression reports across old and new checkpoints.
+      \end{itemize}
+    \item Long-term goal: continuously improve the RCA model and its operating
+      system together.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Takeaway}
+  \begin{itemize}
+    \item Motivation: Nokia needs RCA models for complex telecom and industrial
+      operations.
+    \item Evidence: public base models have weak RCA benchmark performance; SFT
+      significantly improves RCA behavior on Qwen2.5.
+    \item Boundary: SFT alone does not solve exposure bias, evaluator shortage,
+      evidence grounding, or forgetting.
+    \item Direction: build the full post-training pipeline and the GUI/harness
+      system needed to keep RCA models improving over time.
   \end{itemize}
 \end{frame}
