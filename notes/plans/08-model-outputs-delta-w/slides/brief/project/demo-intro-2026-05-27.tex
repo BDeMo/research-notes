@@ -171,26 +171,29 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Current Difficulty: SFT Is Not Enough}
+\begin{frame}{Current Difficulty: General Capability Drop}
   \scriptsize
   \begin{table}
-    \begin{tabular}{p{0.34\textwidth}rrp{0.22\textwidth}}
+    \begin{tabular}{lrrrr}
       \toprule
-      Criterion & Before & After & Reading \\
+      Checkpoint & IFEval & MMLU & GSM8K & TruthfulQA \\
       \midrule
-      lincyaw service F1, anti-forget v2 & 0.563 & 0.233 & Retention dropped. \\
-      Nezha evidence overlap, anti-forget v2 & 0.578 & 0.000 & Evidence grounding collapsed. \\
-      RCAEval JSON parse, $q3_{curr\_4}$ & 1.000 & 0.113 & Format became fragile. \\
-      GSM8K, $q25_{base}$ to $q25_{mix}$ & 0.795 & 0.715 & General ability moved. \\
-      TruthfulQA, $q25_{base}$ to $q25_{mix}$ & 0.647 & 0.589 & General ability moved. \\
+      $q25_{base}$ & 0.680 & 0.754 & 0.795 & 0.647 \\
+      $q25_{mix}$ & 0.655 & 0.751 & 0.715 & 0.589 \\
+      Drop & -0.025 & -0.003 & -0.080 & -0.058 \\
+      \midrule
+      $q3_{base}$ & 0.387 & 0.768 & 0.935 & 0.545 \\
+      $q3_{mix}$ & 0.421 & 0.766 & 0.880 & 0.494 \\
+      Change & +0.034 & -0.002 & -0.055 & -0.051 \\
       \bottomrule
     \end{tabular}
   \end{table}
   \normalsize
   \begin{itemize}
-    \item Main lesson: valid JSON or higher RCA score in one cell is not enough.
-    \item We need a full post-training system with evaluators, feedback, and
-      iterative updates.
+    \item Main lesson: RCA SFT improves domain behavior, but direct SFT can move
+      general capability.
+    \item This motivates a full post-training pipeline and stronger regression
+      checks, not only one SFT checkpoint.
   \end{itemize}
 \end{frame}
 

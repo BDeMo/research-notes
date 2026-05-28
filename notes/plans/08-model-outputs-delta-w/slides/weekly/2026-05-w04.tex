@@ -105,7 +105,7 @@
       \begin{itemize}
         \item 2 base families: Qwen2.5-7B-Instruct (`q25`) and Qwen3-8B (`q3`).
         \item 4 RCA datasets: Nezha, OpenRCA-500, RCAEval, lincyaw/rca.
-        \item Training schedules: base, curriculum chain, joint mix, and anti-forget v2.
+        \item Training schedules: base, curriculum chain, and joint mix.
         \item Evaluation matrix: RCA metrics + general capability benchmarks.
       \end{itemize}
     \item Project role: this is not the final solution; it is the initialization phase that maps the SFT capability boundary.
@@ -137,13 +137,14 @@
         \item $q3_{curr\_2}$ post-fix `json_parseable`: 0.408 / 0.582 / 0.804 / 0.755.
         \item Later cumulative Qwen3 checkpoints continue the format-collapse pattern.
       \end{itemize}
-    \item Anti-forget v2 quick-win failed its decision gate:
+    \item General benchmark regression appears after direct RCA SFT:
       \begin{itemize}
-        \item RCA retention failed 4/4; lincyaw `service_set_f1` dropped 0.563 $\rightarrow$ 0.233.
-        \item Nezha `json_parseable` improved 0.857 $\rightarrow$ 1.000, but `evidence_overlap` collapsed 0.578 $\rightarrow$ 0.000.
-        \item General anchor helped GSM8K but did not protect all general capability.
+        \item $q25_{mix}$ GSM8K drops 0.795 $\rightarrow$ 0.715.
+        \item $q25_{mix}$ TruthfulQA drops 0.647 $\rightarrow$ 0.589.
+        \item $q3_{mix}$ GSM8K drops 0.935 $\rightarrow$ 0.880.
+        \item $q3_{mix}$ TruthfulQA drops 0.545 $\rightarrow$ 0.494.
       \end{itemize}
-    \item Takeaway: more SFT and simple data mixing are not enough to guarantee robust RCA ability.
+    \item Takeaway: SFT can teach RCA behavior, but general-capability regression must be tracked before scaling.
   \end{itemize}
 \end{frame}
 

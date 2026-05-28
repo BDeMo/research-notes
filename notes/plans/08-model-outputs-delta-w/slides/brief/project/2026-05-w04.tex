@@ -70,10 +70,6 @@
       $q25_{curr\_2}$ & 0.016 & 0.128 & 0.077 & 0.094 \\
       $q25_{curr\_3}$ & 0.017 & 0.068 & 0.096 & 0.046 \\
       $q25_{curr\_4}$ & 0.008 & 0.142 & 0.324 & 0.124 \\
-      $q25_{curr\_v2\_1}$ & 0.018 & 0.047 & 0.037 & 0.023 \\
-      $q25_{curr\_v2\_2}$ & 0.017 & 0.200 & 0.094 & 0.127 \\
-      $q25_{curr\_v2\_3}$ & 0.035 & 0.043 & 0.061 & 0.018 \\
-      $q25_{curr\_v2\_4}$ & 0.029 & 0.155 & 0.090 & 0.132 \\
       $q25_{mix}$ & \textbf{0.034} & \textbf{0.305} & \textbf{0.733} & \textbf{0.242} \\
       $q3_{base}$ & 0.009 & 0.079 & 0.049 & 0.064 \\
       $q3_{curr\_1}$ & 0.014 & 0.083 & 0.055 & 0.071 \\
@@ -103,8 +99,6 @@
       Curriculum signal & lincyaw service F1 & 0.272 pre-fix & 0.563 post-fix & eval path matters \\
       q3 format collapse & RCAEval JSON parse & 1.000 base & 0.113 $q3_{curr\_4}$ & LoRA recipe fragile \\
       q3 mix collapse & RCAEval JSON parse & 1.000 base & 0.000 $q3_{mix}$ & parser sees no structure \\
-      v2 evidence loss & Nezha evidence & 0.578 v1 & 0.000 v2 & valid JSON can be empty \\
-      v2 service loss & lincyaw service F1 & 0.563 v1 & 0.233 v2 & anti-forget failed \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -126,10 +120,6 @@
       $q25_{curr\_2}$ & 0.671 & 0.754 & 0.815 & 0.626 \\
       $q25_{curr\_3}$ & 0.694 & 0.751 & 0.785 & 0.643 \\
       $q25_{curr\_4}$ & 0.675 & 0.749 & 0.775 & 0.611 \\
-      $q25_{curr\_v2\_1}$ & 0.675 & 0.751 & 0.800 & 0.637 \\
-      $q25_{curr\_v2\_2}$ & 0.664 & 0.753 & 0.750 & 0.613 \\
-      $q25_{curr\_v2\_3}$ & 0.679 & 0.750 & 0.805 & 0.654 \\
-      $q25_{curr\_v2\_4}$ & 0.632 & 0.750 & 0.770 & 0.597 \\
       $q25_{mix}$ & 0.655 & 0.751 & 0.715 & 0.589 \\
       $q3_{base}$ & 0.387 & 0.768 & 0.935 & 0.545 \\
       $q3_{curr\_1}$ & 0.371 & 0.769 & 0.915 & 0.540 \\
@@ -145,29 +135,6 @@
   \begin{itemize}
     \item \textbf{Reading}: direct SFT changes non-RCA ability; $q25_{mix}$ loses 8 pp on GSM8K and 5.8 pp on TruthfulQA.
     \item BBH is omitted here because the latest matrix aggregation is broken for all checkpoints.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Experiments: Anti-Forget v2 Decision Gate}
-  \scriptsize
-  \begin{table}
-    \begin{tabular}{p{0.42\textwidth}rrp{0.22\textwidth}}
-      \toprule
-      Criterion & v1 & v2 & Status \\
-      \midrule
-      Nezha evidence overlap & 0.578 & 0.000 & Fail: catastrophic drop \\
-      OpenRCA-500 service F1 & 0.939 & 0.843 & Fail: -9.6 pp \\
-      RCAEval service F1 & 0.676 & 0.559 & Fail: -11.7 pp \\
-      lincyaw service F1 & 0.563 & 0.233 & Fail: -33.0 pp \\
-      Nezha JSON parseability & 0.857 & 1.000 & Pass, but misleading \\
-      GSM8K vs $q25_{mix}$ target & 0.715 & 0.770 & Pass \\
-      TruthfulQA vs $q25_{mix}$ target & 0.589 & 0.597 & Fail vs target \\
-      \bottomrule
-    \end{tabular}
-  \end{table}
-  \begin{itemize}
-    \item \textbf{Verdict}: quick-win failed; oversample + anchor improved surface format but damaged evidence/service retention.
-    \item \textbf{Decision}: do not keep scaling direct SFT as the only RCA path.
   \end{itemize}
 \end{frame}
 
