@@ -37,8 +37,9 @@ Format:
 ### [cartridges] Cartridges: Lightweight and general-purpose long context representations — Eyuboglu et al., 2025
 - **Type**: paper
 - **Link**: https://arxiv.org/abs/2506.06266
-- **Why it matters**: Self-study CD with prefix tuning. Shares the "internalize context" goal with D2L but uses real gradient descent + sleep-time compute. Direct comparable baseline for plan 01 and plan 08.
-- **Tags**: #context-distillation #prefix-tuning #sleep-time-compute
+- **Why it matters**: Trains a small **KV cache** per corpus via "self-study" — synthetic Q&A + KL distillation. Naive NTP on the corpus fails; the self-study recipe is the contribution. Matches ICL at **38.6× less memory**, **26.4× throughput**. Extends 128K → 484K effective tokens (MTOB). Cartridges compose at inference without retraining. Direct comparable baseline for plan 01 and plan 08; the self-study Q&A pipeline is directly transferable to v0's teacher-student training. Read in detail 2026-05-28.
+- **Used in**: matrix/2026-05-26, matrix/2026-05-28; plan 08 v0 training recipe.
+- **Tags**: #context-distillation #kv-cache #sleep-time-compute #long-context
 
 ### [sleep] Sleep-time Compute: Beyond Inference Scaling at Test-Time — Lin, K. et al., 2025
 - **Type**: paper
@@ -57,9 +58,11 @@ Format:
 - **Tags**: #self-improvement #reasoning
 
 ### [genadapter] Generative Adapter: Contextualizing Language Models in Parameters with a Single Forward Pass — Chen et al., ICLR 2025
-- **Type**: paper
-- **Why it matters**: Closest prior to D2L. Uses NTP loss instead of KL — D2L explicitly outperforms it. Read carefully before plan 08.
-- **Tags**: #hypernetwork #context-distillation
+- **Type**: paper / code
+- **Link**: arXiv:2411.05877 · [code](https://github.com/chentong0/generative-adapter)
+- **Why it matters**: Bi-linear hypernet generates a **LoRA delta** per context chunk; key recurrence $S_t = S_{t-1} + A_2 H_t^\top H_t B_1$ with $S_t \in \mathbb{R}^{d_r \times d_r}$, $d_r \ll d_h$ — **constant memory** across stream length. SVD normalization stabilizes training and naturally produces low-rank LoRA. Pretrain: 1B SlimPajama tokens, chunk size 1024. Mistral-7B / Llama2-7B. StreamingQA F1 19.5 (SFT) → 31.5 (genadapter) at 32K context. **Essentially plan 08's north star minus verifier gating** — the gap is now identifiable. v0 should treat as primary LoRA-side baseline. Read in detail 2026-05-28.
+- **Used in**: matrix/2026-05-26, matrix/2026-05-28; plan 08, plan 08 v0.
+- **Tags**: #hypernetwork #context-distillation #lora #recurrent-state
 
 ### [hint] HINT: Hypernetwork instruction tuning — Ivison et al., ACL 2023
 - **Type**: paper
@@ -123,8 +126,10 @@ Format:
 
 ### [gisting] Learning to Compress Prompts with Gist Tokens — Mu, J., Li, X., Goodman, N., NeurIPS 2024
 - **Type**: paper
-- **Why it matters**: Compresses prompts into a small set of "gist" tokens at training time. Prefix-side analog of context distillation.
-- **Tags**: #hypernetwork #prompt-compression
+- **Link**: arXiv:2304.08467
+- **Why it matters**: LM is its own gist predictor — no separate hypernet. Insert `k` gist tokens between prompt and input; attention-mask trick forces information into gist activations. **No additional training cost** over instruction tuning. Up to **26× prompt compression**, 40% FLOPs reduction. **Designed for short prompts (≤ 30 tokens), not long context** — soft-prompt ceiling. Baseline that v0 must beat to justify the wrapper architecture. Read in detail 2026-05-28.
+- **Used in**: matrix/2026-05-26, matrix/2026-05-28; plan 08 v0 baseline.
+- **Tags**: #hypernetwork #prompt-compression #attention-masking
 
 ## Inference-time compute (X-axis)
 
@@ -297,6 +302,13 @@ Format:
 - **Type**: tech report
 - **Why it matters**: Empirical case for why we can't just keep growing X.
 - **Tags**: #long-context
+
+### [act-beacon] Long Context Compression with Activation Beacon — Zhang, P. et al., 2024
+- **Type**: paper / system
+- **Link**: arXiv:2401.03462 · [code](https://github.com/FlagOpen/FlagEmbedding/)
+- **Why it matters**: Argues soft-token compression (Gisting, ICAE, AutoCompressor) is the *bottleneck* for long-context, and proposes compressing into KV activations at every layer via a `<b>` beacon token. Chunked progressive workflow, random compression-ratio training. 8× KV cache reduction, 2× speedup; 128K tested at 20K train. Direct architectural counter-proposal to plan 08 v0's soft-token default. Read in detail 2026-05-28.
+- **Used in**: matrix/2026-05-28; plan 08 v0 design ablation (proposed J5).
+- **Tags**: #long-context #compression #ttt-adjacent #plan08-v0
 
 ### [longbench] LongBench: A bilingual, multitask benchmark for long context — Bai et al., 2023
 - **Type**: benchmark

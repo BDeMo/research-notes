@@ -118,7 +118,19 @@ M: exp · proto · paper · thesis · prod · side  +  solo · collab · team ·
 | I3 | X-then-W curriculum | ★★★ | F | ←#01 | | – | Train X-saturating, then distill X-residual into W, repeat |
 | I4 | Inverse problem on X-trajectories | ★★ | ? | ←#01 | | – | $\min_W \|f(\text{short-X};W) - f(\text{long-X};W_0)\|$ |
 | I5 | Prompt ↔ LoRA equivalence map | | ? | | | – | Reverse map: LoRA→prompt for interpretability + jailbreak defense |
-| I6 | Inference-time compute allocator | | ? | | | – | Tiny controller: spend FLOP on more X or on ΔW? |
+| I6 | Inference-time compute allocator | | ? | ≈#J3 | | – | Tiny controller: spend FLOP on more X or on ΔW? |
+
+### J. Architecture from method-reading (added 2026-05-28)
+
+Born from reading Cartridges / Activation Beacon / Gisting / Generative Adapter against plan 08 v0. Source notes: [`docs/matrix/2026-05-28-methods-reading-and-new-plans.md`](../../docs/matrix/2026-05-28-methods-reading-and-new-plans.md).
+
+| ID | Title | ★ | S | φ | M | Plan | Meta |
+|---|---|---|---|---|---|---|---|
+| J1 | Wrapper → LoRA distillation | ★★★ | F | ←#08, ↪? | thesis,solo | – | Train v0 memory wrapper first; learn hypernet `m_t → ΔW_t` to bridge v0 to plan 08 north star. Two-stage |
+| J2 | Verifier-gated Generative Adapter | ★★ | F | ←#08 | paper | – | Add $\alpha_t = V(C_t, \Delta_t)$ to [genadapter] streaming update. The simplest plan-08-north-star variant testable today |
+| J3 | Hybrid X+W chunk router | ★★ | F | ≈#I6 | paper | – | Per chunk decide soft-token (X) vs LoRA-delta (W) compression. Operationalizes I6 |
+| J4 | SVD-normalized memory wrapper | ★ | F | ←#08, v0.1 | – | – | Adopt [genadapter]'s SVD normalization in v0 wrapper architecture |
+| J5 | Beacon-style KV memory in v0.1 | ★★ | F | ←#08, v0.1 | – | – | v0 default (soft tokens) is weakest long-context choice per [act-beacon]. Add KV-activation memory ablation in v0 Phase-1 |
 
 ---
 
@@ -130,6 +142,9 @@ M: exp · proto · paper · thesis · prod · side  +  solo · collab · team ·
 | **I3** | `F` | Natural continuation of I1; PhD-thread material |
 | **H6** | `D` | Most ambitious; longest-horizon plan (08) |
 | **D1** | `D` | Sharpest single-paper opportunity (plan 03) |
+| **J1** | `F` | Strategic bridge: v0 → plan 08 north star (2026-05-28) |
+| **J2** | `F` | Simplest plan-08-north-star variant: [genadapter] + verifier (2026-05-28) |
+| **J5** | `F` | Cheapest v0 architecture ablation; sharpens plan 08 v0 positioning (2026-05-28) |
 | **G2** | `?` | Theory backbone for the X-W framing — needed before scaling |
 
 ## How to use this index

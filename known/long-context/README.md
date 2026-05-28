@@ -42,7 +42,7 @@
 - [li-tmlr] Li, T. et al. (TMLR 2025). **Long-context LLMs struggle with long in-context learning.**
 - Pan, Z. et al. (ACL Findings 2024). **LLMLingua-2.**
 - Mu, J., Li, X., Goodman, N. (NeurIPS 2024). **Gisting.**
-- Zhang, P. et al. (ICLR 2025). **Activation Beacon.**
+- [act-beacon] **Activation Beacon** (Zhang, P. et al., 2024) — chunked KV-activation compression; argues soft-token compression is the bottleneck for long context. Read in detail 2026-05-28.
 - Cao, B., Cai, D., Lam, W. (2025). **InfiniteICL.** [arXiv:2504.01707](https://arxiv.org/abs/2504.01707).
 - Gu, A., Dao, T. (2024). **Mamba.**
 - [ttt-layers] Sun, Y., Li, X. et al. (2024). **TTT layers** — competing $\mathcal{O}(N)$ approach.

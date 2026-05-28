@@ -52,6 +52,7 @@
 | Date | Topic | Headline output | Files |
 |---|---|---|---|
 | 2026-05-26 | Inference-time training (X-W framing) | Brainstorm of 50 ideas + 3 detailed plans + Doc-to-LoRA reading | [`2026-05-26-inference-time-training.md`](2026-05-26-inference-time-training.md) |
+| 2026-05-28 | Methods reading + new plan brainstorm | Read 4 methods (Cartridges / Activation Beacon / Gisting / Generative Adapter) for plan 08 v0; 5 J-series ideas + 3 existing ★★+ candidates | [`2026-05-28-methods-reading-and-new-plans.md`](2026-05-28-methods-reading-and-new-plans.md) |
 
 ---
 
@@ -59,7 +60,8 @@
 
 Topics that span multiple sessions and are still alive:
 
-- **Inference-time training** — last touched 2026-05-26. Lead ideas: X-saturation curriculum (plan 01), W-space BoN (plan 03), model outputs ΔW (plan 08).
+- **Inference-time training** — last touched 2026-05-28. Lead ideas: X-saturation curriculum (plan 01), W-space BoN (plan 03), model outputs ΔW (plan 08).
+- **Plan 08 v0 — Learned Memory Wrapper** — actively in execution (30+ commits since 2026-05-26). Frozen 8B base + trainable wrapper, RCA-demo motivated. Reading [genadapter] / [cartridges] / [act-beacon] / [gisting] for architecture decisions and baselines. New J-series ideas (2026-05-28) propose v0.1 architecture ablations + the bridge to plan 08 north star.
 
 ## Archived threads
 
