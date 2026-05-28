@@ -4,7 +4,7 @@
 \begin{frame}{Current Deliverables}
   \begin{itemize}
     \item RCA foundation-model demo direction for Nokia telecom / industrial RCA.
-    \item Public RCA SFT checkpoint matrix over Qwen2.5 and Qwen3 bases.
+    \item Public RCA SFT checkpoint matrix over Qwen2.5 base.
     \item Benchmark evidence on public RCA datasets before and after SFT.
     \item \texttt{rca-chat} inspection path for loading checkpoints and reviewing
       RCA outputs case by case.
@@ -55,7 +55,6 @@
       Checkpoint & Nezha & OpenRCA-500 & RCAEval & lincyaw \\
       \midrule
       $q25_{base}$ recommendation F1 & 0.013 & 0.045 & 0.041 & 0.023 \\
-      $q3_{base}$ recommendation F1 & 0.009 & 0.079 & 0.049 & 0.064 \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -78,8 +77,6 @@
       $q25_{base}$ & 0.013 & 0.045 & 0.041 & 0.023 \\
       $q25_{curr\_4}$ & 0.008 & 0.142 & 0.324 & 0.124 \\
       $q25_{mix}$ & \textbf{0.034} & \textbf{0.305} & \textbf{0.733} & \textbf{0.242} \\
-      $q3_{base}$ & 0.009 & 0.079 & 0.049 & 0.064 \\
-      $q3_{mix}$ & 0.012 & 0.043 & 0.000 & 0.016 \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -156,7 +153,7 @@
   \begin{itemize}
     \item Done:
       \begin{itemize}
-        \item trained public RCA SFT checkpoints over Qwen2.5 and Qwen3 bases;
+        \item trained public RCA SFT checkpoints over the Qwen2.5 base;
         \item compared curriculum and joint-mix training;
         \item built RCA benchmark matrix and \texttt{rca-chat} inspection path;
         \item showed domain generalization on public RCA datasets.
@@ -181,10 +178,6 @@
       $q25_{base}$ & 0.680 & 0.754 & 0.795 & 0.647 \\
       $q25_{mix}$ & 0.655 & 0.751 & 0.715 & 0.589 \\
       Drop & -0.025 & -0.003 & -0.080 & -0.058 \\
-      \midrule
-      $q3_{base}$ & 0.387 & 0.768 & 0.935 & 0.545 \\
-      $q3_{mix}$ & 0.421 & 0.766 & 0.880 & 0.494 \\
-      Change & +0.034 & -0.002 & -0.055 & -0.051 \\
       \bottomrule
     \end{tabular}
   \end{table}

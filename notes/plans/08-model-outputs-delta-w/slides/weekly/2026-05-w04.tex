@@ -103,7 +103,7 @@
     \item Goal: use `rca-demo` to find how far standard SFT can push a general model toward RCA behavior.
     \item Setup:
       \begin{itemize}
-        \item 2 base families: Qwen2.5-7B-Instruct (`q25`) and Qwen3-8B (`q3`).
+        \item Displayed base family: Qwen2.5-7B-Instruct (`q25`).
         \item 4 RCA datasets: Nezha, OpenRCA-500, RCAEval, lincyaw/rca.
         \item Training schedules: base, curriculum chain, and joint mix.
         \item Evaluation matrix: RCA metrics + general capability benchmarks.
@@ -132,17 +132,10 @@
 
 \begin{frame}{SFT Boundaries: Not Always a Win}
   \begin{itemize}
-    \item Qwen3 is fragile under the current LoRA/curriculum recipe:
-      \begin{itemize}
-        \item $q3_{curr\_2}$ post-fix `json_parseable`: 0.408 / 0.582 / 0.804 / 0.755.
-        \item Later cumulative Qwen3 checkpoints continue the format-collapse pattern.
-      \end{itemize}
     \item General benchmark regression appears after direct RCA SFT:
       \begin{itemize}
         \item $q25_{mix}$ GSM8K drops 0.795 $\rightarrow$ 0.715.
         \item $q25_{mix}$ TruthfulQA drops 0.647 $\rightarrow$ 0.589.
-        \item $q3_{mix}$ GSM8K drops 0.935 $\rightarrow$ 0.880.
-        \item $q3_{mix}$ TruthfulQA drops 0.545 $\rightarrow$ 0.494.
       \end{itemize}
     \item Takeaway: SFT can teach RCA behavior, but general-capability regression must be tracked before scaling.
   \end{itemize}
@@ -259,7 +252,6 @@
     \item \textbf{Done}: `rca-chat` Gradio probe exists and can load matrix checkpoints:
       \begin{itemize}
         \item $q25_{base}$, $q25_{mix}$, $q25_{curr\_*}$;
-        \item $q3_{base}$, $q3_{mix}$, $q3_{curr\_*}$;
         \item public RCA datasets plus optional private Liang DTS bundle.
       \end{itemize}
     \item \textbf{Done}: long-context builder script exists:
@@ -371,7 +363,6 @@ python3 scripts/compression/prepare_compression_eval.py \
       \begin{itemize}
         \item Shows how much RCA behavior came from SFT.
       \end{itemize}
-    \item \textbf{Do not use q3 as first demo model}: q3 cumulative SFT currently has format-collapse risk.
   \end{itemize}
 \end{frame}
 
@@ -412,7 +403,6 @@ python3 scripts/compression/prepare_compression_eval.py \
     \item We start around 8B because it is strong enough for reasoning and still feasible for repeated experiments.
     \item Candidate bases:
       \begin{itemize}
-        \item Qwen3-8B / Qwen3-8B-Instruct for long-context and reasoning experiments.
         \item Llama-3.1-8B-Instruct as a secondary validation base.
         \item Qwen2.5-Coder-7B or similar for public debug-trace extension.
       \end{itemize}

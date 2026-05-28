@@ -71,12 +71,6 @@
       $q25_{curr\_3}$ & 0.017 & 0.068 & 0.096 & 0.046 \\
       $q25_{curr\_4}$ & 0.008 & 0.142 & 0.324 & 0.124 \\
       $q25_{mix}$ & \textbf{0.034} & \textbf{0.305} & \textbf{0.733} & \textbf{0.242} \\
-      $q3_{base}$ & 0.009 & 0.079 & 0.049 & 0.064 \\
-      $q3_{curr\_1}$ & 0.014 & 0.083 & 0.055 & 0.071 \\
-      $q3_{curr\_2}$ & 0.006 & 0.054 & 0.044 & 0.042 \\
-      $q3_{curr\_3}$ & 0.001 & 0.020 & 0.018 & 0.015 \\
-      $q3_{curr\_4}$ & 0.013 & 0.046 & 0.024 & 0.033 \\
-      $q3_{mix}$ & 0.012 & 0.043 & 0.000 & 0.016 \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -97,8 +91,6 @@
       \midrule
       SFT service gain & lincyaw service F1 & 0.013 base & 0.771 $q25_{mix}$ & RCA skill learned \\
       Curriculum signal & lincyaw service F1 & 0.272 pre-fix & 0.563 post-fix & eval path matters \\
-      q3 format collapse & RCAEval JSON parse & 1.000 base & 0.113 $q3_{curr\_4}$ & LoRA recipe fragile \\
-      q3 mix collapse & RCAEval JSON parse & 1.000 base & 0.000 $q3_{mix}$ & parser sees no structure \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -121,12 +113,6 @@
       $q25_{curr\_3}$ & 0.694 & 0.751 & 0.785 & 0.643 \\
       $q25_{curr\_4}$ & 0.675 & 0.749 & 0.775 & 0.611 \\
       $q25_{mix}$ & 0.655 & 0.751 & 0.715 & 0.589 \\
-      $q3_{base}$ & 0.387 & 0.768 & 0.935 & 0.545 \\
-      $q3_{curr\_1}$ & 0.371 & 0.769 & 0.915 & 0.540 \\
-      $q3_{curr\_2}$ & 0.405 & 0.768 & 0.895 & 0.526 \\
-      $q3_{curr\_3}$ & 0.468 & 0.764 & 0.905 & 0.529 \\
-      $q3_{curr\_4}$ & 0.418 & 0.761 & 0.880 & 0.508 \\
-      $q3_{mix}$ & 0.421 & 0.766 & 0.880 & 0.494 \\
       \bottomrule
     \end{tabular}
   \end{table}
