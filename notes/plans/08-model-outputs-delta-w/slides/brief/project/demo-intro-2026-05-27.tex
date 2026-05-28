@@ -1,15 +1,16 @@
-% Standalone 10-minute RCA foundation-model demo slides.
+% Standalone RCA foundation-model demo slides.
 % Updated for 2026-05-28.
 
-\begin{frame}{Demo Flow: 10 Minutes}
-  \begin{enumerate}
-    \item Motivation: why Nokia needs an RCA foundation model.
-    \item Path: why existing general LLMs are not enough.
-    \item Data: why domain data is the core bottleneck.
-    \item Pipeline: SFT, RL / PPO, and on-policy distillation.
-    \item Current status: public RCA SFT results and remaining gaps.
-    \item Next deliverables: model GUI, training GUI, and harness iteration.
-  \end{enumerate}
+\begin{frame}{Current Deliverables}
+  \begin{itemize}
+    \item RCA foundation-model demo direction for Nokia telecom / industrial RCA.
+    \item Public RCA SFT checkpoint matrix over Qwen2.5 and Qwen3 bases.
+    \item Benchmark evidence on public RCA datasets before and after SFT.
+    \item \texttt{rca-chat} inspection path for loading checkpoints and reviewing
+      RCA outputs case by case.
+    \item Next-stage plan for the full post-training pipeline: SFT, RL / PPO,
+      on-policy distillation, and harness iteration.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Motivation: Why RCA Foundation Model}
