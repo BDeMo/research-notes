@@ -380,6 +380,127 @@ Format:
 - **Why it matters**: General quality. Use only after rule-based channels are saturated.
 - **Tags**: #benchmark #open-ended
 
+## 2026 prior-work landscape (added 2026-05-28)
+
+These five clusters were scanned during the 2026-05-28 brainstorm. They define the field's current frontier and directly affect the uniqueness column of our idea evaluation.
+
+### TTT for LLMs (2026 cluster)
+
+### [in-place-ttt] In-Place Test-Time Training — Anonymous, ICLR 2026 Oral
+- **Type**: paper
+- **Link**: arXiv:2604.06169
+- **Why it matters**: Treats MLP final projection matrix as fast weights — drop-in TTT enhancement for pretrained LLMs. Replaces generic reconstruction with NTP-aligned objective. Chunk-wise update, context-parallel compatible. 4B model handles 128K context. **Directly preempts plan 08's "what to update" and J5's parameterization choice.** Plan 08 must explicitly differentiate.
+- **Tags**: #ttt #fast-weights #plan08-prior
+
+### [tempo] TEMPO: Scaling Test-time Training for Large Reasoning Models — 2026
+- **Type**: paper
+- **Link**: arXiv:2604.19295
+- **Why it matters**: TTT for reasoning models via EM — alternating M-step policy refinement with E-step critic recalibration on labeled rewards. OLMO3-7B on AIME 2024: 33.0% → 51.1%. **Partially preempts J2 (verifier-gated genadapter) and any "RL-style inference-time learning" idea.** Our angle must be either non-reasoning, single-pass, or recurrent-state.
+- **Tags**: #ttt #rl #reasoning #plan03-prior
+
+### [lact] Large Chunk Test-Time Training (LaCT) — ICLR 2026
+- **Type**: paper
+- **Why it matters**: 1M-token chunk updates; high hardware utilization. Generalizes TTT across modalities. Frames "chunk size as a state-capacity / hardware-utilization trade-off". Useful baseline for plan 08 v0's chunk-size sweep.
+- **Tags**: #ttt #scaling #efficiency
+
+### [ttc-rl] Test-Time Curriculum RL — ICLR 2026
+- **Type**: paper
+- **Why it matters**: Model auto-selects task-relevant data at inference and trains on it. **Adjacent to plan 01's X-saturation curriculum** — but TTC-RL does it online during inference, plan 01 offline as data curation.
+- **Tags**: #ttt #curriculum #plan01-adjacent
+
+### Sequential editing stability (2026 cluster — now crowded)
+
+### [mose] Multiplicative Orthogonal Sequential Editing — AAAI 2026
+- **Type**: paper
+- **Why it matters**: Replaces additive $W' = W_0 + \Delta W$ with **multiplicative** $W' = R \cdot W_0$ where $R^\top R = I$ — strictly preserves Frobenius norm and condition number. 12.08% sequential-editing improvement, 95.73% general-capability retention. **Cleanest formulation of "edits without drift" — direct alternative to AlphaEdit / additive null-space methods.** Strong candidate for plan 08 north-star ΔW parameterization.
+- **Tags**: #model-editing #lifelong #stability #plan08-relevant
+
+### [crispedit] CRISPEDIT: Curvature-Restricted In-Situ Parameter Editing — 2026
+- **Type**: paper
+- **Why it matters**: Gauss-Newton Hessian eigenspace identifies low-curvature directions where capability loss is invariant. K-FAC + matrix-free projector for LLM-scale efficiency. Bregman-divergence constraint avoids base-convergence requirement. **Most principled current answer to plan 08's "what update directions are safe" question.**
+- **Tags**: #model-editing #curvature #k-fac #stability
+
+### [rlsedit] RLSEdit: Recursive Least-Squares for Lifelong Editing — 2026
+- **Type**: paper
+- **Link**: arXiv:2601.15686
+- **Why it matters**: Online quadratic optimization via Woodbury identity. Per-edit cost independent of history length; scales with current edit rank only. Soft constraints (deviation from pre-trained + anchor mapping). Has deviation bounds. **The mathematical model of "lifelong edits" most reusable for plan 08's verifier-gated $\Delta W$ stream.**
+- **Tags**: #model-editing #online #woodbury
+
+### [revive] REVIVE: Dominant Singular Subspace Protection — 2026
+- **Type**: paper
+- **Link**: arXiv:2601.11042
+- **Why it matters**: Identifies that model collapse correlates with cumulative corruption of dominant singular subspace. Plug-and-play filter removes update components interfering with top singular vectors. **Scales to 20,000 sequential edits on LLaMA-3.**
+- **Tags**: #model-editing #svd #lifelong
+
+### [stable-edit] StableEdit: LN as a self-reinforcing stability loop — 2026
+- **Type**: paper
+- **Link**: arXiv:2605.11836
+- **Why it matters**: Theoretical analysis of why LayerNorm-based normalization stabilizes lifelong edits. Refines ULTRAEDIT with warm-up + full whitening. **Asymptotically orthogonal updates, bounded norms — million-scale streams.** The current best-understood "why LN works for editing" result.
+- **Tags**: #model-editing #ln #theory
+
+### [beta-edit] BetaEdit: Null-Space Constrained Sequential Editing — 2026
+- **Type**: paper
+- **Link**: arXiv:2605.09285
+- **Why it matters**: Reintroduces penalty term to compensate for pseudo-null-space imperfection in AlphaEdit-style methods. History-aware updates. **10,000 sequential edits stable.** Extends the null-space line.
+- **Tags**: #model-editing #null-space #history-aware
+
+### [ultra-edit] ULTRAEDIT — Gu et al., 2026
+- **Type**: paper
+- **Why it matters**: LN-style normalization achieves long-horizon stability. The model that StableEdit theoretically explains. Million-scale edit streams.
+- **Tags**: #model-editing #ln #scaling
+
+### Hypernet → LoRA (still expanding)
+
+### [shine] SHINE: Scalable In-Context Hypernetwork for Context → LoRA — 2026
+- **Type**: paper
+- **Link**: arXiv:2602.06358
+- **Why it matters**: Transformer-based hypernet via self-attention; M2P (memory-to-parameter) transformer with alternating row/column bidirectional attention. Generates layer-specific LoRA from base LM's own internal representations. **Most expressive in-context hypernet of 2026; sits between [genadapter] and plan 08 north star.** Plan 08 north star reduces to "[shine] + verifier gating" at first order.
+- **Tags**: #hypernetwork #lora #context
+
+### [ouroboros] OUROBOROS: Controller hypernet for recursive transformers — 2026
+- **Type**: paper
+- **Link**: arXiv:2604.02051
+- **Why it matters**: 9.2M-param Controller hypernet modulates frozen **SVD-initialized** LoRA bases recurrently. Per-step diagonal modulation. Replaces standard residual with gated recurrence (88% retention init). 43.4% loss reduction on 17-layer Qwen2.5-3B. Architectural cousin to genadapter; suggests "freeze the LoRA bases, only train the modulator" as a third design point alongside our v0 wrapper and Genadapter.
+- **Tags**: #hypernetwork #lora #recurrent
+
+### LoRA merging interference (2026)
+
+### [pico] Pico: Pre-merge Interference Calibration in Output-space — 2026
+- **Type**: paper
+- **Link**: arXiv:2604.16826
+- **Why it matters**: Identifies the output-side matrix B of LoRA as the interference source; calibrates B (data-free) before merge. Plugs into Task Arithmetic, TIES, TSV-M. Relevant if plan 03 (W-space BoN) wants to compose its $\{\Delta W_i\}$ rather than search.
+- **Tags**: #lora #merging #calibration
+
+### [iso-c] Isotropic Merging — Marczak et al., 2025
+- **Type**: paper
+- **Why it matters**: SVD on summed task vectors, equalize singular values. Spectral harmonization of merged models. Baseline for any merging-based plan 03 variant.
+- **Tags**: #merging #svd
+
+### Representation engineering (matured into a field)
+
+### [repe-survey] Representation Engineering for LLMs — Survey, 2025
+- **Type**: survey
+- **Link**: arXiv:2502.17601
+- **Why it matters**: Comprehensive map of activation-steering family. Establishes vocabulary (Representation Reading vs Representation Control). **The starting point for any RepE work** — read before B2 (steering vectors) or I5 (prompt↔LoRA equivalence).
+- **Tags**: #repe #survey
+
+### [odesteer] ODESteer: ODE-Based Activation Steering via Barrier Functions — 2026
+- **Type**: paper
+- **Link**: arXiv:2602.17560
+- **Why it matters**: First principled framework for activation steering as ODE solution; steering direction = barrier function from control theory. Multi-step adaptive steering. +5.7% TruthfulQA. **Promotes activation steering from heuristic to theoretical.** Closest path to making I5 / G2 / B2 theory-respectable.
+- **Tags**: #repe #theory #ode
+
+### [w-a-equiv] Weight-Activation Equivalence Mapping — 2026
+- **Type**: paper
+- **Link**: arXiv:2603.00425
+- **Why it matters**: First-order equivalence between weight-space updates and activation-space interventions. Identifies **post-block output** as theoretically grounded highly expressive intervention point. Steering accuracy within 0.2%-0.9% of full SFT while training only 0.04% of params. **Operationalizes I5 (Prompt ↔ LoRA equivalence) — and immediately suggests J3 (hybrid X+W router) can be reframed as a weight↔activation router with theoretical backing.**
+- **Tags**: #repe #theory #peft #plan08-relevant
+
+### [austeer] AUSteer: Fine-grained Attribute Unit steering — 2026
+- **Type**: paper
+- **Why it matters**: Moves from block-level to fine-grained Attribute Unit steering. Targeted intervention on fewer activations beats coarse intervention. Reference for "what granularity should B2 use?".
+- **Tags**: #repe #granularity
+
 ## Conversations / internal
 
 ### [conv-2026-05-26] First brainstorm session

@@ -190,8 +190,47 @@
 2. **For plan 08 v0**: add genadapter + Activation Beacon as baselines in `validation.md`. Update v0 Phase-1 to include KV-activation memory variant.
 3. **Theory work** (G2 / J3) — defer until at least one of v0 / plan 01 has produced numbers.
 
+## 2026 prior-work landscape scan (added later this session)
+
+Triggered by user request "考虑 significance / technical issue / alternative / technical approach / resource / budget" plus "看看最近什么最火". Surveyed 5 clusters and added 20 stable `[id]`s to `knowledge-sources.md`:
+
+- **TTT for LLMs (red-hot)**: [in-place-ttt] (ICLR 2026 Oral, MLP-final-proj fast weights), [tempo] (EM-style critic recalibration for reasoning), [lact] (1M-token chunks), [ttc-rl] (online curriculum).
+- **Sequential editing stability (now-saturated)**: [mose] (multiplicative orthogonal), [crispedit] (Gauss-Newton K-FAC), [rlsedit] (Woodbury LS), [stable-edit], [ultra-edit], [beta-edit], [revive].
+- **Hypernet → LoRA (still expanding)**: [shine] (M2P transformer), [ouroboros] (controller modulates SVD-LoRA bases).
+- **LoRA merging interference**: [pico], [iso-c].
+- **Representation engineering (matured)**: [repe-survey], [odesteer], [w-a-equiv] (★ first-order weight↔activation equivalence — theoretical bridge!), [austeer].
+
+### Implications for our existing ideas
+
+Several J-series and existing ideas have non-trivial 2026 prior work that demands reframing:
+- **J2 (verifier-gated genadapter)** ← partially preempted by [tempo] → pivot to "single-pass version of TEMPO".
+- **J5 (Beacon KV memory)** ← directly preempted by [act-beacon] + [in-place-ttt] → absorb into v0 ablation, not standalone idea.
+- **G4 (stability/forgetting)** ← saturated by [mose]/[crispedit]/[rlsedit]/[stable-edit]/[beta-edit]/[revive] → use them as tools, don't build new framework.
+- **B2 (steering vectors)** ← RepE is a saturated subfield; survives only if integrated with X-W axis.
+- **Plan 08 north star** ← at first order = [shine] + verifier gating. Contribution surface shrunk; sharpen claim.
+
+### Three new candidate ideas suggested by the scan (K-series, not yet in TOC)
+
+| Proposed | Title | Inspiration |
+|---|---|---|
+| **K1** | Multiplicative ΔW for plan 08 | [mose] — lifelong stability via $R \cdot W_0$ instead of $W_0 + \Delta W$ |
+| **K2** | Joint weight+activation adaptation | [w-a-equiv] — post-block output as theory-backed intervention point |
+| **K3** | Critic-recalibrated v0 | [tempo] — E-step on labeled probe set, alternating with M-step wrapper training |
+
+User decision needed: add K1/K2/K3 to ideas TOC now, or wait for next brainstorm?
+
+## Output of this session (full)
+
+- `docs/matrix/2026-05-28-methods-reading-and-new-plans.md` (this file)
+- `notes/ideas/evaluation-2026-05-28.md` (**NEW** — full scored table for all 58 items)
+- `docs/matrix/knowledge-sources.md` — 24 new `[id]`s (4 method-reading + 20 landscape-scan)
+- `notes/ideas/README.md` — J-series ideas + Top picks refresh to 2026-aware version
+- `known/inference-time-training/README.md` — cross-link to today's reading
+- `known/long-context/README.md` — promote [act-beacon] ID
+
 ## Open questions raised this session
 
-- Genadapter's bi-linear $S_t = S_{t-1} + A_2 H_t^\top H_t B_1$ is a Hebbian-style associative memory. Is plan 08 north star fundamentally just "genadapter + verifier"? If yes, the contribution surface shrinks; if no, the gap is what we're really claiming.
-- Cartridges trains *per corpus*, but composes at inference. Does v0's `m_t` compose across corpora? If yes, that's a unique angle vs. genadapter (which streams sequentially without compositionality claims).
-- Why does soft-prompt compression hit a ceiling at ~26× (Gisting) while KV-activation compression hits ~38× (Cartridges) or higher? Is there a structural reason, or is it engineering?
+- Genadapter's bi-linear $S_t = S_{t-1} + A_2 H_t^\top H_t B_1$ is a Hebbian-style associative memory. Is plan 08 north star fundamentally just "[shine] + verifier"? If yes, the contribution surface shrinks; if no, the gap is what we're really claiming.
+- Cartridges trains *per corpus*, but composes at inference. Does v0's `m_t` compose across corpora? If yes, that's a unique angle vs. [genadapter] (which streams sequentially without compositionality claims).
+- Why does soft-prompt compression hit ~26× (Gisting) while KV-activation hits ~38× (Cartridges) or higher? Structural reason, or engineering?
+- **Multiplicative vs additive ΔW** ([mose] vs [in-place-ttt]): which framework is more compatible with verifier-gated streaming updates that *do* sometimes need to be reverted?

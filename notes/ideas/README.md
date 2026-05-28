@@ -136,16 +136,22 @@ Born from reading Cartridges / Activation Beacon / Gisting / Generative Adapter 
 
 ## Top picks at a glance
 
-| ID | Status | Why it tops the list |
-|---|---|---|
-| **I1** | `D` | First plan drafted; the framing's most concrete instance |
-| **I3** | `F` | Natural continuation of I1; PhD-thread material |
-| **H6** | `D` | Most ambitious; longest-horizon plan (08) |
-| **D1** | `D` | Sharpest single-paper opportunity (plan 03) |
-| **J1** | `F` | Strategic bridge: v0 → plan 08 north star (2026-05-28) |
-| **J2** | `F` | Simplest plan-08-north-star variant: [genadapter] + verifier (2026-05-28) |
-| **J5** | `F` | Cheapest v0 architecture ablation; sharpens plan 08 v0 positioning (2026-05-28) |
-| **G2** | `?` | Theory backbone for the X-W framing — needed before scaling |
+Last refreshed 2026-05-28 after the 2026 prior-work landscape scan. **Full scored table**: [`evaluation-2026-05-28.md`](evaluation-2026-05-28.md).
+
+| ID | Status | Verdict | Why it tops the list |
+|---|---|---|---|
+| **I1** | `D` | ★★★ | Plan 01; cleanest X-W operationalization, no direct 2026 preemption |
+| **I3** | `F` | ★★★ | Sequel of I1; iterative X-then-W curriculum |
+| **H6** | `D` | ★★★ | Plan 08 + v0; must differentiate from [in-place-ttt], [shine], [tempo] |
+| **D1** | `D` | ★★★ | Plan 03; W-axis BoN, orthogonal to [tempo]'s RL-on-traces |
+| **J1** | `F` | ★★★ | Wrapper → LoRA distillation; cleanest v0 → north-star bridge |
+| **E1** | `R` | ★★ | Codebase-adaptive coding agent; high product value, SWE-Bench-Verified |
+| **I6** | `?` | ★★ | X-W compute allocator; backed by [w-a-equiv] theory |
+| **G5** | `?` | ★★ | Privacy of TTT; under-explored, important for deployment |
+| **C4** | `?` | ★★ | Checkpoint & rollback; safety guard for plan 08 |
+| **J3** | `F` | ★★ | Hybrid X+W chunk router; [w-a-equiv] grounded |
+
+**Pivoted from earlier top-pick list**: J2 (preempted by [tempo]), J5 (preempted by [act-beacon]/[in-place-ttt] — absorb as v0 ablation), G2 (defer until I1 produces data). See evaluation file for full reasoning.
 
 ## How to use this index
 
@@ -167,3 +173,4 @@ Full policy: [`docs/maintenance.md`](../../docs/maintenance.md). Local rules for
 - **Archive**: `git mv` the source file to `notes/ideas/_archive/<topic>.md`, replace the source-table row with `archived <date>`, drop the per-idea rows or move them under a collapsed "Archive" section. Log the move in today's matrix entry.
 - **Split**: if a single brainstorm source file > 500 lines, factor into a folder per §4 of `maintenance.md`.
 - **Symbol legend** stays terse — full definitions live in [`memory/symbols.md`](../../memory/symbols.md), not here.
+- **Quarterly evaluation snapshot**: re-score all rows against current prior work; save as `evaluation-YYYY-MM-DD.md` (T2). Archive previous snapshot to `_archive/` when ≥50% rows shift verdict. Current snapshot: [`evaluation-2026-05-28.md`](evaluation-2026-05-28.md).
