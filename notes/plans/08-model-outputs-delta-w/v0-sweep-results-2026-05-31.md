@@ -118,14 +118,46 @@ Reproduced from `capacity_curve.md`; PNG at `capacity_curve.png`.
 
 * (from `status.jsonl`: total elapsed wall hr, per-phase breakdown)
 
-## 8 — What runs next (Week 1)
+## 8 — Gist Tokens baseline comparison (Phase J)
+
+The Gist Tokens baseline (Mu et al. NeurIPS 2023, adapted to frozen-base
+SFT) is the cleanest fair comparison for any soft-prompt memory wrapper.
+It's a per-chunk feedforward compressor — no recurrence — so it
+isolates the contribution of recurrence + cross-chunk integration in
+our wrapper.
+
+Memory-budget matching: Gist uses `k_per_chunk × n_chunks` tokens;
+our wrapper uses `K` (fixed). For the headline comparison we set
+`k_per_chunk = 6` so Gist's total is ~36 ≈ K=32.
+
+| dataset | metric | Gist (SFT-only) | Ours (SFT-only) | Ours (best recipe) |
+|---|---|---:|---:|---:|
+| categorical_niah (2 bit) | eval_c | | | |
+| coding_niah (40 bit) | eval_c | | | |
+| numerical_niah_d5 (16.6 bit) | eval_c | | | |
+| numerical_niah_d12 (40 bit) | eval_c | | | |
+| multi_needle_niah_k3 | eval_c | | | |
+| same_form_distractors | eval_c | | | |
+
+Filled in after Phase J finishes (~2.5 hr after main sweep ends).
+
+**Interpretation guide**:
+* If Gist ≈ Ours-SFT, recurrence is not the source of our wins — it's the
+  combine mode (xattn) or the OPD/RL recipe.
+* If Gist << Ours-SFT, recurrence + diversity reg + xattn matter.
+* If Gist >> Ours-SFT on something easy (categorical), our wrapper is
+  over-engineered for the trivial regime — fine, that's a story.
+
+## 9 — What runs next (Week 1)
 
 If go-decision = continue:
 
-* Phase J (queued, see `build_sweep.py`): 5-seed replicates of top-3 +
-  multi_needle_niah_k3/k5 × K=32/128 + same_form_distractors × K=32/128.
-* Then Gist Tokens baseline scaffolding.
-* Then QuALITY adapter.
+* Phase J (queued, see `build_sweep.py`): Gist baseline at matched
+  budgets across 6 datasets + Our wrapper on multi_needle_niah_k3/k5
+  and same_form_distractors at best recipe + 5-seed replicates of the
+  reference recipe.
+* Then QuALITY adapter (real-text long-context, Pang et al. 2022).
+* Then RULER subset (synthetic long-context battery).
 
 If pivot:
 
