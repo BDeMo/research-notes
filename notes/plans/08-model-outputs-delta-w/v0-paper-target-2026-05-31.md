@@ -5,7 +5,21 @@
 > paper. This doc lays out (a) what "paper-level" requires concretely,
 > (b) the gap between us and that bar, (c) a defensible paper framing
 > that uses our existing results as a feature not a bug, and (d) a
-> 3-4 week roadmap from "engineering checkpoint" to "draft."
+> roadmap from "engineering checkpoint" to "draft."
+>
+> **Decisions locked in (2026-05-30):**
+>
+> - Framing: **Candidate A — Bit-Capacity Limits of Soft-Prompt
+>   Memory** (analysis paper).
+> - Venue: **Top venue (ACL / EMNLP / NeurIPS / ICLR main)**.
+>   Realistic targets given today's date:
+>   - **ICLR 2027** (primary; deadline ~Sep-Oct 2026, ≈ 4 months)
+>   - **ACL 2027** (backup; deadline ~Feb 2027, ≈ 9 months)
+>   - NeurIPS 2026 workshops (Sep-Oct deadlines) for early preview /
+>     feedback if we want to test the framing publicly.
+> - Compute ceiling: 4× H100 for 8-12 weeks ≈ 5000-7000 GPU-hr.
+>   Candidate A's full top-venue matrix uses ≈1500-2500 GPU-hr —
+>   leaves room for re-runs and reviewer additions.
 
 ## 1 — What a paper-level long-context-memory paper requires
 
@@ -114,86 +128,120 @@ Go with **Candidate A**. It's the framing where our actual results
 rather than a weakness. It also has the cleanest experimental
 matrix (one big sweep + a few real-text validators).
 
-## 4 — Three-week roadmap
+## 4 — Roadmap (top-venue scope, 8-12 weeks)
 
-Assumes we go with Candidate A. All wall-clock estimates assume
-4 H100s, single-user.
+Assumes Candidate A + top venue. All wall-clock estimates assume
+4 H100s, single-user. Each "week" is calendar-week.
 
-### Week 1 (now → next Sat, ~7 days)
+### Week 1 — sweep aggregation + capacity curve foundation
 
-| day | deliverable |
-|---|---|
-| Sun (tomorrow) | aggregate 35-hr sweep, lock recipe + best HP. ½-day. |
-| Mon | extend `datasets.py`: `numerical_niah` (3/5/10/15-digit), `multi_needle_niah`, longer-context coding_niah. 1 day. |
-| Mon-Tue | run the capacity curve (K × entropy) on the winning recipe. ~40 runs, ~30 GPU-hr. |
-| Wed | implement Gist Tokens baseline (cleanest published comparator). Train on same data. 1 day. |
-| Thu-Fri | add QuALITY adapter (HF: `emozilla/quality`). Eval winner + Gist on QuALITY. ½ day infra + 4-6 hr runtime. |
-| Sat | first internal write-up: capacity curve + recipe + Gist comparison. |
+| day | deliverable | infra need |
+|---|---|---|
+| Sun (tomorrow) | aggregate 35-hr / 106-job sweep; lock recipe & best HP; write `v0-sweep-results.md` | none |
+| Mon | extend `datasets.py`: `multi_needle_niah` (k=3, 5 selective-recall stress), `same_form_distractors` (semantic stress) | code |
+| Mon-Tue | refresh capacity curve: add Phase J runs at entropy points missing from Phase I (numerical_niah at 5-seed × 4 anchor points) | sweep extension |
+| Wed-Thu | implement **Gist Tokens** baseline (Mu et al. 2023) — published comparator with the cleanest training recipe. Train on same data using our orchestrator. | code |
+| Fri | add QuALITY adapter (HF: `emozilla/quality`). First real-text eval point. | code |
+| Sat | mid-week internal write-up: capacity curve v1 + Gist comparison on synthetic. |
 
-### Week 2
-
-| day | deliverable |
-|---|---|
-| Mon-Tue | RULER-NIAH subset (HF: `simonjegou/ruler`) at 4K and 16K context. Adapter ½ day; eval matrix 1 day. |
-| Wed | LongMemEval-mini (50-100 items hand-curated). The most paper-relevant memory benchmark. |
-| Thu-Fri | second baseline: AutoCompressor or RMT (whichever has cleaner code). 1-2 days. |
-| Sat | results table v0: 3 benchmarks × 3 methods × 3-5 seeds. |
-
-### Week 3
+### Week 2 — published baselines + real-text benchmarks
 
 | day | deliverable |
 |---|---|
-| Mon-Wed | multi-model: re-run winning recipe on Qwen3-1.7B and Qwen3-4B. Generates a 2-3 point scaling curve. |
-| Thu | cost analysis: FLOPs per token × eval cost curves. ~½ day. |
-| Fri | analysis figures: capacity heatmap, train-eval gap by recipe, drift geometry over training. |
-| Sat | full results table + figures finalized. |
+| Mon-Tue | RULER-NIAH subset (HF: `simonjegou/ruler`) at 4K and 16K context. The standard long-context NIAH protocol. |
+| Wed | LongMemEval-mini (50-100 items hand-curated; full eval if time). The most paper-relevant *memory* benchmark. |
+| Thu-Fri | second published baseline: **AutoCompressor** (Chevalier et al. 2023) — recurrent soft-token compression, directly comparable to our recurrence. |
+| Sat | results table v0: 3 benchmarks × 4 methods × 3 seeds. |
 
-### Week 4 (write)
+### Week 3 — multi-model scaling (biggest compute)
+
+| day | deliverable | est. GPU-hr |
+|---|---|---|
+| Mon-Tue | Qwen3-1.7B re-runs across the capacity curve | ~80 |
+| Wed-Thu | Qwen3-4B re-runs across the capacity curve | ~250 |
+| Fri | optional Qwen3-14B at headline points only (3-5 configs) | ~300 |
+| Sat | scaling curves: eval-c × model size; bit-capacity vs theoretical bound |
+
+Multi-model is the single biggest compute block: ~600 GPU-hr → ~6
+wall-days on 4 H100s. Front-load it Week 3.
+
+### Week 4 — third baseline + cost analysis + 5-seed bars
 
 | day | deliverable |
 |---|---|
-| Mon-Tue | draft intro + method. |
-| Wed-Thu | draft experiments + analysis. |
-| Fri | draft related work + discussion. |
-| Sat-Sun | full pass + figures + submission target check. |
+| Mon-Tue | third published baseline: **RMT** (Bulatov et al. 2022) or **ICAE** (Ge et al. 2024). Pick whichever has cleaner code. |
+| Wed | cost analysis: per-token FLOPs and inference latency for each method, on each benchmark, at each model size. |
+| Thu-Fri | seed-replicate top headline numbers (5 seeds) so error bars are publishable. |
+| Sat | analysis-only sweep: drift geometry, attention patterns, ablation of the read interface. |
 
-**Total**: ~4 weeks from today. Probably realistic for a workshop
-draft (NeurIPS workshops late summer) or a TMLR submission.
+### Weeks 5-6 — writing + iteration
 
-## 5 — What changes immediately tonight
+| week | deliverable |
+|---|---|
+| 5 | full draft v0: intro / related / method / experiments / discussion. Figures: capacity heatmap, per-method radar, scaling curves, geometric diagnostics. |
+| 6 | full draft v1 with internal feedback incorporated. Re-run any experiments revealed as missing. |
 
-1. **Keep the 35-hr sweep running** — it's exactly Phase 0 of Week 1.
-2. **Extend Phase G of the sweep** with two cheap additions that
-   start populating the Week-1 capacity curve:
-   * `coding_niah_K{64,128,256}` — see if larger K rescues the
-     40-bit failure (one more entropy point).
-   * `categorical_niah_n_chunks{16,32,64}` — extends the length
-     axis we'll need.
-   These cost a few GPU-hours and pre-stage Week-1 data.
-3. **Add Phase H (numerical_niah)** — but only after the dataset
-   adapter ships; deferred to Monday.
+### Weeks 7-8 — final experiments, polish, submission
 
-The Phase G additions are queued via `sweep-master-extras.json`
-that the orchestrator picks up next time we re-launch (or
-hand-queued tomorrow morning when the master sweep finishes).
+| week | deliverable |
+|---|---|
+| 7 | any reviewer-anticipating experiments (alternative metric definitions, sensitivity analyses, code-release prep). |
+| 8 | submission package: PDF + supplementary + code release + reproducibility checklist. |
 
-## 6 — Open questions for the user
+### Stretch (Weeks 9-12, if reviewer feedback / extension cycle)
 
-Before Monday I need a decision on:
+* Qwen3-32B headline points (~600 GPU-hr alone).
+* SCROLLS or InfiniteBench as third real-text benchmark.
+* Compress-then-retrieve hybrid (Candidate C lite) as an extension.
 
-1. **Paper framing**: Candidate A (capacity), B (training), or C
-   (hybrid)? Or a fourth I'm not seeing?
-2. **Target venue**: ACL/EMNLP/ICLR (longer cycle, higher bar) vs
-   TMLR (rolling, methods-friendly) vs workshop (faster, smaller
-   contribution acceptable)? Drives experiment scope.
-3. **Compute ceiling**: roughly 4 H100s for ~4 weeks gives us
-   ~2700 GPU-hours total. Candidate A's full matrix uses
-   ~400 — comfortably within budget. Anything bigger (multi-model
-   at scale, e.g. Qwen3-32B) starts to bite.
-4. **Specialization timing**: do we still want coding-RCA /
-   telecom-RCA specialization in the paper, or save for v1?
-   Recommend: save for v1 — Candidate A is general enough to stand
-   alone, and adding specialization here dilutes the message.
+**Total to first submission**: ~8 weeks from today (≈ late July 2026
+for ICLR 2027 submission).
+
+**Compute budget check**:
+- Phases A-I (this week's 35-hr sweep): ~70 GPU-hr (sunk).
+- Weeks 1-2 (real benchmarks + 1st baseline): ~150 GPU-hr.
+- Week 3 (multi-model): ~600 GPU-hr.
+- Week 4+ (more baselines + 5-seed + analyses): ~400 GPU-hr.
+- Reserved buffer: ~500 GPU-hr.
+- **Total**: ~1700 GPU-hr; ≈18 wall-days on 4× H100. Comfortable.
+
+## 5 — What changed tonight (already queued)
+
+1. **Kept the 35-hr sweep running** — Phase 0 of Week 1.
+2. **Added Phase H** (10 jobs): `coding_niah_K{16, 256, 512}`,
+   `categorical_K{8, 256}`, length-axis (chunks 8/64), and longer-
+   context coding_niah at K=128. Pre-stages capacity-curve anchors.
+3. **Shipped `numerical_niah` adapter** in `llm_infra.datasets`,
+   exposing 6 entropy levels (digits=1, 2, 3, 5, 8, 12 → 3.3 / 6.6
+   / 10 / 16.6 / 26.6 / 39.9 bits). Registered as
+   `numerical_niah_d{N}` choices in `train_smoke.py`.
+4. **Added Phase I** (12 jobs): explicit K × entropy capacity
+   sub-matrix using `numerical_niah_d{N}` at K∈{16, 32, 128, 256}.
+   This is the actual centerpiece data for the paper.
+
+**Current sweep:** 106 jobs, ~18 wall-hr on 4× H100, picked up by
+the orchestrator when it transitions out of `WAIT_IDLE` (i.e. once
+the 4 in-flight stages runs finish).
+
+## 6 — Open questions still pending
+
+Resolved (2026-05-30): framing = A, venue = top.
+
+Still pending:
+
+1. **Specialization timing.** Do we still want coding-RCA / telecom-
+   RCA specialization in this paper, or save for a v1 follow-up?
+   *Recommendation:* save for v1. Candidate A stands alone, and
+   adding specialization here dilutes the analysis message and
+   doubles experiment count.
+2. **Model family commitment.** Stick with Qwen3 throughout, or add
+   a single point from a different family (e.g. Llama-3-8B) to show
+   the findings aren't Qwen-specific? *Recommendation:* add Llama-
+   3.1-8B headline points only (3-5 configs) in Week 4 as a
+   robustness check.
+3. **Code release timing.** Release on submission, on acceptance,
+   or on preprint? Top venues typically expect submission-time
+   release. Need to decide before Week 4.
 
 ## 7 — Honest assessment
 
@@ -205,6 +253,20 @@ ceiling — how far below the theoretical bound we actually sit,
 and why (read interface). That's a more interesting result if it
 shows a 100×+ gap, less so if it shows 2-3×.
 
-We'll know after the capacity curve runs whether the story is
-compelling enough to push, or whether we should pivot to one of the
-weaker candidates (B or C) or scope down to a workshop draft.
+We'll know after Phase I runs (~tomorrow) whether the story is
+compelling enough to push for a top venue, or whether we should
+descope to TMLR / workshop.
+
+**Go / no-go decision points:**
+
+- **Tomorrow (Sun)**: do Phase I results show a clear bit-capacity
+  cliff that doesn't go away with larger K? If yes → proceed
+  Week 1 as planned. If no (wrapper plateaus everywhere) → revisit
+  framing: maybe Candidate B is safer.
+- **End of Week 1**: does the Gist Tokens baseline outperform us
+  by >>20 points on QuALITY? If yes → we have a real problem;
+  reconsider whether to keep our architecture as the headline.
+  If no → continue.
+- **End of Week 3 (multi-model)**: do the capacity findings hold
+  across model sizes? If yes → strong paper. If no → the
+  framing needs a "Qwen-specific" caveat that weakens the story.
