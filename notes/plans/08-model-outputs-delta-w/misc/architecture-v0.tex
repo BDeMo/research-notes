@@ -1,0 +1,139 @@
+% =============================================================
+%  Plan 08 — Learned Memory Wrapper
+%  Architecture diagram, version: v0.1 (2026-06-01)
+%
+%  Tracks code state:
+%    llm-infra      : a26def4
+%    encoder-infra  : 7eca190
+%    mem-embedding  : 269d42b
+%
+%  Compile: pdflatex architecture-v0.tex   (needs tikz, positioning, fit,
+%           shapes.geometric, arrows.meta, calc, decorations.pathreplacing)
+% =============================================================
+\documentclass[border=12pt,tikz]{standalone}
+\usepackage{tikz}
+\usepackage{amsmath,amssymb}
+\usetikzlibrary{positioning,fit,shapes.geometric,arrows.meta,calc,
+                decorations.pathreplacing,backgrounds}
+
+\definecolor{frozenfill}{HTML}{E8ECEF}     % grey  — frozen (no grad)
+\definecolor{trainedfill}{HTML}{FFE6B3}    % amber — trainable
+\definecolor{datafill}{HTML}{D8E8FB}       % blue  — data / state
+\definecolor{probefill}{HTML}{E7F5E1}      % green — probes / metrics
+\definecolor{trainfill}{HTML}{F4D6E5}      % pink  — training stage
+\definecolor{arrowclr}{HTML}{2B2B2B}
+
+\tikzset{
+  block/.style       = {draw, rounded corners=2pt, minimum height=8mm,
+                        inner sep=4pt, align=center, font=\small},
+  frozen/.style      = {block, fill=frozenfill},
+  trained/.style     = {block, fill=trainedfill, very thick},
+  data/.style        = {block, fill=datafill, shape=rectangle},
+  probe/.style       = {block, fill=probefill, dashed, font=\footnotesize},
+  train/.style       = {block, fill=trainfill, font=\small\bfseries},
+  flow/.style        = {-Latex, thick, draw=arrowclr},
+  fback/.style       = {-Latex, thick, dashed, draw=arrowclr!70},
+  grp/.style         = {draw=arrowclr!50, rounded corners=4pt,
+                        inner sep=8pt, dashed, very thin},
+}
+
+\begin{document}
+\begin{tikzpicture}[node distance=8mm and 14mm]
+
+%% --- top banner ---------------------------------------------------------
+\node[font=\Large\bfseries, anchor=west] (title)
+  at (0,5.4) {Plan 08 — Learned Memory Wrapper};
+\node[font=\small\itshape, anchor=west] (subtitle)
+  at (0,4.9) {version v0.1\ \,(2026-06-01)\ \,|\,\ Qwen3-8B\,/\,frozen base\,/\,4{\times}H100};
+
+%% --- input column -------------------------------------------------------
+\node[data]                              (doc) at (0,3.5)
+  {Document\\\footnotesize chunked $x_1,\dots,x_N$};
+\node[data,  below=of doc]               (qry)
+  {Query block\\\footnotesize $q$\,+\,gold span};
+
+%% --- encoder ------------------------------------------------------------
+\node[frozen, right=of doc]              (enc)
+  {\textbf{Encoder}\\\footnotesize BaseAsEncoderAdapter\\\footnotesize (frozen LM forward)};
+
+%% --- wrapper (the trained core) ----------------------------------------
+\node[trained, right=of enc, minimum width=44mm]  (update)
+  {\textbf{Update block}\\\footnotesize Perceiver-IO cross-attn\\\footnotesize $m_t = m_{t-1} + \alpha\cdot\Delta m_t$};
+\node[trained, below=of update, minimum width=44mm] (apply)
+  {\textbf{Apply block}\\\footnotesize 5 combine modes:\\\footnotesize \texttt{prefix} / \texttt{residual} / \texttt{interleave}\\\footnotesize / \texttt{hybrid} / \texttt{xattn}*};
+
+\node[data, right=of update, minimum width=22mm] (mem)
+  {Memory $m_t$\\\footnotesize $(B,K,d)$};
+
+%% --- frozen base --------------------------------------------------------
+\node[frozen, right=of apply, minimum width=30mm] (base)
+  {\textbf{Frozen base LM}\\\footnotesize Qwen3-8B};
+
+\node[data, right=of base]               (out)
+  {Output\\\footnotesize logits / tokens};
+
+%% --- training stages ----------------------------------------------------
+\node[train, below=20mm of apply, minimum width=22mm]  (sft)  {SFT\\\footnotesize teacher-forced\\\footnotesize CE + KL};
+\node[train, right=8mm of sft,    minimum width=22mm]  (opd)  {OPD\\\footnotesize on-policy distill\\\footnotesize KL(student\,\|\,teacher)};
+\node[train, right=8mm of opd,    minimum width=22mm]  (rl)   {RL\\\footnotesize REINFORCE\\\footnotesize +LOO baseline};
+
+\node[font=\footnotesize, above=1mm of sft]
+  {staged: \texttt{--train-modes sft,opd,rl}\ \  \texttt{--stage-steps 800,600,400}};
+
+%% --- probes / metrics ---------------------------------------------------
+\node[probe, above=of mem,  minimum width=32mm] (geom)
+  {\textbf{Geometry probes}\\\footnotesize drift,\,$\|\Delta m_t\|_{p50}$,\,cos\_consec};
+\node[probe, above=of base, minimum width=32mm] (cap)
+  {\textbf{Capacity probes}\\\footnotesize random-mem PPL,\\\footnotesize pooled-mem PPL};
+\node[probe, above=of out,  minimum width=28mm] (end)
+  {\textbf{End metrics}\\\footnotesize contains\,/\,exact\,/\,token\_f1};
+
+%% --- flow arrows --------------------------------------------------------
+\draw[flow] (doc)     -- (enc);
+\draw[flow] (enc)     -- node[above,font=\footnotesize]{ChunkEncoding\\\footnotesize hidden, mask} (update);
+\draw[flow] (update)  -- (mem);
+\draw[flow] (mem.south) |- (apply.east);
+\draw[flow] (qry.east) -| ($(apply.west)+(-6mm,0)$) -- (apply.west);
+\draw[flow] (apply)   -- node[above,font=\footnotesize]{BaseCall\\\footnotesize inputs\_embeds} (base);
+\draw[flow] (base)    -- (out);
+
+%% recurrence loop on update block
+\draw[fback] (mem.north) .. controls +(0,9mm) and +(0,9mm) .. (update.north)
+  node[midway,above,font=\footnotesize]{$m_{t-1}\leftarrow m_t$ (next chunk)};
+
+%% training feeds wrapper params (both update + apply)
+\draw[fback] (sft.north)  -- ++(0,4mm) -| ($(apply.south)+(-12mm,0)$);
+\draw[fback] (opd.north)  -- ++(0,4mm) -| ($(apply.south)+(0,0)$);
+\draw[fback] (rl.north)   -- ++(0,4mm) -| ($(apply.south)+(+12mm,0)$);
+
+%% probe taps
+\draw[fback] (geom)  -- (mem.east);
+\draw[fback] (cap)   -- (base.north);
+\draw[fback] (end)   -- (out.north);
+
+%% --- legend / annotations ----------------------------------------------
+\begin{scope}[shift={(0,-5.2)}, font=\footnotesize]
+  \node[frozen,  minimum width=22mm] (lg1)              {frozen};
+  \node[trained, right=4mm of lg1, minimum width=22mm] (lg2) {trainable};
+  \node[data,    right=4mm of lg2, minimum width=22mm] (lg3) {state\,/\,tensor};
+  \node[probe,   right=4mm of lg3, minimum width=22mm] (lg4) {probe (read-only)};
+  \node[train,   right=4mm of lg4, minimum width=22mm] (lg5) {training stage};
+\end{scope}
+
+\node[font=\footnotesize\itshape, anchor=west] at (0,-6.4)
+  {*\,\texttt{xattn} (Phase C winner): apply-time $m'\!=\!\mathrm{CrossAttn}(m,\,\bigcup\nolimits_t h_t)$,
+   then prepend.};
+
+%% --- right-side baseline overlay ---------------------------------------
+\node[block, fill=trainedfill!50, dashed, anchor=west,
+      font=\footnotesize, align=left]
+   at (10.7,3.5)
+   {\textbf{Baseline}\\
+    \textbf{GistWrapper}\\
+    \footnotesize per-chunk feedforward\\
+    \footnotesize compressor;\\
+    \footnotesize $M = [\,g_1\,\|\,\dots\,\|\,g_N\,]$,\\
+    \footnotesize prefix only (no recurrence)};
+
+\end{tikzpicture}
+\end{document}
