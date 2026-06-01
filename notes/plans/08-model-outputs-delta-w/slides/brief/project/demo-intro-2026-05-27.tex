@@ -1,15 +1,54 @@
 % Standalone RCA foundation-model demo slides.
 % Updated for 2026-05-28.
 
-\begin{frame}{Current Deliverables}
+\begin{frame}{Problem Statement}
+  \begin{itemize}
+    \item Nokia RCA workflows are long-context, evidence-heavy, and hard to
+      operate manually across logs, traces, tickets, topology, and tools.
+    \item General LLMs are not optimized for telecom RCA: they may produce fluent
+      text without service-level grounding or actionable root-cause evidence.
+    \item We need an RCA foundation model and a post-training harness that can
+      continuously improve with internal data, evaluator feedback, and tool use.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Timeline and Highlights}
+  \begin{itemize}
+    \item \textbf{Done}: built the first public RCA SFT matrix on Qwen2.5 and
+      identified that RCA capability is learnable from public RCA datasets.
+    \item \textbf{Highlight}: $q25_{mix}$ improves RCAEval recommendation F1
+      from 0.041 to 0.733.
+    \item \textbf{Now}: turn the SFT result into a demo package with benchmark
+      evidence, \texttt{rca-chat}, and reproducible checkpoint provenance.
+    \item \textbf{Next}: move from one SFT stage to a full post-training loop:
+      evaluator, RL / PPO or preference training, on-policy distillation, and
+      harness iteration.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Done: Current Artifacts}
   \begin{itemize}
     \item RCA foundation-model demo direction for Nokia telecom / industrial RCA.
     \item Public RCA SFT checkpoint matrix over Qwen2.5 base.
     \item Benchmark evidence on public RCA datasets before and after SFT.
     \item \texttt{rca-chat} inspection path for loading checkpoints and reviewing
       RCA outputs case by case.
+    \item Documentation artifacts: \texttt{rca-demo} reports, matrix summaries,
+      and \texttt{research-notes} project brief slides.
     \item Next-stage plan for the full post-training pipeline: SFT, RL / PPO,
       on-policy distillation, and harness iteration.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Early Publication and Comments}
+  \begin{itemize}
+    \item \textbf{Early publication target}: package the RCA SFT matrix, demo
+      harness, benchmark manifest, and model card as the first internal report.
+    \item \textbf{Colleague comments needed}: RCA task definition, acceptable
+      evidence quality, reward/evaluator design, and which internal cases should
+      be used only for qualitative review.
+    \item \textbf{Report rule}: every update should show what is done, what
+      artifact proves it, what feedback is needed, and what milestone follows.
   \end{itemize}
 \end{frame}
 
@@ -187,6 +226,20 @@
       general capability.
     \item This motivates a full post-training pipeline and stronger regression
       checks, not only one SFT checkpoint.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Future Works: Milestones and Goals}
+  \begin{itemize}
+    \item \textbf{Milestone 1}: model-use GUI and minimal harness.\\
+      Goal: make checkpoint inspection reproducible for public and internal RCA
+      cases.
+    \item \textbf{Milestone 2}: RCA training GUI.\\
+      Goal: let internal users assemble SFT, RLHF, off-policy, on-policy, and
+      distillation modules.
+    \item \textbf{Milestone 3}: harness iteration system.\\
+      Goal: version model, tools, skills, MCP interfaces, evaluators, and
+      regression reports together.
   \end{itemize}
 \end{frame}
 

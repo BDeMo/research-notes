@@ -10,24 +10,39 @@
 
 ## Reader guide
 
-This directory now has two scopes:
+This directory now has three scopes:
 
-- **Practical v0**: frozen 7B/8B base model + trainable learned-memory wrapper.
-  This is the version to execute first for a research paper prototype and the
-  RCA foundation-model demo.
-- **Full Plan 08**: model-emitted weight deltas and verifier-gated
-  self-modification. This remains the long-term research direction.
+- **Practical v0 / v1** (in flight, paper now): frozen 7B/8B base model + trainable learned-memory wrapper at *encode time*. Characterizes the bit-capacity wall. **This is the version producing the ICLR 2027 paper draft (`latent-mem-paper`).**
+- **v2** (designed, paper next): same wrapper protocol, but memory is appended *during* autoregressive generation and persists *across sessions*. Inherits the bit-capacity diagnostic from v1.
+- **Full Plan 08** (long-term, parked): model-emitted weight deltas and verifier-gated self-modification.
 
-Start here for v0:
+Plus one **parallel methodology research question**:
 
-- [`v0-learned-memory-wrapper.md`](v0-learned-memory-wrapper.md) — concise
-  English note for the executable v0.
-- [`v0-learned-memory-wrapper_zh.md`](v0-learned-memory-wrapper_zh.md) — Chinese
-  version.
+- **Q2** — Which activations carry memory? Probe the frozen base for sparse / dormant channels and write the wrapper into those only. Its own paper.
+
+Start here for v0 / v1 (the paper being written now):
+
+- [`v0-learned-memory-wrapper.md`](v0-learned-memory-wrapper.md) — concise English note for the executable v0.
+- [`v0-learned-memory-wrapper_zh.md`](v0-learned-memory-wrapper_zh.md) — Chinese version.
+- [`v0-paper-target-2026-05-31.md`](v0-paper-target-2026-05-31.md) — paper framing decision (Candidate A: Bit-Capacity Limits).
+- [`v0-sweep-plan-2026-05-31.md`](v0-sweep-plan-2026-05-31.md) — sweep design.
+- [`v0-sweep-results-2026-05-31.md`](v0-sweep-results-2026-05-31.md) — sweep results scaffold.
+- [`v0-results-2026-05-30.md`](v0-results-2026-05-30.md) — earlier interim results.
+- [`v0-datasets-plan.md`](v0-datasets-plan.md) — dataset plan.
 - [`v0-budget.md`](v0-budget.md) — v0 budget and decision gates.
 - [`v0-budget_zh.md`](v0-budget_zh.md) — Chinese budget.
+- [`misc/`](misc/) — versioned architecture and training diagrams (PNG + TikZ).
 
-Then read the original files for the full self-modifying-LLM version.
+Start here for v2 (next paper):
+
+- [`v2-plan.md`](v2-plan.md) — design + wrapper-to-model integration + open questions.
+- [`v2-related-work.md`](v2-related-work.md) — literature survey (2024–25 latent-reasoning landscape; ~20 papers).
+
+Start here for Q2 (parked methodology):
+
+- [`q2-activation-memory-probe.md`](q2-activation-memory-probe.md) — research questions, methodology sketch, compute estimate.
+
+Then read the original files below for the full self-modifying-LLM version (long-term scope).
 
 ## Problem
 
@@ -99,11 +114,30 @@ Kill criteria:
 - If learned $\Delta W$ is observably indistinguishable from random noise (verifier accepts uniformly) → killing learnt-update; fall back to D2L-style context-conditioned updates.
 
 ## Files in this plan
+
+### Index
 - [`README.md`](README.md) — this file
-- [`v0-learned-memory-wrapper.md`](v0-learned-memory-wrapper.md) — practical v0 scope
-- [`v0-learned-memory-wrapper_zh.md`](v0-learned-memory-wrapper_zh.md) — Chinese v0 scope
-- [`v0-budget.md`](v0-budget.md) — practical v0 budget
-- [`v0-budget_zh.md`](v0-budget_zh.md) — Chinese v0 budget
+
+### v0 / v1 — paper now (ICLR 2027 draft in `latent-mem-paper`)
+- [`v0-learned-memory-wrapper.md`](v0-learned-memory-wrapper.md) — practical v0 scope (EN)
+- [`v0-learned-memory-wrapper_zh.md`](v0-learned-memory-wrapper_zh.md) — practical v0 scope (ZH)
+- [`v0-paper-target-2026-05-31.md`](v0-paper-target-2026-05-31.md) — paper framing decision
+- [`v0-sweep-plan-2026-05-31.md`](v0-sweep-plan-2026-05-31.md) — sweep design
+- [`v0-sweep-results-2026-05-31.md`](v0-sweep-results-2026-05-31.md) — sweep results scaffold
+- [`v0-results-2026-05-30.md`](v0-results-2026-05-30.md) — interim results
+- [`v0-datasets-plan.md`](v0-datasets-plan.md) — dataset plan
+- [`v0-budget.md`](v0-budget.md) — v0 budget (EN)
+- [`v0-budget_zh.md`](v0-budget_zh.md) — v0 budget (ZH)
+- [`misc/`](misc/) — versioned diagrams (PNG + TikZ)
+
+### v2 — paper next (cross-session latent memory)
+- [`v2-plan.md`](v2-plan.md) — A+B framing, wrapper-to-model integration design space, open questions, next steps
+- [`v2-related-work.md`](v2-related-work.md) — 2024–25 literature survey (~20 papers)
+
+### Q2 — methodology sub-paper (parked)
+- [`q2-activation-memory-probe.md`](q2-activation-memory-probe.md) — which activations carry memory; constrained-write wrapper
+
+### Long-term self-modifying-LLM scope (full Plan 08)
 - [`validation.md`](validation.md) — experimental protocol, baselines
 - [`channels.md`](channels.md) — benchmarks, datasets
 - [`budget.md`](budget.md) — costs by phase

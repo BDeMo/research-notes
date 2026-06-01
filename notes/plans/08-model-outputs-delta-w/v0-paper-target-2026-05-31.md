@@ -270,3 +270,24 @@ descope to TMLR / workshop.
 - **End of Week 3 (multi-model)**: do the capacity findings hold
   across model sizes? If yes → strong paper. If no → the
   framing needs a "Qwen-specific" caveat that weakens the story.
+
+---
+
+## Addendum (2026-06-01) — v2 framing decided
+
+After a literature pass on "embedding memory written during AR
+generation" (see `v2-related-work.md`), the v2 paper direction is
+locked: **cross-session latent memory (A) + read/write under a
+strictly frozen base with the same bit-capacity diagnostic (B)**.
+
+This makes v1 (this paper) and v2 a single line of work:
+
+* v1 = "encode-time soft memory has a read-side bit-capacity wall"
+* v2 = "the wall persists for generation-time, cross-session memory
+  too, and here is the wrapper that lives at the empty intersection
+  of the existing methods"
+
+Therefore: do **not** over-claim v1 as the last word on soft memory.
+Frame v1 explicitly as the diagnostic foundation that v2 extends.
+See `v2-plan.md` for the full v2 design and `q2-activation-memory-probe.md`
+for the spun-off methodology question on which activations to write into.

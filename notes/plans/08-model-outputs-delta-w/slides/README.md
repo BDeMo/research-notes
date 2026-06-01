@@ -90,6 +90,20 @@ pdflatex main.tex
 - For a new week, copy the previous weekly file, rename it using the rule above,
   update the title slide, then update the `\input{...}` line in `main.tex`.
 - Use an industry-style progress-report structure:
+  - For bi-weekly reports and other stakeholder reports, prioritize these
+    sections:
+    1. `Problem Statement`: what problem matters, why now, and why current
+       solutions are insufficient.
+    2. `Timeline and Highlights`: the major progress points, decisions, and
+       current highlight result.
+    3. `Done`: completed artifacts with concrete links, paths, demos, or metric
+       tables.
+    4. `Early Publication / Comments`: what can be shared early and what
+       feedback is needed from colleagues.
+    5. `Future Works`: milestones, target dates if known, and the goal of each
+       milestone.
+  - The most important management-level fields are `Problem Statement`,
+    `Timeline`, and `Highlight`; make them visible near the beginning.
   - If the project/report is continuing from a previous week, start with a short
     recap: last week's goal, decision, open risk, and what changed this week.
   - If the project/report is starting a new topic, start with background and
