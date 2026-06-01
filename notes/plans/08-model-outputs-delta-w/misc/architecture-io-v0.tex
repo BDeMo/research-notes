@@ -1,0 +1,162 @@
+% =============================================================
+%  Plan 08 — Wrapper I/O contract
+%  version v0.1 (2026-06-01)
+%
+%  Companion to architecture-v0.tex. This diagram focuses on the
+%  3 methods of the Wrapper protocol and the exact tensor shapes
+%  in / out of each, so reviewers can audit the model definition.
+% =============================================================
+\documentclass[border=10pt,tikz]{standalone}
+\usepackage{tikz}
+\usepackage{amsmath,amssymb}
+\usetikzlibrary{positioning,fit,shapes.geometric,arrows.meta,calc,backgrounds}
+
+\definecolor{frozenfill}{HTML}{E8ECEF}
+\definecolor{trainedfill}{HTML}{FFE6B3}
+\definecolor{datafill}{HTML}{D8E8FB}
+\definecolor{stagefill}{HTML}{F0E6F5}
+\definecolor{shapeclr}{HTML}{6A6A6A}
+\definecolor{arrowclr}{HTML}{2B2B2B}
+
+\tikzset{
+  block/.style       = {draw, rounded corners=2pt, inner sep=5pt,
+                        align=center, font=\small},
+  stage/.style       = {block, fill=stagefill, very thick,
+                        minimum height=12mm, minimum width=120mm,
+                        font=\large\bfseries},
+  trained/.style     = {block, fill=trainedfill, very thick,
+                        minimum width=44mm},
+  frozen/.style      = {block, fill=frozenfill},
+  data/.style        = {block, fill=datafill},
+  shape/.style       = {font=\footnotesize\itshape, text=shapeclr, align=left},
+  flow/.style        = {-Latex, thick, draw=arrowclr},
+  loop/.style        = {-Latex, thick, dashed, draw=arrowclr!70},
+}
+
+\begin{document}
+\begin{tikzpicture}[node distance=6mm and 14mm]
+
+%% --- title -------------------------------------------------------------
+\node[font=\Large\bfseries, anchor=west] (title) at (0,9.3)
+  {Wrapper I/O Contract — Plan 08\ \,v0.1\ \,(2026-06-01)};
+\node[font=\small\itshape, anchor=west] at (0,8.8)
+  {Tensor shapes: $B$ = batch, $K$ = memory tokens (e.g. 32),
+   $d$ = hidden dim (Qwen3-8B: 4096), $L_t$ = chunk-$t$ length,
+   $T$ = query+gold length, $V$ = vocab.};
+
+%% =====================================================================
+%% STAGE 1 — init_memory
+%% =====================================================================
+\node[stage] (s1) at (0,7.5) {\textsc{Stage 1 — \texttt{init\_memory}}};
+
+\node[data, below=of s1.south west, anchor=north west] (i1a)
+  {batch $B$\\\footnotesize device};
+\node[trained, right=of i1a] (init)
+  {\texttt{init\_memory(B,\,device)}\\\footnotesize allocate\\\footnotesize learnable embeddings};
+\node[data, right=of init] (o1a)
+  {\textsc{MemoryState}\\\footnotesize payload: $(B,K,d)$\\\footnotesize extra=\{step:\,0\}};
+
+\draw[flow] (i1a) -- (init);
+\draw[flow] (init) -- (o1a);
+\node[shape, below=1mm of init]
+  {trained:\ \,$K{\cdot}d$ embedding table};
+
+%% =====================================================================
+%% STAGE 2 — update (recurrent)
+%% =====================================================================
+\node[stage, below=18mm of s1] (s2)
+  {\textsc{Stage 2 — \texttt{update}\ \ (called $N$ times, one per chunk)}};
+
+% --- inputs ---
+\node[data, below=of s2.south west, anchor=north west] (mem_in)
+  {$m_{t-1}$\\\footnotesize $(B,K,d)$};
+\node[data, below=of mem_in] (chunk_in)
+  {\textsc{ChunkEncoding}\\\footnotesize hidden: $(B,L_t,d)$\\\footnotesize mask:\ \ \ $(B,L_t)$};
+
+% --- update block ---
+\node[trained, right=18mm of mem_in, yshift=-7mm, minimum width=64mm,
+      minimum height=22mm, text width=60mm, align=left] (up)
+  {\centerline{\bfseries Update block}\medskip
+   \footnotesize $\mathrm{candidate}=\mathrm{CrossAttn}(\mathrm{Q}{=}m_{t-1},\ \mathrm{KV}{=}h_t,\ \mathrm{mask})$\\
+   \footnotesize $\Delta m_t = \mathrm{LayerNorm}(\mathrm{candidate}-m_{t-1})$\\
+   \footnotesize $m_t = m_{t-1} + \alpha_{\mathrm{upd}} \cdot \Delta m_t$
+  };
+
+% --- outputs ---
+\node[data, right=of up, yshift=7mm] (mem_out)
+  {$m_t$\\\footnotesize $(B,K,d)$};
+\node[data, below=of mem_out] (extra_out)
+  {extra dict\\\footnotesize last\_delta: $\Delta m_t$\\\footnotesize step: $t$};
+
+\draw[flow] (mem_in)   -- ($(up.west)+(0,7mm)$);
+\draw[flow] (chunk_in) -- ($(up.west)+(0,-7mm)$);
+\draw[flow] ($(up.east)+(0,7mm)$)  -- (mem_out);
+\draw[flow] ($(up.east)+(0,-7mm)$) -- (extra_out);
+
+% --- recurrence loop ---
+\draw[loop] (mem_out.east) .. controls +(20mm,0) and +(20mm,0) ..
+   node[right,font=\footnotesize,xshift=2mm]{$m_{t-1}\!\leftarrow\!m_t$}
+   ($(mem_in.east)+(0,0)$);
+
+\node[shape, below=1mm of up.south, anchor=north]
+  {trained:\ \,CrossAttn(Q,\,K,\,V proj),\ \,$\alpha_{\mathrm{upd}}$,\ \,LayerNorm,\ \,[opt] FFN};
+
+%% =====================================================================
+%% STAGE 3 — apply (once)
+%% =====================================================================
+\node[stage, below=58mm of s2] (s3)
+  {\textsc{Stage 3 — \texttt{apply}\ \ (once per generation step)}};
+
+\node[data, below=of s3.south west, anchor=north west] (call_in)
+  {\textsc{BaseCall} in\\\footnotesize inputs\_embeds: $(B,T,d)$\\\footnotesize attention\_mask: $(B,T)$};
+\node[data, below=of call_in] (mem_use)
+  {$m_N$\\\footnotesize $(B,K,d)$};
+
+\node[trained, right=18mm of call_in, yshift=-7mm,
+      minimum width=80mm, minimum height=42mm,
+      text width=76mm, align=left] (ap)
+  {\centerline{\bfseries Apply block — 5 combine modes\medskip}
+   \footnotesize\texttt{prefix}:\ \ \ \,embeds$'\!=\![\,m_N,\,x\,]$,\ \ \ \,$T'\!=\!T{+}K$\\
+   \footnotesize\texttt{residual}:\ embeds$'\!=\!x+\alpha_{\mathrm{app}}\!\cdot\!\mathrm{CrossAttn}(x,m_N)$,\ $T'\!=\!T$\\
+   \footnotesize\texttt{interleave}: embeds$'\!=\![\,x_{1:p},\,m_N,\,x_{p:}\,]$,\ \ $T'\!=\!T{+}K$\\
+   \footnotesize\texttt{hybrid}: residual then prefix,\ \ \ \ \ \ \ \ \ \ \ $T'\!=\!T{+}K$\\
+   \footnotesize\texttt{xattn} {\small$\star$}: $m'\!=\!\mathrm{CrossAttn}(m_N,\,\bigsqcup_t h_t)$,\\
+   \hphantom{xattn $\star$:\ }embeds$'\!=\![\,m',\,x\,]$,\ \ \ $T'\!=\!T{+}K$
+  };
+
+\node[data, right=of ap] (call_out)
+  {\textsc{BaseCall} out\\\footnotesize inputs\_embeds: $(B,T',d)$\\\footnotesize attention\_mask: $(B,T')$};
+
+\draw[flow] (call_in) -- ($(ap.west)+(0,11mm)$);
+\draw[flow] (mem_use) -- ($(ap.west)+(0,-11mm)$);
+\draw[flow] (ap) -- (call_out);
+
+\node[shape, below=1mm of ap.south, anchor=north, text width=82mm, align=left]
+  {trained:\ \,per-mode CrossAttn(Q,K,V) for \texttt{residual} / \texttt{xattn};\\
+   \hphantom{trained:\ }$\alpha_{\mathrm{app}}$ for \texttt{residual} / \texttt{hybrid}.\\
+   $\star$\ Phase-C-winning variant.};
+
+%% =====================================================================
+%% Downstream — frozen base
+%% =====================================================================
+\node[frozen, below=18mm of call_out, minimum width=42mm] (base)
+  {\textbf{Frozen base LM}\\\footnotesize Qwen3-8B\\\footnotesize no grad};
+\node[data, below=of base] (logits)
+  {logits\\\footnotesize $(B,T',V)$};
+
+\draw[flow] (call_out) -- (base);
+\draw[flow] (base) -- (logits);
+
+%% =====================================================================
+%% Legend
+%% =====================================================================
+\begin{scope}[shift={(0,-9.0)}, font=\footnotesize]
+  \node[trained, minimum width=30mm]            (l1) {trainable};
+  \node[frozen,  minimum width=30mm, right=4mm of l1] (l2) {frozen};
+  \node[data,    minimum width=30mm, right=4mm of l2] (l3) {tensor / state};
+  \node[stage,   minimum width=44mm, right=4mm of l3,
+                 minimum height=7mm, font=\footnotesize\bfseries] (l4) {stage};
+\end{scope}
+
+\end{tikzpicture}
+\end{document}
