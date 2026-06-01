@@ -182,3 +182,45 @@ Headline pass should fit in 24 hr.
   results matrix Phase L will fill in.
 * `../../mem-test/mem-embedding/k8s/sweep/build_sweep.py` —
   `PHASE_L` definition for Tier S.
+
+---
+
+## Addendum — Phase M shipped 2026-06-01 evening
+
+Discovered while implementing Phase L that the `xattn` readout
+`_ApplyTimeReadoutBlock` hard-coded `alpha_init=1.0` with no CLI
+knob, so the Phase L jobs that paired `--apply-alpha-init 1.0`
+with `combines=xattn` were no-ops on the read side. Phase M
+ships the missing code (configurable read-side α, per-channel α,
+new `xattn_residual` combine, reconstruction-loss head, no-
+context baseline, toy K=2 dataset, m_T probe script,
+alpha-logging CSV) and 12 jobs that actually exercise those
+levers.
+
+Phase M waiter polls for Phase L's run dir → drains it → launches
+Phase M with the auto-aggregator. The waiter is resilient to
+"Phase L hasn't started yet" — it polls every 60 s for the dir
+to appear.
+
+Code shipped today, summary:
+
+| file | what |
+|---|---|
+| `mem-embedding/src/mem_embedding/wrapper.py` | `xattn_residual` combine; readout α CLI-configurable + per-channel; optional reconstruction head |
+| `llm-infra/src/llm_infra/strategies.py` | `NoContextStrategy` (the literal "no wrapper" lower bound) |
+| `llm-infra/src/llm_infra/datasets.py` | `generate_categorical_niah_k2` (1-bit toy A2 sanity) |
+| `llm-infra/src/llm_infra/train.py` | reconstruction loss in `BPTTTrainer`; α-log CSV |
+| `mem-embedding/scripts/train_smoke.py` | new CLI flags wired through; `readout_alpha_after_train` in summary |
+| `mem-embedding/scripts/probe_memory.py` | new — m_T linear probe (A3) |
+| `mem-embedding/scripts/run_sweep.py` | boolean-flag handling in `_build_cmd` |
+| `mem-embedding/k8s/sweep/build_sweep.py` | `PHASE_M` (12 jobs) + `--only-phase-m` |
+| `mem-embedding/k8s/run-phase-m-waiter.sh` | poll-for-Phase-L-dir + drain + launch |
+
+Smoke-tested on the pod (CPU + tiny LM) — `xattn_residual`
+trains, `no_context` baseline appears in the summary, alpha-log
+CSV is written, reconstruction loss is added.
+
+Decision rule update: Phase M jobs must beat `no_context_contains
++ 0.05` (the lower bound) before being considered "the wrapper
+is doing something." Above that, must beat the Phase J Gist
+numbers (0.34 contains / 0.20 exact) to be promoted to BEST.
