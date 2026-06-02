@@ -5,6 +5,101 @@
 > 5-seed mean). Goal: get our wrapper above Gist on at least one
 > training task × benchmark pair, then propagate.
 >
+> **VERDICT 2026-06-02 18:48 UTC — Tier S WON.** Phase L's `data_500`
+> (Tier-S #5) and `3stage_2000` (Tier-S #7) both **cleared the bar**:
+> eval `exact_match` = 0.43 and 0.42 respectively, vs Gist's 0.20 on
+> the same metric. The dominant lever turned out to be **n_items
+> 100 → 500** (the "generalization-not-optimization" hypothesis from
+> S5 — confirmed). The α-init / λ_div / steps levers (S1–S4, S6) all
+> dominated by data scale. See the new §0 below for the verdict +
+> next-step rewrite. Subsequent tiers (A, B, C) are now re-tiered
+> based on what's still needed for paper-level numbers, not what
+> was needed to "make it work at all".
+>
+> **UPDATE 2026-06-02 21:55 UTC — Phase S queued.** The wrapper-side
+> work is now in "show it generalizes" mode, not "make it work" mode.
+> 39 paper-critical generalization jobs are chained behind R (lands
+> ~14:00 UTC Wed = 11:00 PT Wed). The Phase S manifest covers the
+> three claims `latent-mem-paper/main.tex` needs to make beyond
+> hyperparameter tuning:
+> - **cross-task**: data_500 lift on num_d1/num_d3/coding/multi_k3/sameform (S1, 5 jobs)
+> - **cross-scale (Qwen family)**: data_500 + 3stage on Qwen3-14B × 4 datasets (S3, 5 jobs)
+> - **scale-invariant wall**: bit-capacity wall on Qwen3-14B × d ∈ {1,3,5,12} (S4, 4 jobs)
+> - **read-side stress**: sameform + multi-needle k=5 at 8B and 14B (S5+S6, 4 jobs)
+> - **tight CIs**: 8 seeds on headline cell + 4 seeds per cross-task cell (S7+S8, 16 jobs)
+>
+> **v1 limitations logged for v2 follow-up** (`v1-followups.md`):
+> 1. *True synth→real cross-domain* — `train_smoke.py` ties `--dataset`
+>    to both train and eval; we need a `--eval-dataset` flag (~30 min
+>    code change but ate the 20 h paper-deadline window).
+> 2. *Llama-3.1-8B cross-family* — only Qwen weights are mounted on
+>    `sam-dev`; v1 "model-agnostic" = "scale-agnostic within Qwen
+>    family" (Qwen3-8B + Qwen3-14B).
+> 3. *RULER-NIAH-13 + ∞Bench-LongQA adapters* — dataset onboarding
+>    not done; v1 main table benchmark column is QuALITY (full + hard).
+
+---
+
+## 0 · Tier-S verdict (2026-06-02 18:48 UTC)
+
+### 0.1 What happened
+
+Pulled from `runs/sweep-phaseL-20260602-170655UTC/report.md`.
+
+| rank | Tier-S id | job | recipe lever | eval em | eval c | train em | gap | drift |
+|---:|---|---|---|---:|---:|---:|---:|---:|
+| 1 | S5 | `phaseL__data_500` | **n_items 100 → 500** | **0.430** | 0.440 | 0.540 | **0.11** ✓ | 2 704 |
+| 2 | S7 | `phaseL__3stage_2000` | **sft+opd+rl 900+600+500 @ 100 items** | **0.420** | 0.440 | 0.900 | 0.48 | 3 328 |
+| 3 | S1 | `phaseL__apply_alpha_1` | apply_α 0.0 → 1.0 | 0.260 | 0.380 | 0.660 | 0.40 | 4 384 |
+| 4 | S2 | `phaseL__lambda_div_05` | λ_div 0.1 → 0.5 | 0.220 | 0.240 | 0.380 | 0.16 | 1 496 |
+| 5 | S4 | `phaseL__steps_5000_alpha1_div05` | S1+S2+S3 | 0.120 | 0.300 | 0.940 | 0.82 ✗ | 924 |
+| 6 | (ref) | `phaseL__ref_repro` | K-ref recipe re-run | 0.100 | 0.240 | 0.760 | 0.66 ✗ | 4 448 |
+| 7 | S6 | `phaseL__interleave_div05` | interleave + α=1 + λ_div=0.5 | 0.060 | 0.380 | 0.720 | 0.66 ✗ | 1 360 |
+| 8 | S3 | `phaseL__steps_5000` | 5000 steps not 1800 | 0.000 | 0.300 | 0.000 | n/a | 9 536 ✗ |
+
+Vs the gist anchor: Gist em = 0.20 on the same task. **We
+now lead by +23 pp on em (S5) and +22 pp (S7).**
+
+### 0.2 What was learned
+
+1. **Generalization, not optimization, was the bottleneck.** S3, S4,
+   S8 all *more* compute on *same* data → worse (S3 fully
+   collapsed, S4 train=0.94 eval=0.12). S5 / S7 are the ones that
+   moved.
+2. **Data scaling (S5) and multi-stage (S7) win independently.**
+   Phase Q's `stack_best` is the obvious next stack
+   (n_items=5000 + sft+opd+rl + answer-head + xattn_residual).
+3. **apply_α=1.0 (S1) helps over the ref**, going from 0.10 → 0.26
+   em. But the data lever dominates it.
+4. **`combine=interleave` (S6) overfits hardest** — confirms the
+   2026-05-30 observation that interleave has the highest train but
+   collapses on eval.
+
+### 0.3 New highest-leverage interventions
+
+Demoted from Tier A/B because we're now above Gist on em:
+
+| #  | name | why now |
+|----|---|---|
+| Q-stack | scale data 100 → {1000, 5000} on the SFT recipe (no head) | direct extension of Phase L S5 |
+| Q-head | answer-head λ=0.5 at n=500 / 1000 | early-Q smoke shows code works; need data + head together |
+| R-pivot | replicate L S5 recipe on `quality` real-text MC | fills the paper benchmark column |
+| Q-stack-best | n=5000 + sft+opd+rl + answer-head + readout α=0.5 + per-channel | the synthetic headline |
+| O-base | replicate L S5 on Qwen3-14B | does scale help? |
+| Aux | finish 5-seed replication of L S5 in Phase N | tighten CIs on the headline cell |
+
+### 0.4 Tier reorg
+
+Old Tier A (diagnostics) becomes **Tier T-low (test-only after
+Q lands)** — we no longer need diagnostics to find a working
+recipe; we only need them if Q fails to scale further. Old Tier
+B's PRs go through Phase M (already shipped: readout α
+configurable, per-channel α, recon head, xattn_residual, answer
+head) and Phase Q (answer head + data scale stacked). Tier C is
+unchanged — only relevant if Q + R both plateau.
+
+---
+>
 > Format: every approach has **lift** (expected accuracy gain if it
 > works), **cost** (engineer-hours + GPU-hours), and **info value**
 > (what we learn even if it fails). Tiers ordered by

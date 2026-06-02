@@ -49,6 +49,27 @@
 - **Prompt baking** — Bhargava et al. (2024).
 - **In-context editing** — Qi, S. et al., ICLR 2025.
 
+## On-policy distillation on latent memory / reasoning
+
+> Survey doc: `v0-opd-on-latent-memory-survey-2026-06-01.md` — written 2026-06-01.
+> **Headline**: the *closest* prior art to the v1 OPD-on-wrapper pipeline is OPCD (Microsoft, Feb 2026) and LatentMem-LMPO (Tencent et al., Feb 2026); neither does the exact thing we do (recurrent latent memory wrapper on a strictly frozen base + three-stage SFT→OPD→REINFORCE).
+
+- **OPCD — On-Policy Context Distillation for Language Models** — Ye et al., MSR (Furu Wei). [arXiv:2602.12275](https://arxiv.org/abs/2602.12275). Bridges OPD with context distillation; **internalizes context into model weights**, not into a wrapper.
+- **Privileged Information Distillation (π-Distill / OPSD)** — [arXiv:2602.04942](https://arxiv.org/abs/2602.04942). Teacher sees CoT/trace; student doesn't; OPD with reverse KL on PI-conditioned teacher.
+- **On-Policy Prefix Distillation** — Zhang et al., Optum AI (2026-02). [arXiv:2602.15260](https://arxiv.org/abs/2602.15260). Cheap OPD by supervising only the prefix of student rollouts.
+- **A Survey of On-Policy Distillation for LLMs** — (2026). [arXiv:2604.00626](https://arxiv.org/abs/2604.00626).
+- **LatentMem / LMPO** — Wang et al. (2026-02). [arXiv:2602.03036](https://arxiv.org/abs/2602.03036). **GRPO-variant backprop through latent memories** in a multi-agent system with frozen backbones — *closest cousin* to our RL phase, just multi-agent not single-base.
+- **MEM1** — Zhou et al., NeurIPS 2025. End-to-end RL trains agent to consolidate context into a hidden state; trains the base, not a wrapper.
+- **MemRL** — Wang et al. (2026-01). [arXiv:2601.03192](https://arxiv.org/abs/2601.03192). Non-parametric PPO over an episodic text-bank memory with frozen LLM — frame & MDP formulation we should adopt.
+- **Memory-R1** — Yan et al. (2025-08). [arXiv:2508.19828](https://arxiv.org/abs/2508.19828). GRPO over add/update/delete ops on a **text** memory bank.
+- **MemFactory** — (2026-03). Unified framework for GRPO on text-mediated memory ops.
+- **Latent RL on Coconut** — *Reinforcement Learning for Latent-Space Thinking in LLMs* (2025-12). [arXiv:2512.11816](https://arxiv.org/abs/2512.11816). Value head fixes Coconut's "indirect supervision to latent steps" problem — directly applicable to our m_T.
+- **Shadow Mask Distillation** — (2026-05). [arXiv:2605.06850](https://arxiv.org/abs/2605.06850). On-policy alignment for KV cache compression under RL; the trick that ensures rollout and gradient-time policies match — sanity check for our RLTrainer.
+- **Deep Context Distillation (DCD)** — Caccia et al. (2025-03). [arXiv:2503.08727](https://arxiv.org/abs/2503.08727). Per-document LoRA via hidden-state + output KL — supervised, not on-policy.
+- **Context Distillation as Latent Memory Management** — (2026-05). [arXiv:2605.28889](https://arxiv.org/abs/2605.28889). Per-context LoRA + cache-sharing self-gating; off-policy KL.
+- **MEMO** — modular MEMORY model + frozen executive (2026-05).
+- **MemoryPrompt** — Pannitto et al., LREC 2024. Light recurrent wrapper writing 5 soft vectors to a frozen base — **architecture is the closest direct ancestor of ours**, but trained with standard NTP CE only.
+
 ## Agentic memory & long-horizon agents
 
 - **MemGPT** — Packer, C. et al. (2023).
