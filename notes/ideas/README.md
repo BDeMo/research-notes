@@ -20,6 +20,7 @@ M: exp · proto · paper · thesis · prod · side  +  solo · collab · team ·
 | Topic | Source | Date | # ideas |
 |---|---|---|---|
 | Inference-time training (X-W framing) | [`inference-time-training.md`](inference-time-training.md) | 2026-05-26 | 50 |
+| RCA model building — transformer-intrinsic adaptation | [`rca-transformer-intrinsic-2026-06-03.md`](rca-transformer-intrinsic-2026-06-03.md) | 2026-06-03 | 12 |
 
 ---
 
@@ -131,6 +132,35 @@ Born from reading Cartridges / Activation Beacon / Gisting / Generative Adapter 
 | J3 | Hybrid X+W chunk router | ★★ | F | ≈#I6 | paper | – | Per chunk decide soft-token (X) vs LoRA-delta (W) compression. Operationalizes I6 |
 | J4 | SVD-normalized memory wrapper | ★ | F | ←#08, v0.1 | – | – | Adopt [genadapter]'s SVD normalization in v0 wrapper architecture |
 | J5 | Beacon-style KV memory in v0.1 | ★★ | F | ←#08, v0.1 | – | – | v0 default (soft tokens) is weakest long-context choice per [act-beacon]. Add KV-activation memory ablation in v0 Phase-1 |
+
+---
+
+## RCA model building — 12 ideas (added 2026-06-03)
+
+> **Problem** (user-posed): build Nokia's RCA model solving two challenges — long context at **inference** + catastrophic forgetting at **training** — with an *insightful, easy-to-adapt, lightweight, model-agnostic, task-free* method derived from **transformer-intrinsic phenomena**. Paper: strong on RCA *and* preserves code/math. Project: in-domain generalize to other RCA datasets/abilities → Nokia model release.
+> **Unifying lens**: both challenges = "where is information allowed to flow"; transformers already have privileged sites (attention sinks, massive activations, induction heads). Confine read (context) + write (adaptation) to those natural sites.
+> **Constraint prior**: mem-X v1 3-regime law → RCA is likely **Regime C** (verbatim needle) so favor *overlay existing KV/sinks*, not *add new soft tokens*.
+> **Future room (not now)**: method should be extensible AR → **dLLM** — anchor the paper on the architecture-agnostic *principle* (not AR sinks specifically), abstract "site" as a `site_selector`, and favor architecture-agnostic levers (R4/R8/R7). dLLM is natively better at Regime C (masked reconstruction = infilling) and has a free adaptive-compute knob (denoising steps). See source §8.
+> Full brainstorm (2 rounds + recipes + anti-patterns + decision questions + dLLM extension): [`rca-transformer-intrinsic-2026-06-03.md`](rca-transformer-intrinsic-2026-06-03.md).
+
+| ID | Title | ★ | S | φ | M | Plan | Meta |
+|---|---|---|---|---|---|---|---|
+| R1 | Sink-anchored writable memory | ★★★ | F | | paper | – | Reuse attention-sink positions as a writable memory register; train ~500K sink-shaper, base frozen. Main lever for both problems |
+| R2 | Induction-head freezing + adapter elsewhere | ★★★ | F | ≈#R1 | paper | – | Freeze induction heads (ICL carriers) during SFT → few-shot/ICL preserved; adapt elsewhere |
+| R3 | Read-side KV reweighter | ★★ | F | ≈#R1 | paper | – | Tiny head rewrites *how* KV is read, not the KV; base frozen → verbatim preserved (fixes Regime C) |
+| R4 | Per-head attention temperature $\tau_{l,h}$ | ★★ | F | ≈#R1 | paper | – | ~1K learnable scalars in softmax; per-task entropy knob; lightest possible lever |
+| R5 | Logit-lens consistency aux loss | ★ | ? | | | – | Penalize layer-wise readout drift during SFT (tuned lens) → anti-forgetting |
+| R6 | Massive-activation gradient mask | ★ | F | ≈#R1 | paper | – | Grad-mask massive-activation channels (Sun 2024) → protect global regulators = protect base ability |
+| R7 | "Task-direction" steering | ★★ | ? | | | – | Refusal-direction analog for *adding* ability; find RCA-mode direction from contrast pairs, add at inference → zero train, zero forgetting |
+| R8 | Layer-band LoRA + orthogonal singular constraint | ★★ | F | ≈#R1 | paper | – | LoRA only on middle 1/3 layers, projected to orthogonal complement of top-k singular subspace (REVIVE) |
+| R9 | Cosine-similarity layer skipping (Cal-Skip) | ★ | ? | | | – | Skip redundant layers via inter-layer U-curve → saves long-ctx FLOPs |
+| R10 | Sparse-write fine-tune (parameter-level) | ★ | ? | | | – | Update only ~5% of params that actually move in fine-tune |
+| R11 | SAE-feature gated routing | ★ | ? | | | – | Route/freeze task-relevant SAE features; very high differentiation, needs instrumentation |
+| R12 | Tuned-lens-aware early exit | ★ | ? | | | – | Adaptive early exit via tuned lens → saves long-ctx FLOPs |
+
+**Recipes** (full in source): Light = R1+R6 · Medium = R1+R2+R8+R4 · Heavy = R1+R3+R7+R6+R5.
+
+> ⚠️ **Prior-work audit (2026-06-03, source §10)**: a 2022-2026 lit review found **none of R1-R12 is novel as a standalone mechanism** — the space is saturated. Exact hits: **R8 = OPLoRA (AAAI 2026)**, **R10 = Sparse Memory Finetuning (Meta 2025)**, **R4 = SSA/SSMax**, **R3 = ReasonCache/KV Packet**, **R5 = Logit-Lens-Loss/SelfAug**, **R6 = MoFO/MIGU**, **R2 = Mechanistic-Forgetting-2026/ABFT**, **R7 = trained steering vectors**, **R11 = SAE-FT/SAE-FD**. R1 (sink-as-writable-memory) has only a thin unclaimed core. **Revised recommendation**: drop the "novel mechanism" framing; pursue either (A) a *unifying-observation* paper (same intrinsic sites solve long-ctx AND forgetting, RCA+code+math co-eval) or (B) a *verified-new-phenomenon* (sink key-bias-only tuning, unverified). See source §10.3-10.4.
 
 ---
 

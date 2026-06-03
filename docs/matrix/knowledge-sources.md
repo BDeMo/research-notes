@@ -591,6 +591,54 @@ Plan-08 v1 promotes this to Regime C canonical: extract one specific string from
 - **Why it matters**: Plan-08 v2's planned **head-to-head baseline** for suffix memory. Reimplementation on top of `mem-test/mem-embedding` is one of the v2 work items (~1 focused week).
 - **Tags**: #v2 #baseline #memory-paper
 
+## RCA / transformer-intrinsic prior-work audit (added 2026-06-03)
+
+Closest-preempting work found in the 2022-2026 lit review for the RCA brainstorm ([`notes/ideas/rca-transformer-intrinsic-2026-06-03.md`](../../notes/ideas/rca-transformer-intrinsic-2026-06-03.md) §10). Each killed one of our R1-R12 angles.
+
+### Forgetting / capability-preserving fine-tuning
+
+- **[oplora]** OPLoRA — Orthogonal Projection LoRA (Xiong & Xie, AAAI 2026, arXiv:2510.13003). SVD-decompose frozen W, constrain LoRA to orthogonal complement of top-k singular subspace ($P_L=I-U_kU_k^\top$, $P_R=I-V_kV_k^\top$); math+code+commonsense; LLaMA-2-7B + Qwen2.5-7B. **= our R8 verbatim.**
+- **[clora]** CLoRA — Controlled LoRA with subspace/null-space regularization (ACL 2025). Orthogonal regularization on LoRA dirs. R8 neighbour.
+- **[smf]** Sparse Memory Finetuning (Meta, arXiv:2510.15103) + follow-ups (2605.03229, 2604.05248). Update only memory slots high-activated by new data vs background; NQ F1 drop 89% full-FT / 71% LoRA / **11% SMF**. **= our R10 / B6 verbatim.**
+- **[mofo]** MoFO — Momentum-Filtered Optimizer (arXiv:2407.20999). Update only large-momentum params → stay near pretrained. **= our R6.**
+- **[migu]** MIGU — Magnitude-based Gradient Updating (arXiv:2406.17245). Task-label-free; update large-magnitude-output params. **= our R6.**
+- **[mech-forget]** Mechanistic Analysis of Catastrophic Forgetting (arXiv:2601.18699). Freezing attention → forgetting ↓64%; 15-23% of lower-layer heads severely disrupted. **= our R2** (and the main threat to the unifying-observation framing).
+- **[ft-no-forget-icl]** Fine-Tuning Without Forgetting In-Context Learning (arXiv:2602.23197). Theory: restricting updates to the value matrix preserves ICL. **= our R2.**
+- **[abft]** Attention Behavior Fine-Tuning. Directly manipulates induction heads for ICL. **= our R2.**
+- **[selfaug]** SelfAug (EMNLP 2025 findings.763). Input-logit self-distribution alignment vs forgetting. **= our R5.**
+- **[tmkl]** Target-Masked KL (arXiv:2605.29498). Replay-free LoRA forgetting regularizer on non-target logits. **= our R5.**
+- **[logit-lens-loss]** Logit Lens Loss (arXiv:2602.01530, VLM) · **[distill-lens]** DistillLens (arXiv:2602.13567). Internal-readout consistency aux losses. **= our R5.**
+- **[sae-ft]** SAE-FT (arXiv:2605.15961, CLIP) · **[sae-fd]** SAE-FD (arXiv:2605.25525) · **[sae-tuning]** SAE-Tuning (OpenReview vUrZaERt8b). Freeze/gate SAE features to preserve capability. **= our R11.**
+
+### Attention temperature / softmax sharpening
+
+- **[ssa]** Selective Self-Attention (arXiv:2411.12892). Learnable per-head/token temperature on Q/V; <0.5% params; fine-tunable on existing LLMs. **= our R4.**
+- **[ssmax]** Scalable-Softmax (arXiv:2501.19399). Per-layer/head learnable scalar; long-context retrieval. **= our R4.**
+- **[focal-attn]** Focal Attention (arXiv:2511.06818). Learned per-layer softmax temperature. **= our R4.**
+
+### Steering / capability addition on frozen base
+
+- **[steer-reason]** Trained steering vectors to unlock reasoning (OpenReview URrDgCHA1i). Layer-wise additive biases, frozen weights (BitFit-like). **= our R7.**
+- **[instruct-steer]** Instruction-following via activation steering (arXiv:2410.12877). Difference-in-means task directions. **= our R7.**
+- **[cache-steer]** KV Cache Steering (arXiv:2507.08799). One-time KV-cache steering vectors, frozen base. **= our R7 / R3.**
+
+### Frozen-base KV / memory adapters (long context)
+
+- **[reasoncache]** ReasonCache (arXiv:2602.02366). Prefix-tuning KV vectors at each layer, frozen base; KV cache as learnable memory interface. **= our R3 / R1.**
+- **[kv-packet]** KV Packet (arXiv:2604.13226). Trainable soft-token KV adapters wrapping document blocks, frozen base, self-supervised distillation; **explicitly fixes disrupted attention-sink boundary artifacts**. **= our R3 / R1.**
+- **[rlkv]** RLKV (arXiv:2510.08525). RL-trained gating adapters identify reasoning-critical heads for KV compression. R3 neighbour.
+- **[persist-mem-dec]** Trained Persistent Memory for Frozen Decoder-Only LLMs (arXiv:2603.22329) + encoder-decoder variant (2603.16413). Prefix / KV-extension / Hebbian / slot-write memory adapters, frozen base. **= our R1** (closest persistent-memory neighbour).
+- **[kvm]** Key-Value Means (arXiv:2605.09877). Block-recurrent compressed memory; chunked RNN over attention state. **= our R1** (recurrent-memory neighbour).
+- **[lcirc]** LCIRC (arXiv:2502.06139) · **[memcom]** MemCom (arXiv:2510.16092). Recurrent / layer-wise compression injected into a frozen LLM. R1 neighbours.
+
+### Attention-sink science (the phenomenon R1 builds on)
+
+- **[sink-streaming]** Xiao et al. 2023 — StreamingLLM / attention sinks (arXiv:2309.17453). Origin; learnable sink token for streaming stability.
+- **[sink-emerge]** When Attention Sink Emerges (arXiv:2410.10781). Sink ≈ **key bias storing extra attention scores** — basis for the §10.2 key-bias gap.
+- **[sink-first-token]** Why do LLMs attend to the first token? (arXiv:2504.02732). Sink = over-mixing avoidance.
+- **[sink-ctr]** Attention Sinks: Catch-Tag-Release (NeurIPS 2025, arXiv:2502.00919). Sinks tag tokens with semantic directions; low-rank-capturable.
+- **[massive-act]** Sun et al. 2024 — Massive Activations in LLMs. Few channels with 100-1000× activation act as implicit bias; deleting breaks the model. Basis for R6.
+
 ## Conversations / internal
 
 ### [conv-2026-05-26] First brainstorm session
