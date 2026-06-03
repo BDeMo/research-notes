@@ -1,52 +1,29 @@
 # Plan 08 — Model Outputs ΔW as Part of Generation (Self-Modifying LLMs)
 
-> **Status**: drafting (most speculative of the three)
-> **Created**: 2026-05-26
+> **Status**: **v1 paper submitting (characterization)** · north star (self-modifying ΔW) on hold pending v2
+> **Created**: 2026-05-26 · **Last updated**: 2026-06-03
 > **Owner**: Mingjia
 > **Parent idea**: brainstorm H6 (also entangles H3, H7, I3)
 > **One-liner**: At each turn, the model produces not just an answer $y$ but also a **weight delta $\Delta W$** representing what it just learned. A verifier decides whether to apply, reject, or scale $\Delta W$. Over time, the model literally rewrites itself.
 
+## v1 (mem-X / soft-prompt) — current paper-submitting branch
+
+**v1 ≠ north star.** v1 implements the simplest carrier of the "learned wrapper around a frozen base" idea: memory as input embeddings (mem-X axis), no $\Delta W$ yet. Sister axes mem-H (hidden state) and mem-W (LoRA-delta) are parked.
+
+**The 3-regime law (Phase Y, 4 seeds, 2026-06-03)** is the v1 paper's contribution:
+- Regime A — QuALITY: wrapper matches Gist within seed noise, **+5 to +12 pp over no-training baselines**, 1/3 fewer soft tokens.
+- Regime B — MuSR-mm: **both wrappers at chance**; full_context wins.
+- Regime C — RULER-NIAH: **OURS = GIST = 0.000 ± 0.000** across 4 seeds; full_context = 0.995.
+
+Full fact-dump at [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md). Source repo: `~/workspace/mem-test/mem-embedding/`. Paper repo: `~/workspace/latent-mem-paper/`.
+
+**Pivot menu**: [`v1-if-wrapper-doesnt-work-2026-06-03.md`](v1-if-wrapper-doesnt-work-2026-06-03.md) — 10 directions, top-3 testable-today: hybrid wrapper+retrieval (B), infilling objective (D), unfreeze last layer (I).
+
 ---
 
-## Reader guide
+## North star (what this plan was originally about)
 
-This directory now has three scopes:
-
-- **Practical v0 / v1** (in flight, paper now): frozen 7B/8B base model + trainable learned-memory wrapper at *encode time*. Characterizes the bit-capacity wall. **This is the version producing the ICLR 2027 paper draft (`latent-mem-paper`).**
-- **v2** (designed, paper next): same wrapper protocol, but memory is appended *during* autoregressive generation and persists *across sessions*. Inherits the bit-capacity diagnostic from v1.
-- **Full Plan 08** (long-term, parked): model-emitted weight deltas and verifier-gated self-modification.
-
-Plus one **parallel methodology research question**:
-
-- **Q2** — Which activations carry memory? Probe the frozen base for sparse / dormant channels and write the wrapper into those only. Its own paper.
-
-Start here for v0 / v1 (the paper being written now):
-
-- [`v0-learned-memory-wrapper.md`](v0-learned-memory-wrapper.md) — concise English note for the executable v0.
-- [`v0-learned-memory-wrapper_zh.md`](v0-learned-memory-wrapper_zh.md) — Chinese version.
-- [`v0-paper-target-2026-05-31.md`](v0-paper-target-2026-05-31.md) — paper framing decision (Candidate A: Bit-Capacity Limits).
-- [`v0-sweep-plan-2026-05-31.md`](v0-sweep-plan-2026-05-31.md) — sweep design.
-- [`v0-sweep-results-2026-05-31.md`](v0-sweep-results-2026-05-31.md) — sweep results scaffold.
-- [`v0-results-2026-05-30.md`](v0-results-2026-05-30.md) — earlier interim results.
-- [`v0-datasets-plan.md`](v0-datasets-plan.md) — dataset plan.
-- [`v0-budget.md`](v0-budget.md) — v0 budget and decision gates.
-- [`v0-budget_zh.md`](v0-budget_zh.md) — Chinese budget.
-- [`misc/`](misc/) — versioned architecture and training diagrams (PNG + TikZ).
-- [`v1-followups-2026-06-02.md`](v1-followups-2026-06-02.md) — earlier follow-up list (mostly closed by Phase Y).
-- [`v1-method-design-improvements-2026-06-02.md`](v1-method-design-improvements-2026-06-02.md) — sketch of bigger-budget / dual-rail / sparse-write memory variants.
-- **[`v1-if-wrapper-doesnt-work-2026-06-03.md`](v1-if-wrapper-doesnt-work-2026-06-03.md)** — **(NEW 2026-06-03 PT)** post-Phase-Y brainstorm: the multi-seed + public-benchmark evidence shows the wrapper is a *narrow-utility lossy compressor* (matches Gist on QuALITY, at-chance on MuSR, 0.000 on RULER while full_context=0.995). This doc lists 10 pivot directions ranked by time-to-result × upside, and recommends 3 concrete this-week experiments: (B) hybrid wrapper+retrieval, (D) infilling training, (I) last-layer unfreeze ablation. Default plan: queue all 3 in parallel and re-assess in 24 h.
-- **[`v0-how-we-got-here.md`](v0-how-we-got-here.md)** — **(NEW 2026-06-03 PT)** retrospective derivation. Reconstructs the v0 architecture as a sequence of six decisions (constraints C1-C4 → dense memory pool → Perceiver-IO residual update with exposed $\Delta m$ → 7-way combine horse-race → SFT-only training ladder → hyperparameter freeze → protocol). Includes the "negative space" table of every discarded variant, and the one-line answer to "how did we arrive at the wrapper?".
-
-Start here for v2 (next paper):
-
-- [`v2-plan.md`](v2-plan.md) — design + wrapper-to-model integration + open questions.
-- [`v2-related-work.md`](v2-related-work.md) — literature survey (2024–25 latent-reasoning landscape; ~20 papers).
-
-Start here for Q2 (parked methodology):
-
-- [`q2-activation-memory-probe.md`](q2-activation-memory-probe.md) — research questions, methodology sketch, compute estimate.
-
-Then read the original files below for the full self-modifying-LLM version (long-term scope).
+---
 
 ## Problem
 
@@ -118,31 +95,7 @@ Kill criteria:
 - If learned $\Delta W$ is observably indistinguishable from random noise (verifier accepts uniformly) → killing learnt-update; fall back to D2L-style context-conditioned updates.
 
 ## Files in this plan
-
-### Index
 - [`README.md`](README.md) — this file
-
-### v0 / v1 — paper now (ICLR 2027 draft in `latent-mem-paper`)
-- [`v0-how-we-got-here.md`](v0-how-we-got-here.md) — retrospective derivation of the v0 wrapper (constraints → decisions → recipe)
-- [`v0-learned-memory-wrapper.md`](v0-learned-memory-wrapper.md) — practical v0 scope (EN)
-- [`v0-learned-memory-wrapper_zh.md`](v0-learned-memory-wrapper_zh.md) — practical v0 scope (ZH)
-- [`v0-paper-target-2026-05-31.md`](v0-paper-target-2026-05-31.md) — paper framing decision
-- [`v0-sweep-plan-2026-05-31.md`](v0-sweep-plan-2026-05-31.md) — sweep design
-- [`v0-sweep-results-2026-05-31.md`](v0-sweep-results-2026-05-31.md) — sweep results scaffold
-- [`v0-results-2026-05-30.md`](v0-results-2026-05-30.md) — interim results
-- [`v0-datasets-plan.md`](v0-datasets-plan.md) — dataset plan
-- [`v0-budget.md`](v0-budget.md) — v0 budget (EN)
-- [`v0-budget_zh.md`](v0-budget_zh.md) — v0 budget (ZH)
-- [`misc/`](misc/) — versioned diagrams (PNG + TikZ)
-
-### v2 — paper next (cross-session latent memory)
-- [`v2-plan.md`](v2-plan.md) — A+B framing, wrapper-to-model integration design space, open questions, next steps
-- [`v2-related-work.md`](v2-related-work.md) — 2024–25 literature survey (~20 papers)
-
-### Q2 — methodology sub-paper (parked)
-- [`q2-activation-memory-probe.md`](q2-activation-memory-probe.md) — which activations carry memory; constrained-write wrapper
-
-### Long-term self-modifying-LLM scope (full Plan 08)
 - [`validation.md`](validation.md) — experimental protocol, baselines
 - [`channels.md`](channels.md) — benchmarks, datasets
 - [`budget.md`](budget.md) — costs by phase

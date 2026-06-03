@@ -501,6 +501,96 @@ These five clusters were scanned during the 2026-05-28 brainstorm. They define t
 - **Why it matters**: Moves from block-level to fine-grained Attribute Unit steering. Targeted intervention on fewer activations beats coarse intervention. Reference for "what granularity should B2 use?".
 - **Tags**: #repe #granularity
 
+## Public benchmarks used in plan-08 v1 (added 2026-06-03)
+
+These appear in `latent-mem-paper` Tables 1-2 and in `notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`. Stable IDs assigned now so all v1 + v2 docs can cite them consistently.
+
+### [quality] QuALITY: Question Answering with Long Input Texts, Yes! — Pang, Parrish, Lal, et al., NAACL 2022
+- **Type**: benchmark
+- **Link**: arXiv:2112.08608 · HF `emozilla/quality`
+- **Why it matters**: 4-way MC reading comprehension on ~7K-token articles. **The Regime A canonical benchmark** in plan-08 v1: lossy compression actually *helps* here because the answer is reconstructible from a gist. Phase Y headline: OURS 0.193 ± 0.032 (n=4 seeds) vs no_context 0.141.
+- **Used in**: plan 08 v1 paper Table 1; mem-X Phase V/X/Y
+- **Tags**: #benchmark #long-context #mc
+
+### [musr] MuSR: Multistep Soft Reasoning — Sprague, Zhang, Sanford, et al., 2024
+- **Type**: benchmark
+- **Link**: arXiv:2310.16049
+- **Why it matters**: Closed-MC reasoning over 1000+ token narratives with multi-step temporal logic. **Regime B canonical** in plan-08 v1: both wrappers at chance (≈ 0.495), full_context wins. Shows the wrapper learned compression but no transferable reasoning signal. Forces honest "limitations" discussion.
+- **Used in**: plan 08 v1 paper Table 1; mem-X Phase X/Y
+- **Tags**: #benchmark #reasoning #long-context
+
+### [ruler] (already exists) — Hsieh et al., COLM 2024
+
+Plan-08 v1 promotes this to Regime C canonical: extract one specific string from a 2K-token WikiText haystack. Both wrappers = 0.000 ± 0.000 (4 seeds, exactly zero); full_context = 0.995. Cleanest evidence for "lossy compression destroys the needle string".
+
+### [hotpotqa] HotpotQA: A Dataset for Diverse, Explainable Multi-hop QA — Yang, Qi, Zhang, et al., EMNLP 2018
+- **Type**: benchmark
+- **Link**: arXiv:1809.09600 · HF `hotpotqa/hotpot_qa`
+- **Why it matters**: Multi-hop QA with distractor paragraphs; free-form span answers. Plan-08 v1 used as cross-distribution generalization probe (Phase V). Free-form (token_f1) rather than MC — different metric domain from QuALITY.
+- **Used in**: plan 08 v1 paper Table 1; mem-X Phase V
+- **Tags**: #benchmark #multi-hop #long-context
+
+### [narrativeqa] The NarrativeQA Reading Comprehension Challenge — Kočiský, Schwarz, Blunsom, et al., TACL 2018
+- **Type**: benchmark
+- **Link**: arXiv:1712.07040 · HF `deepmind/narrativeqa`
+- **Why it matters**: Open-ended QA over long narratives (books / movie scripts). Generous metric (`contains_match` over multiple references). Plan-08 v1 Phase V cross-distribution probe.
+- **Tags**: #benchmark #long-context #open-ended
+
+### [triviaqa] TriviaQA: A Large Scale Distantly Supervised Challenge — Joshi, Choi, Weld, Zettlemoyer, ACL 2017
+- **Type**: benchmark
+- **Link**: arXiv:1705.03551
+- **Why it matters**: Open-domain QA with Wikipedia evidence. Tests whether wrapper trained on synthetic NIAH transfers to real Wikipedia text. Plan-08 v1 Phase X.
+- **Tags**: #benchmark #open-domain
+
+### [msmarco] MS MARCO v2.1: A Human Generated MAchine Reading COmprehension Dataset — Nguyen, Rosenberg, Song, et al., 2016
+- **Type**: benchmark
+- **Link**: arXiv:1611.09268
+- **Why it matters**: Passage-QA at scale. Plan-08 v1 Phase X cross-distribution probe; tests "short context, real text" failure mode.
+- **Tags**: #benchmark #passage-qa
+
+### [squad2] SQuAD v2: Know What You Don't Know — Rajpurkar, Jia, Liang, ACL 2018
+- **Type**: benchmark
+- **Link**: arXiv:1806.03822
+- **Why it matters**: Short-context RC with unanswerable questions. Plan-08 v1 Phase X — important because most wrapper benchmarks are long-context; SQuAD v2 measures whether the wrapper hurts in the short-context regime.
+- **Tags**: #benchmark #rc
+
+### [wikitext103] WikiText-103 — Merity, Xiong, Bradbury, Socher, ICLR 2017
+- **Type**: dataset
+- **Link**: arXiv:1609.07843
+- **Why it matters**: The haystack substrate for plan-08 v1's RULER-NIAH evaluation. Standard LM benchmark; here used as text background, not as a metric.
+- **Tags**: #dataset #lm
+
+## Long-context compression / memory architectures (related work for plan 08, added 2026-06-03)
+
+### [icae] In-Context Auto-Encoder for Context Compression in a Large Language Model — Ge, Hu, et al., ICLR 2024
+- **Type**: paper
+- **Link**: arXiv:2307.06945
+- **Why it matters**: Encoder-decoder with learned compression of context into a small set of memory slots, trained via reconstruction. **Closest neighbour to Direction D (infilling objective)** in plan-08 v1's pivot menu.
+- **Tags**: #compression #soft-prompt #plan08-relevant
+
+### [autocompressor] Adapting Language Models to Compress Contexts — Chevalier, Wettig, Ajith, Chen, EMNLP 2023
+- **Type**: paper
+- **Link**: arXiv:2305.14788
+- **Why it matters**: Summary-token-style recurrent context compression. Plan-08 v1 explicitly positions itself alongside this lineage (and Gist, ICAE). Different write-side recurrence; same overall problem.
+- **Tags**: #compression #soft-prompt #recurrent
+
+### [h2o] H2O: Heavy-Hitter Oracle for Efficient Generative Inference of LLMs — Zhang, Sheng, Zhou, et al., NeurIPS 2023
+- **Type**: paper
+- **Link**: arXiv:2306.14048
+- **Why it matters**: KV-cache eviction policy; the canonical reference for plan-08 v1's **Direction F (KV-cache compression instead of soft prompt)** pivot.
+- **Tags**: #kv-cache #long-context
+
+### [streamingllm] Efficient Streaming Language Models with Attention Sinks — Xiao, Tian, Chen, Han, ICLR 2024
+- **Type**: paper
+- **Link**: arXiv:2309.17453
+- **Why it matters**: Attention-sink + sliding-window for streaming long contexts. Plan-08 v1 Direction F neighbour.
+- **Tags**: #kv-cache #streaming
+
+### [tokmem] TokMem — token-memory baseline (citation TBD, v2 target)
+- **Type**: paper
+- **Why it matters**: Plan-08 v2's planned **head-to-head baseline** for suffix memory. Reimplementation on top of `mem-test/mem-embedding` is one of the v2 work items (~1 focused week).
+- **Tags**: #v2 #baseline #memory-paper
+
 ## Conversations / internal
 
 ### [conv-2026-05-26] First brainstorm session

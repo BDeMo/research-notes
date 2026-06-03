@@ -53,6 +53,7 @@
 |---|---|---|---|
 | 2026-05-26 | Inference-time training (X-W framing) | Brainstorm of 50 ideas + 3 detailed plans + Doc-to-LoRA reading | [`2026-05-26-inference-time-training.md`](2026-05-26-inference-time-training.md) |
 | 2026-05-28 | Methods reading + new plan brainstorm | Read 4 methods (Cartridges / Activation Beacon / Gisting / Generative Adapter) for plan 08 v0; 5 J-series ideas + 3 existing ★★+ candidates | [`2026-05-28-methods-reading-and-new-plans.md`](2026-05-28-methods-reading-and-new-plans.md) |
+| 2026-06-03 | mem-X v1 results harvest (plan 08 v0) | Extracted facts from 7-day Phase A→Y burst; **3-regime law** (A wins / B at-chance / C collapse) is the v1 paper claim; OPD+RL stages dropped; J5 empirically answered | [`2026-06-03-mem-x-v1-harvest.md`](2026-06-03-mem-x-v1-harvest.md) |
 
 ---
 
@@ -60,8 +61,8 @@
 
 Topics that span multiple sessions and are still alive:
 
-- **Inference-time training** — last touched 2026-05-28. Lead ideas: X-saturation curriculum (plan 01), W-space BoN (plan 03), model outputs ΔW (plan 08).
-- **Plan 08 v0 — Learned Memory Wrapper** — actively in execution (30+ commits since 2026-05-26). Frozen 8B base + trainable wrapper, RCA-demo motivated. Reading [genadapter] / [cartridges] / [act-beacon] / [gisting] for architecture decisions and baselines. New J-series ideas (2026-05-28) propose v0.1 architecture ablations + the bridge to plan 08 north star.
+- **Inference-time training** — last touched 2026-06-03. Lead ideas: X-saturation curriculum (plan 01), W-space BoN (plan 03), model outputs ΔW (plan 08).
+- **Plan 08 v0 — mem-X soft-prompt wrapper (`mem-test/mem-embedding`)** — **v1 paper submitting (characterization)** as of 2026-06-03. 25 phases A→Y on 8×H100. **3-regime law** is the v1 headline (A: wins on QuALITY · B: at-chance on MuSR · C: collapses on RULER-NIAH). v2 = suffix memory blocked until v1 freeze 2026-06-15. Full harvest: [`../../notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`](../../notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md).
 
 ## Archived threads
 
