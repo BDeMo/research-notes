@@ -28,15 +28,42 @@
 > - **read-side stress**: sameform + multi-needle k=5 at 8B and 14B (S5+S6, 4 jobs)
 > - **tight CIs**: 8 seeds on headline cell + 4 seeds per cross-task cell (S7+S8, 16 jobs)
 >
+> **UPDATE 2026-06-03 18:10 UTC — Phase V queued** after user
+> flagged: *"we cannot only beat baselines on our self-made
+> datasets — we need fully public benchmarks"*. 12 cells on three
+> fully public long-context benchmarks (QuALITY, HotpotQA
+> distractor, NarrativeQA) using a NEW `--eval-dataset` flag in
+> `train_smoke.py` (zero-shot transfer protocol — wrapper trained
+> on `categorical_niah`, evaluated on each public benchmark
+> without any per-benchmark retraining; matched Gist baseline
+> sees same training corpus, same seed, same eval). ETA Phase V
+> launch ~19:00 UTC after Phase T drains; ETA Phase V completion
+> ~20:30 UTC = 13:30 PT. New scaffolding lands in
+> `mem-embedding/summary/matrix.md` §5.V,
+> `latent-mem-paper/main.tex` §5 (`Public-benchmark
+> generalisation`), `latent-mem-paper/details.tex` §11 (Phase V
+> protocol + failure-mode catalogue), and
+> `summary/critical-review-2026-06-03-v1.1.5-public.md`.
+>
 > **v1 limitations logged for v2 follow-up** (`v1-followups.md`):
-> 1. *True synth→real cross-domain* — `train_smoke.py` ties `--dataset`
->    to both train and eval; we need a `--eval-dataset` flag (~30 min
->    code change but ate the 20 h paper-deadline window).
+> 1. ~~*True synth→real cross-domain* — `train_smoke.py` ties
+>    `--dataset` to both train and eval; we need a `--eval-dataset`
+>    flag (~30 min code change but ate the 20 h paper-deadline
+>    window).~~ **RESOLVED 2026-06-03** — `--eval-dataset` flag
+>    landed; Phase V is the first cross-dataset transfer suite.
 > 2. *Llama-3.1-8B cross-family* — only Qwen weights are mounted on
 >    `sam-dev`; v1 "model-agnostic" = "scale-agnostic within Qwen
 >    family" (Qwen3-8B + Qwen3-14B).
-> 3. *RULER-NIAH-13 + ∞Bench-LongQA adapters* — dataset onboarding
->    not done; v1 main table benchmark column is QuALITY (full + hard).
+> 3. *RULER-NIAH-13 + ∞Bench-LongQA adapters* — half-done:
+>    Phase V adds HotpotQA distractor + NarrativeQA, so v1.2 will
+>    have THREE public-benchmark columns (QuALITY + HotpotQA +
+>    NarrativeQA). RULER is procedural-only and ∞Bench needs an
+>    upstream loader fix; both still deferred to v2.
+> 4. *Wrapper checkpointing* — `train_smoke.py` still discards
+>    the wrapper at end-of-training; Phase V re-trains per
+>    (train, eval) pair. Saving `wrapper.pt` is logged in
+>    `v1-followups.md` §1.4 and is the prerequisite to making
+>    RULER / ∞Bench / LongBench-v2 cheap in v2.
 
 ---
 

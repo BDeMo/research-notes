@@ -17,31 +17,34 @@
 
 ## 1 · Code-level changes deferred
 
-### 1.1 `--eval-dataset` flag in `train_smoke.py` &nbsp; (cost: ~30 min code + ~6 h re-run)
+### 1.1 `--eval-dataset` flag in `train_smoke.py` &nbsp; ✅ LANDED 2026-06-03
 
-**What.** Decouple `--dataset` (training distribution) from a new
-`--eval-dataset` (held-out evaluation distribution). Today's harness
-ties them together, so we cannot run "train on `categorical_niah`,
-eval on `quality`" without retraining for every (train, eval) pair.
+**Resolution.** Landed 2026-06-03 18:00 UTC as part of the
+Phase V scaffolding (user feedback "we need fully public
+benchmarks"). The flag in `train_smoke.py` accepts any key from
+`DATASETS` and routes a separate generator into the held-out
+evaluation while the wrapper trains on `--dataset`. The wrapper
+is never updated against `--eval-dataset` so any number is
+honestly zero-shot. Adapters `generate_hotpot_qa` and
+`generate_narrativeqa` shipped in the same commit.
 
-**Impact on v1.** Would let us claim **TRUE cross-domain transfer**:
-the wrapper trained on synthetic NIAH still works on real-text
-QuALITY (and vice versa). Currently the cross-domain story in
-`main.tex` §4.3 leans on Phase R, which trains directly on QuALITY.
+**Where it landed in the paper.** `main.tex` §5
+`Public-benchmark generalisation` (`Table~\ref{tab:public}`)
+and `details.tex` §11 `Phase~V protocol`.
 
-**Paper section it would strengthen.** `main.tex` §4.3 (could add a
-"synthetic → real transfer" sub-table). `details.tex` §6 (comparison
-table — moves us into a more decisive cell vs Gist Tokens on
-"distribution shift robustness").
+**Original entry kept for v2 reference.** The original
+deferral was: *"Decouple `--dataset` (training distribution)
+from a new `--eval-dataset` (held-out evaluation distribution).
+Today's harness ties them together, so we cannot run 'train on
+`categorical_niah`, eval on `quality`' without retraining for
+every (train, eval) pair."* That's now done.
 
-**v2 intervention sketch.** Add `parser.add_argument("--eval-dataset",
-default=None)` and route `eval_dataset = args.eval_dataset or
-args.dataset` into the eval loop. The wrapper checkpoint is already
-in memory at end-of-training, so we just call the existing
-`evaluate(wrapper, base, eval_dataset)` once more with the held-out
-dataset before exiting. Adds ~30 s per job for the additional eval
-pass. Phase S would be rerun as a "Phase S' " with the flag enabled
-on every cell.
+**Followup deferred to v2.** Mid-training wrapper checkpointing
+(see §1.4) is *not* implemented — currently the wrapper is
+discarded at end-of-training and Phase V re-trains for each
+(train, eval) pair. This costs ~25 min of wrapper training per
+eval target. Saving `wrapper.pt` would make additional eval
+benchmarks (RULER, ∞Bench, LongBench-v2) zero-cost.
 
 ### 1.2 Llama-3.1-8B base mount &nbsp; (cost: ~6 h re-train + ~2 h pod ops)
 
@@ -63,25 +66,40 @@ add a Llama-3.1-8B row to Table 1) and §1 abstract (could write
 (4 configs × 4 datasets × Llama-3.1-8B base). Total cost = pod ops
 (2 h) + 16 jobs × ~30 min on 4 GPUs = 4 h compute + 2 h ops = 6 h.
 
-### 1.3 RULER-NIAH-13 + ∞Bench-LongQA dataset adapters &nbsp; (cost: ~4 h per adapter)
+### 1.3 RULER-NIAH-13 + ∞Bench-LongQA dataset adapters &nbsp; ❗ partial (HotpotQA + NarrativeQA landed; RULER + ∞Bench deferred to v2)
 
-**What.** Add `llm_infra.datasets.ruler_adapter` and
-`llm_infra.datasets.infinitebench_longqa_adapter`. Both are standard
-long-context benchmarks; their absence from the v1 main table is
-purely an onboarding gap.
+**Status 2026-06-03.** Phase V (queued same day) adds two
+public-benchmark adapters to `llm_infra.datasets`:
 
-**Impact on v1.** Phase R already provides QuALITY as the real-text
-benchmark. RULER and ∞Bench would broaden the "benchmark column"
-of Table 1 from 1 to 3 entries.
+- `generate_hotpot_qa` (HotpotQA distractor setting,
+  multi-hop QA over 10 paragraphs, 7,405 val items;
+  Yang et al. 2018)
+- `generate_narrativeqa` (NarrativeQA, open-ended QA over
+  long narrative documents truncated to 60k chars;
+  Kočiský et al. 2018)
 
-**Paper section it would strengthen.** `main.tex` Table 1 (more
-benchmark columns). `details.tex` §4 (more held-out benchmark
-examples).
+Combined with the existing `generate_quality` /
+`generate_quality_hard` adapters, the public-benchmark column
+of Table 1 in v1.2 will have **three** entries (QuALITY,
+HotpotQA, NarrativeQA) rather than the original v1.0 plan of
+one.
 
-**v2 intervention sketch.** Mirror the `quality_adapter` pattern:
-`load_dataset(...)` → 4-way MC or QA pairs → chunked iterator
-yielding `LongContextItem` tuples. Each adapter ~4 h including
-end-to-end smoke test.
+**Still deferred.** RULER-NIAH-13 (Hsieh et al. 2024) is
+procedural — no HuggingFace dataset exists; we would need to
+implement the generator from the RULER GitHub. ∞Bench LongQA
+(Zhang et al. 2024) is downloadable but the original loader
+script is incompatible with current `datasets` lib on the
+pod. LongBench v1 (Bai et al. 2023) has the same
+script-loader issue; LongBench v2 only has a `train` split on
+HF (no held-out eval). All three are deferred to v2 — RULER
+needs a half-day's implementation, ∞Bench and LongBench need
+an upstream loader fix.
+
+**Original entry (kept for v2 audit trail).** *"Add
+`llm_infra.datasets.ruler_adapter` and
+`llm_infra.datasets.infinitebench_longqa_adapter`. Both are
+standard long-context benchmarks; their absence from the v1
+main table is purely an onboarding gap."* — half-done.
 
 ### 1.4 Mid-training wrapper checkpointing &nbsp; (cost: ~2 h)
 
