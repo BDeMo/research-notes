@@ -1,6 +1,6 @@
 # Ideas evaluation snapshot — 2026-05-28
 
-> Score every idea + plan + J-series candidate against 6 axes after a 2026 prior-work landscape scan. Snapshot only; status will drift, re-score quarterly.
+> Score every idea + plan + J-series candidate against 6 axes after a 2026 prior-work landscape scan. Snapshot only; status will d¬rift, re-score quarterly.
 
 ## Scoring legend
 
