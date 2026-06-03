@@ -32,6 +32,9 @@ Start here for v0 / v1 (the paper being written now):
 - [`v0-budget.md`](v0-budget.md) — v0 budget and decision gates.
 - [`v0-budget_zh.md`](v0-budget_zh.md) — Chinese budget.
 - [`misc/`](misc/) — versioned architecture and training diagrams (PNG + TikZ).
+- [`v1-followups-2026-06-02.md`](v1-followups-2026-06-02.md) — earlier follow-up list (mostly closed by Phase Y).
+- [`v1-method-design-improvements-2026-06-02.md`](v1-method-design-improvements-2026-06-02.md) — sketch of bigger-budget / dual-rail / sparse-write memory variants.
+- **[`v1-if-wrapper-doesnt-work-2026-06-03.md`](v1-if-wrapper-doesnt-work-2026-06-03.md)** — **(NEW 2026-06-03 PT)** post-Phase-Y brainstorm: the multi-seed + public-benchmark evidence shows the wrapper is a *narrow-utility lossy compressor* (matches Gist on QuALITY, at-chance on MuSR, 0.000 on RULER while full_context=0.995). This doc lists 10 pivot directions ranked by time-to-result × upside, and recommends 3 concrete this-week experiments: (B) hybrid wrapper+retrieval, (D) infilling training, (I) last-layer unfreeze ablation. Default plan: queue all 3 in parallel and re-assess in 24 h.
 
 Start here for v2 (next paper):
 
