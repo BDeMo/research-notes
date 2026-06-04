@@ -70,7 +70,8 @@ Kill criteria:
 - [`references.md`](references.md) — closest prior (links to `knowledge-sources.md` IDs)
 - [`phase0-results-2026-06-03.md`](phase0-results-2026-06-03.md) — Phase-0 detector validation on Qwen3-8B (actual run)
 - [`phase1-results-2026-06-04.md`](phase1-results-2026-06-04.md) — **Phase-1 exploration, 8 models / 7 H100s (actual run)** — H2 partial, sink≠retrieval robust, NIAH+forgetting setup needs hardening
-- `figs/` — headline figures from the Phase-1 run; `runs/` — Phase-0 detector + raw JSON
+- [`facts-2026-06-04.md`](facts-2026-06-04.md) — **broad fact-finding on the 7–9B cohort** (Qwen3.5-9B, GLM-4-9B, Qwen3-8B, Qwen2.5-7B-Inst; ~30 metrics × 5 angles, native bf16): cross-family collapse-axis facts + the drift↔retrieval coupling
+- `figs/` — headline + facts figures; `runs/` — detector/runner/viz/analysis code + GPU strategy
 
 ## Status vs success criteria (live, after Phase-1 exploration 2026-06-04)
 - **H1 (coexistence)** — ✅ detectors find the small site sets at every scale (Phase-1 R1).

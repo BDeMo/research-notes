@@ -35,10 +35,18 @@ MODELS = {
     "qwen2.5-1.5b": "Qwen/Qwen2.5-1.5B",
     "qwen2.5-1.5b-instruct": "Qwen/Qwen2.5-1.5B-Instruct",
     "qwen2.5-7b-instruct": "Qwen/Qwen2.5-7B-Instruct",
+    # cross-family (different vendor, standard softmax-attn arch Glm4ForCausalLM)
+    "glm4-9b": "THUDM/GLM-4-9B-0414",
+    "glm4-32b": "zai-org/GLM-4-32B-0414",
+    # Qwen3.5 (multimodal, hybrid linear attention — needs newer transformers;
+    # attention-head metrics only valid on its full-attention layers)
+    "qwen3.5-4b": "Qwen/Qwen3.5-4B",
+    "qwen3.5-9b": "Qwen/Qwen3.5-9B",
 }
 SIZE_B = {"qwen3-0.6b": 0.6, "qwen3-1.7b": 1.7, "qwen3-4b": 4.0, "qwen3-8b": 8.0,
           "qwen3-14b": 14.0, "qwen2.5-1.5b": 1.5, "qwen2.5-1.5b-instruct": 1.5,
-          "qwen2.5-7b-instruct": 7.0}
+          "qwen2.5-7b-instruct": 7.0, "glm4-9b": 9.0, "glm4-32b": 32.0,
+          "qwen3.5-4b": 4.0, "qwen3.5-9b": 9.0}
 
 def log(*a):
     print(f"[janus {time.strftime('%H:%M:%S')}]", *a, flush=True)
@@ -49,21 +57,48 @@ def tag_path(tag, name):
     return os.path.join(d, name)
 
 # ---------------------------------------------------------------- model utils
-def load_model(model_id, eager=False, dtype=torch.bfloat16):
+def native_dtype(model_id):
+    # honor the checkpoint's native precision: fp32 if released as fp32, else bf16 floor.
+    # NEVER quantize and never go below bf16 fidelity.
+    from transformers import AutoConfig
+    try:
+        c = AutoConfig.from_pretrained(model_id)
+        c = getattr(c, "text_config", c)
+        nd = getattr(c, "torch_dtype", None) or getattr(c, "dtype", None)
+        nd = str(nd)
+        if "float32" in nd: return torch.float32
+    except Exception:
+        pass
+    return torch.bfloat16  # bf16 floor (fp16 checkpoints also load at bf16, never int8/int4)
+
+def load_model(model_id, eager=False, dtype=None):
     from transformers import AutoModelForCausalLM, AutoTokenizer
     tok = AutoTokenizer.from_pretrained(model_id)
     if tok.pad_token is None:
         tok.pad_token = tok.eos_token
+    if dtype is None:
+        dtype = native_dtype(model_id)
     kw = dict(dtype=dtype)
     if eager:
         kw["attn_implementation"] = "eager"
     model = AutoModelForCausalLM.from_pretrained(model_id, **kw).cuda().eval()
+    log(f"loaded {model_id} dtype={dtype}")
     return model, tok
 
 def head_dim_of(cfg):
     return getattr(cfg, "head_dim", cfg.hidden_size // cfg.num_attention_heads)
 
 def layers_of(model):
+    for path in [lambda m: m.model.layers,
+                 lambda m: m.model.language_model.layers,
+                 lambda m: m.language_model.model.layers,
+                 lambda m: m.model.model.layers]:
+        try:
+            ls = path(model)
+            if ls is not None and len(ls) > 0:
+                return ls
+        except Exception:
+            continue
     return model.model.layers
 
 # ---------------------------------------------------------------- generic text
@@ -99,6 +134,8 @@ def cmd_detect(args):
         ids = tok(FILLER + text, return_tensors="pt", truncation=True, max_length=480).input_ids.cuda()
         out = model(ids, output_attentions=True, output_hidden_states=True)
         for l in range(L):
+            if out.attentions is None or l >= len(out.attentions) or out.attentions[l] is None:
+                continue
             att = out.attentions[l][0]
             sink[l] += att[:, 4:, 0].mean(dim=1).float().cpu().numpy()
         for l in range(L):
@@ -385,7 +422,8 @@ def cmd_sft(args):
 def snapshot_proj(model):
     snap = {}
     for i, lyr in enumerate(layers_of(model)):
-        a = lyr.self_attn
+        a = getattr(lyr, "self_attn", None)
+        if a is None or not hasattr(a, "q_proj"): continue
         for nm in ["q_proj", "o_proj"]:
             snap[(i, nm)] = getattr(a, nm).weight.detach().float().cpu().clone()
     return snap
@@ -541,6 +579,567 @@ def extract_boxed(s):
         i += 1
     return out.strip()
 
+# ================================================================ INTRINSIC
+# Rich per-(layer,head) intrinsic-metric collector + metric x metric correlation.
+# Metrics (all reduced to per-head vectors of length L*H):
+#   static (forward-only, generic+needle text):
+#     retrieval, sink, induction, attn_entropy, attn_distance, kv_norm, v_norm, out_norm
+#   a-priori forgetting-vulnerability (backward on SFT-domain at BASE, no step):
+#     grad_mag (consistent-direction), fisher (empirical diag)
+#   outcome (optional short SFT):
+#     dW_drift, act_drift
+INTRINSIC_METRICS = ["retrieval", "sink", "induction", "attn_entropy", "attn_distance",
+                     "kv_norm", "v_norm", "out_norm", "head_alpha", "grad_mag", "fisher",
+                     "grad_noise", "dW_drift", "act_drift"]
+
+def _attn_modules(model):
+    # returns per-layer attention module or None (None = non-softmax/linear-attn layer)
+    out = []
+    for layer in layers_of(model):
+        a = getattr(layer, "self_attn", None)
+        if a is None or not hasattr(a, "q_proj"):
+            a = None
+        out.append(a)
+    return out
+
+def _attn_layer_indices(model):
+    return [i for i, a in enumerate(_attn_modules(model)) if a is not None]
+
+def _iter_attn_maps(out_attentions, attn_idx, L):
+    # yield (real_layer_index, att[0]) handling hybrid models where
+    # len(out_attentions) == #full-attn layers < L (e.g. Qwen3.5 3:1 hybrid)
+    if out_attentions is None:
+        return
+    n = len(out_attentions)
+    if n == L:
+        for l in range(L):
+            if out_attentions[l] is not None:
+                yield l, out_attentions[l][0]
+    else:
+        # map k-th produced attention to its real layer index
+        for k in range(n):
+            if out_attentions[k] is None:
+                continue
+            real = attn_idx[k] if k < len(attn_idx) else k
+            yield real, out_attentions[k][0]
+
+def cmd_intrinsic(args):
+    model_id = MODELS.get(args.model, args.model)
+    log(f"INTRINSIC {args.model} domain={args.domain} sft_steps={args.sft_steps}")
+    import torch
+    model, tok = load_model(model_id, eager=True)
+    cfg = model.config
+    L, H = cfg.num_hidden_layers, cfg.num_attention_heads
+    hd = head_dim_of(cfg)
+    n_kv = getattr(cfg, "num_key_value_heads", H)
+    grp = max(H // n_kv, 1)
+    M = {m: np.zeros((L, H)) for m in INTRINSIC_METRICS}
+
+    # ---- static forward metrics on generic text ----
+    attn_idx = _attn_layer_indices(model)
+    kv_acc = np.zeros((L, n_kv)); v_acc = np.zeros((L, n_kv)); out_acc = np.zeros((L, H)); ns = 0
+    hooks, store = _install_norm_hooks(model)
+    with torch.no_grad():
+        for text in GENERIC:
+            for d in store.values(): d.clear()
+            ids = tok(FILLER + text, return_tensors="pt", truncation=True, max_length=480).input_ids.cuda()
+            out = model(ids, output_attentions=True)
+            for l, att in _iter_attn_maps(out.attentions, attn_idx, L):
+                att = att.float()                       # [H,T,T]
+                M["sink"][l] += att[:, 4:, 0].mean(dim=1).cpu().numpy()
+                p = att.clamp_min(1e-9)
+                ent = -(p * p.log()).sum(-1).mean(dim=1)  # [H]
+                M["attn_entropy"][l] += ent.cpu().numpy()
+                T = att.shape[-1]
+                pos = torch.arange(T, device=att.device).float()
+                dist = (att * (pos.view(1, 1, T) - pos.view(1, T, 1)).abs()).sum(-1).mean(dim=1)
+                M["attn_distance"][l] += dist.cpu().numpy()
+            for l in range(L):
+                if l in store.get("k", {}):
+                    kv_acc[l] += store["k"][l]; v_acc[l] += store["v"][l]; out_acc[l] += store["out"][l]
+            ns += 1
+    for h in hooks: h.remove()
+    for m in ["sink", "attn_entropy", "attn_distance"]:
+        M[m] /= ns
+    kv_acc /= ns; v_acc /= ns; out_acc /= ns
+    for l in range(L):
+        for h in range(H):
+            M["kv_norm"][l, h] = kv_acc[l, h // grp]
+            M["v_norm"][l, h] = v_acc[l, h // grp]
+    M["out_norm"] = out_acc
+
+    # ---- retrieval + induction (reuse detect logic) ----
+    M["retrieval"] = _retrieval_scores(model, tok, L, H, attn_idx)
+    M["induction"] = _induction_scores(model, tok, L, H, attn_idx)
+
+    # ---- per-head spectral alpha (HT-SR on per-head q/o weight slices) ----
+    try:
+        M["head_alpha"] = _head_alpha(model, L, H, hd)
+    except Exception as e:
+        log("head_alpha failed", e)
+
+    big = SIZE_B.get(args.model, 0) >= 20  # grad-checkpoint + short seq for big models
+    ml = 256 if big else 512
+    # ---- a-priori grad/Fisher/grad-noise on SFT-domain at BASE (no optimizer step) ----
+    try:
+        gm, fi, gns = _grad_fisher(model, tok, args.domain, L, H, hd, n_kv, grp,
+                                   n_batches=args.fisher_batches, use_ckpt=big, maxlen=ml)
+        M["grad_mag"], M["fisher"], M["grad_noise"] = gm, fi, gns
+    except Exception as e:
+        log("grad/fisher failed", e)
+
+    # ---- optional outcome: short SFT -> dW drift + activation drift ----
+    if args.sft_steps > 0:
+        try:
+            base_snap = snapshot_proj(model)
+            base_out = _probe_head_acts(model, tok)
+            _quick_sft(model, tok, args.domain, args.sft_steps, args.lr, use_ckpt=big, maxlen=ml)
+            model.eval()
+            dW = _head_drift_from_snap(model, base_snap, L, H, hd)
+            M["dW_drift"] = dW
+            tuned_out = _probe_head_acts(model, tok)
+            M["act_drift"] = _act_drift(base_out, tuned_out)
+        except Exception as e:
+            log("drift stage failed", e)
+
+    # ---- correlation matrix across metrics (Spearman, over all heads) ----
+    present = [m for m in INTRINSIC_METRICS if np.any(M[m])]
+    corr = np.full((len(present), len(present)), np.nan)
+    for i, a in enumerate(present):
+        for j, b in enumerate(present):
+            corr[i, j] = spearman(M[a].ravel(), M[b].ravel())
+    np.savez(tag_path(args.model, "intrinsic.npz"),
+             **{m: M[m] for m in INTRINSIC_METRICS}, present=np.array(present), corr=corr)
+    out = {"model": args.model, "layers": L, "heads": H, "metrics_present": present,
+           "corr_matrix": {present[i]: {present[j]: round(float(corr[i, j]), 4)
+                                        for j in range(len(present))} for i in range(len(present))}}
+    # headline couplings vs the two outcome metrics
+    for outcome in ["dW_drift", "act_drift", "fisher", "grad_mag"]:
+        if outcome in present:
+            out[f"vs_{outcome}"] = {a: round(spearman(M[a].ravel(), M[outcome].ravel()), 4)
+                                    for a in present if a != outcome}
+    json.dump(out, open(tag_path(args.model, "intrinsic.json"), "w"), indent=2)
+    log(f"INTRINSIC done; metrics={present}")
+    free(model)
+
+def _install_norm_hooks(model):
+    store = {"k": {}, "v": {}, "out": {}}
+    hooks = []
+    cfg = model.config; hd = head_dim_of(cfg)
+    n_kv = getattr(cfg, "num_key_value_heads", cfg.num_attention_heads)
+    H = cfg.num_attention_heads
+    for l, attn in enumerate(_attn_modules(model)):
+        if attn is None:
+            continue
+        def mk_kv(l):
+            def hook(mod, inp, outp):
+                o = outp.detach()[0].float()       # [T, n_kv*hd]
+                o = o.view(o.shape[0], -1, hd).norm(dim=-1).mean(dim=0)  # [n_kv]
+                key = "k" if mod is _attn_modules(model)[l].k_proj else "v"
+                store[key][l] = o.cpu().numpy()
+            return hook
+        hooks.append(attn.k_proj.register_forward_hook(mk_kv(l)))
+        hooks.append(attn.v_proj.register_forward_hook(mk_kv(l)))
+        def mk_out(l):
+            def hook(mod, inp):
+                x = inp[0].detach()[0].float()     # [T, H*hd]
+                store["out"][l] = x.view(x.shape[0], H, hd).norm(dim=-1).mean(dim=0).cpu().numpy()
+            return hook
+        hooks.append(attn.o_proj.register_forward_pre_hook(mk_out(l)))
+    return hooks, store
+
+@torch.no_grad()
+def _retrieval_scores(model, tok, L, H, attn_idx=None):
+    if attn_idx is None: attn_idx = list(range(L))
+    retr = np.zeros((L, H)); rc = 0
+    needles = [("the secret access code for project Helios is 47192", " 47192"),
+               ("the magic number assigned to Dr. Lin is 80356", " 80356"),
+               ("the vault password for the north office is 13947", " 13947")]
+    for fact, val in needles:
+        pre = "Read the passage and answer the question.\n" + filler_to_len(tok, 120)
+        mid = f"\nNote: {fact}.\n" + filler_to_len(tok, 120)
+        post = "\nQuestion: recall the number mentioned above. Answer:"
+        ids = tok(pre + mid + post, return_tensors="pt", truncation=True, max_length=512).input_ids
+        seq = ids[0].tolist(); vt = tok(val, add_special_tokens=False).input_ids; pos = []
+        for i in range(len(seq) - len(vt) + 1):
+            if seq[i:i+len(vt)] == vt: pos = list(range(i, i+len(vt))); break
+        if not pos: continue
+        ids = ids.cuda(); out = model(ids, output_attentions=True); last = ids.shape[1]-1
+        for l, att in _iter_attn_maps(out.attentions, attn_idx, L):
+            retr[l] += att[:, last, pos].sum(dim=1).float().cpu().numpy()
+        rc += 1
+    return retr / max(rc, 1)
+
+@torch.no_grad()
+def _induction_scores(model, tok, L, H, attn_idx=None):
+    if attn_idx is None: attn_idx = list(range(L))
+    induction = np.zeros((L, H)); rng = random.Random(0)
+    seq_a = [rng.randint(1000, min(tok.vocab_size, 30000)-1) for _ in range(60)]
+    rep = seq_a + seq_a; ids = torch.tensor([rep]).cuda()
+    out = model(ids, output_attentions=True); T = len(rep); half = len(seq_a)
+    for l, att in _iter_attn_maps(out.attentions, attn_idx, L):
+        sc = np.zeros(H)
+        for t in range(half+1, T): sc += att[:, t, t-half].float().cpu().numpy()
+        induction[l] = sc / (T-half-1)
+    return induction
+
+def _grad_fisher(model, tok, domain, L, H, hd, n_kv, grp, n_batches=8, use_ckpt=False, maxlen=512):
+    for p in model.parameters(): p.requires_grad_(False)
+    attn = _attn_modules(model)
+    for a in attn:
+        if a is None: continue
+        for nm in ["q_proj", "o_proj"]:
+            getattr(a, nm).weight.requires_grad_(True)
+    if use_ckpt:
+        model.gradient_checkpointing_enable()
+        model.enable_input_require_grads()
+    feats = build_sft_data(tok, domain, n_batches * 2 + 8, maxlen)
+    if not feats: raise RuntimeError("no data for grad/fisher")
+    # per-batch reduction to per-head scalars (no full-weight accumulators -> memory-safe at 32B+)
+    grad_mag = np.zeros((L, H)); fisher = np.zeros((L, H)); nb = 0
+    per_batch = []  # [nb, L, H] per-batch per-head grad norm for grad-noise scale
+    model.train()
+    for bi in range(min(n_batches, len(feats))):
+        ids, labels = collate([feats[bi]], tok.pad_token_id)
+        out = model(ids.cuda(), labels=labels.cuda())
+        model.zero_grad(set_to_none=True)
+        out.loss.backward()
+        pb = np.zeros((L, H))
+        for l, a in enumerate(attn):
+            if a is None: continue
+            for nm in ["q_proj", "o_proj"]:
+                g = getattr(a, nm).weight.grad
+                if g is None: continue
+                g = g.detach().float()
+                if nm == "q_proj":
+                    gh = g.view(H, hd, -1)
+                else:
+                    gh = g.view(-1, H, hd).permute(1, 0, 2)
+                gh = gh.reshape(H, -1)
+                grad_mag[l] += gh.abs().mean(dim=1).cpu().numpy()   # L1 (direction-insensitive scale)
+                fisher[l] += (gh * gh).sum(dim=1).cpu().numpy()      # empirical Fisher diag
+                pb[l] += gh.norm(dim=1).cpu().numpy()
+        per_batch.append(pb); nb += 1
+    model.zero_grad(set_to_none=True); model.eval()
+    if use_ckpt: model.gradient_checkpointing_disable()
+    grad_mag /= max(nb, 1); fisher /= max(nb, 1)
+    pb = np.stack(per_batch, 0) if per_batch else np.zeros((1, L, H))  # [nb,L,H]
+    grad_noise = pb.var(axis=0) / (pb.mean(axis=0) ** 2 + 1e-9)        # coeff of variation^2 per head
+    for p in model.parameters(): p.requires_grad_(True)
+    return grad_mag, fisher, grad_noise
+
+@torch.no_grad()
+def _head_alpha(model, L, H, hd):
+    # HT-SR power-law exponent per head, from the per-head q_proj+o_proj weight slice
+    out = np.zeros((L, H))
+    for l, a in enumerate(_attn_modules(model)):
+        if a is None: continue
+        q = getattr(a, "q_proj", None); o = getattr(a, "o_proj", None)
+        if q is None or o is None: continue
+        qw = q.weight.detach().float().view(H, hd, -1)              # [H, hd, in]
+        ow = o.weight.detach().float().t().contiguous().view(H, hd, -1)  # [H, hd, in]
+        for h in range(H):
+            w = torch.cat([qw[h], ow[h]], dim=1)                    # [hd, 2*in]
+            try:
+                s = torch.linalg.svdvals(w)
+                out[l, h] = _ht_alpha(s)
+            except Exception:
+                pass
+    return out
+
+@torch.no_grad()
+def _probe_head_acts(model, tok):
+    hooks, store = _install_norm_hooks(model)
+    for d in store.values(): d.clear()
+    ids = tok(FILLER + GENERIC[0] + GENERIC[3], return_tensors="pt",
+              truncation=True, max_length=400).input_ids.cuda()
+    model(ids)
+    out = dict(store["out"])
+    for h in hooks: h.remove()
+    return out
+
+def _act_drift(base_out, tuned_out):
+    L = max(base_out) + 1 if base_out else 0
+    H = len(next(iter(base_out.values()))) if base_out else 0
+    drift = np.zeros((L, H))
+    for l in base_out:
+        if l in tuned_out:
+            b = base_out[l]; t = tuned_out[l]
+            drift[l] = np.abs(t - b) / (np.abs(b) + 1e-6)
+    return drift
+
+def _quick_sft(model, tok, domain, steps, lr, use_ckpt=False, maxlen=512):
+    # train only attention q/o proj — consistent with the head-drift/Fisher param set
+    # and memory-safe for big models (no full-param Adam states).
+    for p in model.parameters(): p.requires_grad_(False)
+    train_params = []
+    # big models: train only q/o proj + SGD (no Adam states) to fit memory
+    proj_set = ["q_proj", "o_proj"] if use_ckpt else ["q_proj", "k_proj", "v_proj", "o_proj"]
+    for a in _attn_modules(model):
+        if a is None: continue
+        for nm in proj_set:
+            w = getattr(a, nm).weight; w.requires_grad_(True); train_params.append(w)
+    if use_ckpt:
+        model.gradient_checkpointing_enable(); model.enable_input_require_grads()
+    feats = build_sft_data(tok, domain, steps * 2 + 16, maxlen)
+    opt = torch.optim.SGD(train_params, lr=lr*10) if use_ckpt else torch.optim.AdamW(train_params, lr=lr)
+    model.train()
+    for s in range(steps):
+        b = feats[s % (len(feats)-1):s % (len(feats)-1)+1]
+        ids, labels = collate(b, tok.pad_token_id)
+        out = model(ids.cuda(), labels=labels.cuda())
+        opt.zero_grad(); out.loss.backward()
+        torch.nn.utils.clip_grad_norm_(train_params, 1.0); opt.step()
+        if s % 50 == 0: log(f"  isft {s}/{steps} loss {float(out.loss):.4f}")
+    if use_ckpt: model.gradient_checkpointing_disable()
+
+@torch.no_grad()
+def _head_drift_from_snap(model, snap, L, H, hd):
+    drift = np.zeros((L, H))
+    for i, lyr in enumerate(layers_of(model)):
+        a = getattr(lyr, "self_attn", None)
+        if a is None or not hasattr(a, "q_proj") or (i, "q_proj") not in snap: continue
+        for nm in ["q_proj", "o_proj"]:
+            w = getattr(a, nm).weight.detach().float().cpu()
+            dw = (w - snap[(i, nm)]).numpy()
+            if nm == "q_proj":
+                drift[i] += np.linalg.norm(dw.reshape(H, -1), axis=1)
+            else:
+                drift[i] += np.linalg.norm(dw.reshape(-1, H, hd).transpose(1, 0, 2).reshape(H, -1), axis=1)
+    return drift
+
+# ================================================================ FACTS
+# Broad per-LAYER fact-finding across angles:
+#  representation geometry · information theory (logit lens) · parameter spectra
+#  (+ cross-link per-head coupling metrics from intrinsic.npz, mean-pooled to layers)
+# Goal: a per-layer metric table + metric×metric correlation matrix -> find facts.
+FACTS_METRICS = [
+    # representation geometry (from hidden states)
+    "resid_norm", "anisotropy", "eff_rank", "repr_entropy", "act_kurtosis",
+    "act_sparsity", "update_norm", "curvature", "intrinsic_dim", "cka_adjacent",
+    # information theory (logit lens through final norm + lm_head)
+    "ll_entropy", "ll_kl_to_final", "ll_top1_depth", "tuned_lens_kl", "tuned_lens_depth",
+    # parameter spectra (per layer; aggregated over the 7 proj matrices unless noted)
+    "w_stable_rank", "w_eff_rank", "w_spectral_norm", "w_ht_alpha",
+    "down_stable_rank", "down_ht_alpha", "mlp_gain",
+    # massive activations
+    "massive_count", "massive_max",
+]
+
+def _twonn_id(H):
+    # TwoNN intrinsic-dimension estimator (Facco et al. 2017) on token reps H [T,d].
+    T = H.shape[0]
+    if T < 10: return 0.0
+    d = torch.cdist(H, H)
+    d.fill_diagonal_(float("inf"))
+    r1 = d.min(dim=1).values
+    d2 = d.clone()
+    d2[torch.arange(T), d.argmin(dim=1)] = float("inf")
+    r2 = d2.min(dim=1).values
+    mu = (r2 / (r1 + 1e-9)).clamp_min(1.0 + 1e-6)
+    mu = mu[torch.isfinite(mu)]
+    val = float(mu.log().sum())
+    return (mu.numel() / val) if val > 0 else 0.0
+
+def _linear_cka(X, Y):
+    # linear CKA between two [T,d] activation matrices
+    X = X - X.mean(0, keepdim=True); Y = Y - Y.mean(0, keepdim=True)
+    xy = (X.t() @ Y).norm() ** 2
+    xx = (X.t() @ X).norm(); yy = (Y.t() @ Y).norm()
+    return float(xy / (xx * yy + 1e-9))
+
+def _eff_rank_from_svals(s):
+    s = s[s > 0]
+    if s.numel() == 0: return 0.0
+    p = (s / s.sum())
+    ent = -(p * (p + 1e-12).log()).sum()
+    return float(ent.exp())
+
+def _stable_rank_from_svals(s):
+    s2 = s * s
+    return float(s2.sum() / (s2.max() + 1e-12))
+
+def _ht_alpha(s):
+    # Hill estimator of the power-law tail exponent of the eigenvalue (s^2) spectrum.
+    lam = (s * s).sort(descending=True).values
+    k = max(int(0.5 * lam.numel()), 10)
+    lam = lam[:k]
+    lam_min = lam[-1]
+    n = lam.numel() - 1
+    if n <= 0 or lam_min <= 0: return 0.0
+    hill = (lam[:-1] / lam_min).log().mean()
+    return float(1.0 + 1.0 / (hill + 1e-9))
+
+@torch.no_grad()
+def cmd_facts(args):
+    model_id = MODELS.get(args.model, args.model)
+    log(f"FACTS {args.model}")
+    model, tok = load_model(model_id, eager=False)
+    cfg = model.config
+    L = cfg.num_hidden_layers
+    F = {m: np.zeros(L) for m in FACTS_METRICS}
+
+    # ---- representation + info-theory from hidden states ----
+    texts = GENERIC + [FILLER + g for g in GENERIC[:3]]
+    nrm = getattr(model.model, "norm", None)
+    lm_head = model.lm_head if hasattr(model, "lm_head") else None
+    accum = {m: np.zeros(L) for m in
+             ["resid_norm", "anisotropy", "eff_rank", "repr_entropy", "act_kurtosis",
+              "act_sparsity", "update_norm", "curvature", "intrinsic_dim", "cka_adjacent",
+              "ll_entropy", "ll_kl_to_final", "ll_top1_depth"]}
+    ns = 0
+    ridge_Hl = {l: [] for l in range(L)}; ridge_Hf = []  # for tuned-lens
+    for text in texts:
+        ids = tok(text, return_tensors="pt", truncation=True, max_length=256).input_ids.cuda()
+        out = model(ids, output_hidden_states=True)
+        hs = out.hidden_states  # tuple L+1 of [1,T,d]
+        final_logits = out.logits[0].float()
+        final_p = F_softmax_safe(final_logits)
+        hfinal = hs[-1][0].float()
+        ridge_Hf.append(hfinal.cpu())
+        for l in range(L):
+            h = hs[l + 1][0].float()                  # [T, d]
+            T = h.shape[0]
+            accum["resid_norm"][l] += float(h.norm(dim=-1).mean())
+            hc = h - h.mean(0, keepdim=True)
+            hn = h / (h.norm(dim=-1, keepdim=True) + 1e-6)
+            G = hn @ hn.t()
+            off = (G.sum() - G.diag().sum()) / (T * (T - 1) + 1e-9)
+            accum["anisotropy"][l] += float(off)
+            try:
+                s = torch.linalg.svdvals(hc)
+                accum["eff_rank"][l] += _eff_rank_from_svals(s)
+                p = s / (s.sum() + 1e-9)
+                accum["repr_entropy"][l] += float(-(p * (p + 1e-12).log()).sum())
+            except Exception:
+                pass
+            try: accum["intrinsic_dim"][l] += _twonn_id(h)
+            except Exception: pass
+            if l < L - 1:
+                try: accum["cka_adjacent"][l] += _linear_cka(h, hs[l + 2][0].float())
+                except Exception: pass
+            x = h.flatten()
+            mu = x.mean(); sd = x.std() + 1e-6
+            accum["act_kurtosis"][l] += float((((x - mu) / sd) ** 4).mean())
+            accum["act_sparsity"][l] += float((x.abs() < 0.1 * sd).float().mean())
+            accum["update_norm"][l] += float((hs[l + 1][0].float() - hs[l][0].float()).norm(dim=-1).mean())
+            if 0 < l < L - 1:
+                curv = (hs[l + 2][0].float() - 2 * hs[l + 1][0].float() + hs[l][0].float()).norm(dim=-1).mean()
+                accum["curvature"][l] += float(curv)
+            ridge_Hl[l].append(h.cpu())
+            if nrm is not None and lm_head is not None:
+                try:
+                    ll = lm_head(nrm(hs[l + 1][0].float().to(hs[l + 1].dtype))).float()
+                    pl = F_softmax_safe(ll)
+                    accum["ll_entropy"][l] += float((-(pl * (pl + 1e-12).log()).sum(-1)).mean())
+                    kl = (pl * ((pl + 1e-12).log() - (final_p + 1e-12).log())).sum(-1)
+                    accum["ll_kl_to_final"][l] += float(kl.mean())
+                    accum["ll_top1_depth"][l] += float((pl.argmax(-1) == final_p.argmax(-1)).float().mean())
+                except Exception:
+                    pass
+        ns += 1
+    for m in accum:
+        F[m] = accum[m] / max(ns, 1)
+
+    # ---- tuned-lens-lite: ridge map h_l -> h_final, then lm_head; KL & depth vs final ----
+    if nrm is not None and lm_head is not None:
+        try:
+            Hf = torch.cat(ridge_Hf, 0).cuda()                     # [N, d]
+            pf = F_softmax_safe(lm_head(nrm(Hf.to(hs[-1].dtype))).float())
+            d = Hf.shape[1]; I = torch.eye(d, device=Hf.device)
+            for l in range(L):
+                Hl = torch.cat(ridge_Hl[l], 0).cuda()              # [N, d]
+                A = torch.linalg.solve(Hl.t() @ Hl + 1e-2 * I, Hl.t() @ Hf)  # [d,d]
+                pred = Hl @ A
+                pl = F_softmax_safe(lm_head(nrm(pred.to(hs[-1].dtype))).float())
+                kl = (pl * ((pl + 1e-12).log() - (pf + 1e-12).log())).sum(-1)
+                F["tuned_lens_kl"][l] = float(kl.mean())
+                F["tuned_lens_depth"][l] = float((pl.argmax(-1) == pf.argmax(-1)).float().mean())
+                del Hl, A, pred, pl
+        except Exception as e:
+            log("tuned-lens failed", e)
+
+    # ---- massive activations per layer ----
+    for text in GENERIC[:3]:
+        ids = tok(FILLER + text, return_tensors="pt", truncation=True, max_length=256).input_ids.cuda()
+        out = model(ids, output_hidden_states=True)
+        for l in range(L):
+            cm = out.hidden_states[l + 1][0].abs().float().max(dim=0).values
+            med = cm.median() + 1e-6
+            F["massive_count"][l] = max(F["massive_count"][l], float((cm >= 6 * med).sum()))
+            F["massive_max"][l] = max(F["massive_max"][l], float((cm / med).max()))
+
+    # ---- parameter spectra per layer (robust to hybrid/MoE layers) ----
+    lyrs = layers_of(model)
+    for l in range(L):
+        lyr = lyrs[l]
+        a = getattr(lyr, "self_attn", None) or getattr(lyr, "linear_attn", None) or getattr(lyr, "attn", None)
+        mlp = getattr(lyr, "mlp", None) or getattr(lyr, "feed_forward", None)
+        srs, ers, sns, alphas = [], [], [], []
+        cand = []
+        if a is not None:
+            cand += [(a, "q_proj"), (a, "k_proj"), (a, "v_proj"), (a, "o_proj")]
+        if mlp is not None:
+            cand += [(mlp, "gate_proj"), (mlp, "up_proj"), (mlp, "down_proj")]
+        for mod, nm in cand:
+            w = getattr(mod, nm, None)
+            if w is None or not hasattr(w, "weight"): continue
+            try:
+                s = torch.linalg.svdvals(w.weight.detach().float())
+                srs.append(_stable_rank_from_svals(s)); ers.append(_eff_rank_from_svals(s))
+                sns.append(float(s.max())); alphas.append(_ht_alpha(s))
+                if nm == "down_proj":
+                    F["down_stable_rank"][l] = _stable_rank_from_svals(s); F["down_ht_alpha"][l] = _ht_alpha(s)
+            except Exception:
+                pass
+        if srs:
+            F["w_stable_rank"][l] = float(np.mean(srs)); F["w_eff_rank"][l] = float(np.mean(ers))
+            F["w_spectral_norm"][l] = float(np.mean(sns)); F["w_ht_alpha"][l] = float(np.mean(alphas))
+        # mlp gain: ||up||/||down|| norm proxy
+        up = getattr(mlp, "up_proj", None) if mlp is not None else None
+        dn = getattr(mlp, "down_proj", None) if mlp is not None else None
+        if up is not None and dn is not None and hasattr(up, "weight") and hasattr(dn, "weight"):
+            F["mlp_gain"][l] = float(up.weight.detach().float().norm() / (dn.weight.detach().float().norm() + 1e-6))
+
+    # ---- cross-link per-head coupling metrics (mean-pool to layers) ----
+    intr = os.path.join(ART, args.model, "intrinsic.npz")
+    extra = {}
+    if os.path.exists(intr):
+        z = np.load(intr, allow_pickle=True)
+        for k in ["retrieval", "sink", "fisher", "dW_drift", "grad_mag", "attn_entropy"]:
+            if k in z.files:
+                arr = z[k]
+                if arr.ndim == 2 and arr.shape[0] == L:
+                    extra["hd_" + k] = arr.mean(axis=1)
+
+    # ---- correlation matrix across all per-layer metrics ----
+    allm = {**{m: F[m] for m in FACTS_METRICS if np.any(F[m])}, **extra}
+    names = list(allm.keys())
+    corr = np.full((len(names), len(names)), np.nan)
+    for i, a in enumerate(names):
+        for j, b in enumerate(names):
+            corr[i, j] = spearman(allm[a], allm[b])
+    np.savez(tag_path(args.model, "facts.npz"),
+             **{("F_" + k): v for k, v in allm.items()}, names=np.array(names), corr=corr)
+    # strongest off-diagonal correlations = the "facts"
+    pairs = []
+    for i in range(len(names)):
+        for j in range(i + 1, len(names)):
+            if not np.isnan(corr[i, j]):
+                pairs.append((names[i], names[j], round(float(corr[i, j]), 3)))
+    pairs.sort(key=lambda x: -abs(x[2]))
+    out = {"model": args.model, "layers": L, "metrics": names,
+           "top_correlations": pairs[:30],
+           "corr": {names[i]: {names[j]: round(float(corr[i, j]), 3)
+                               for j in range(len(names)) if not np.isnan(corr[i, j])}
+                    for i in range(len(names))}}
+    json.dump(out, open(tag_path(args.model, "facts.json"), "w"), indent=2)
+    log(f"FACTS done; {len(names)} metrics; top fact: {pairs[0] if pairs else None}")
+    free(model)
+
+def F_softmax_safe(logits):
+    return torch.softmax(logits, dim=-1)
+
 # ---------------------------------------------------------------- collate/util
 def collate(batch, pad):
     m = max(len(x[0]) for x in batch)
@@ -570,8 +1169,13 @@ def main():
     p.add_argument("--run_tag", default="")
     p = sub.add_parser("capeval"); p.add_argument("--model", required=True)
     p.add_argument("--ckpt", default=""); p.add_argument("--n", type=int, default=200)
+    p = sub.add_parser("intrinsic"); p.add_argument("--model", required=True)
+    p.add_argument("--domain", default="math"); p.add_argument("--sft_steps", type=int, default=120)
+    p.add_argument("--lr", type=float, default=2e-5); p.add_argument("--fisher_batches", type=int, default=8)
+    p = sub.add_parser("facts"); p.add_argument("--model", required=True)
     args = ap.parse_args()
-    {"detect": cmd_detect, "niah": cmd_niah, "sft": cmd_sft, "capeval": cmd_capeval}[args.cmd](args)
+    {"detect": cmd_detect, "niah": cmd_niah, "sft": cmd_sft, "capeval": cmd_capeval,
+     "intrinsic": cmd_intrinsic, "facts": cmd_facts}[args.cmd](args)
 
 if __name__ == "__main__":
     main()

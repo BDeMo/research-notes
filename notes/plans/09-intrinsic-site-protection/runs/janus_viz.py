@@ -10,10 +10,12 @@ import matplotlib.pyplot as plt
 ART = os.environ.get("JANUS_OUT", "/home/devuser/janus/artifacts")
 FIG = os.path.join(ART, "figs"); os.makedirs(FIG, exist_ok=True)
 MODELS_ORDER = ["qwen3-0.6b", "qwen3-1.7b", "qwen3-4b", "qwen3-8b", "qwen3-14b",
-                "qwen2.5-1.5b", "qwen2.5-1.5b-instruct", "qwen2.5-7b-instruct"]
+                "qwen2.5-1.5b", "qwen2.5-1.5b-instruct", "qwen2.5-7b-instruct",
+                "glm4-9b", "glm4-32b", "qwen3.5-4b", "qwen3.5-9b"]
 SIZE_B = {"qwen3-0.6b": 0.6, "qwen3-1.7b": 1.7, "qwen3-4b": 4.0, "qwen3-8b": 8.0,
           "qwen3-14b": 14.0, "qwen2.5-1.5b": 1.5, "qwen2.5-1.5b-instruct": 1.5,
-          "qwen2.5-7b-instruct": 7.0}
+          "qwen2.5-7b-instruct": 7.0, "glm4-9b": 9.0, "glm4-32b": 32.0,
+          "qwen3.5-4b": 4.0, "qwen3.5-9b": 9.0}
 made = []
 
 def jload(p):
@@ -213,6 +215,113 @@ def niah_mean(m, suffix):
     if not j: return None
     return float(np.mean(list(j["grid"].values())))
 
+# 10. intrinsic metric x metric correlation matrix (THE coupling map)
+def fig_intrinsic_corr():
+    for m in models_present():
+        npz = os.path.join(ART, m, "intrinsic.npz")
+        if not os.path.exists(npz): continue
+        z = np.load(npz, allow_pickle=True)
+        present = list(z["present"]); corr = z["corr"]
+        n = len(present)
+        fig, ax = plt.subplots(figsize=(0.85*n+3, 0.85*n+2))
+        im = ax.imshow(corr, cmap="RdBu_r", vmin=-1, vmax=1)
+        ax.set_xticks(range(n)); ax.set_xticklabels(present, rotation=45, ha="right", fontsize=8)
+        ax.set_yticks(range(n)); ax.set_yticklabels(present, fontsize=8)
+        for i in range(n):
+            for j in range(n):
+                v = corr[i, j]
+                if not np.isnan(v):
+                    ax.text(j, i, f"{v:.2f}", ha="center", va="center", fontsize=6,
+                            color="white" if abs(v) > 0.55 else "black")
+        fig.colorbar(im, ax=ax, fraction=0.046, label="Spearman ρ")
+        save(fig, f"10_intrinsic_corr_{m}.png", f"Intrinsic metric×metric coupling map — {m}")
+
+# 11. cross-model headline couplings vs drift / fisher
+def fig_intrinsic_summary():
+    ms = [m for m in models_present() if os.path.exists(os.path.join(ART, m, "intrinsic.json"))]
+    if not ms: return
+    targets = ["dW_drift", "fisher"]
+    keys = ["retrieval", "sink", "induction", "attn_entropy", "kv_norm", "out_norm", "grad_mag"]
+    fig, axes = plt.subplots(1, len(targets), figsize=(7*len(targets), 4.8), squeeze=False)
+    for ti, tgt in enumerate(targets):
+        ax = axes[0][ti]
+        x = np.arange(len(keys)); w = 0.8/max(len(ms),1)
+        any_data = False
+        for mi, m in enumerate(ms):
+            j = jload(os.path.join(ART, m, "intrinsic.json"))
+            vs = j.get(f"vs_{tgt}", {})
+            if not vs: continue
+            any_data = True
+            ax.bar(x + mi*w, [vs.get(k, 0) for k in keys], w, label=m)
+        ax.axhline(0, color="k", lw=0.5)
+        ax.set_xticks(x + 0.4); ax.set_xticklabels(keys, rotation=30, ha="right", fontsize=8)
+        ax.set_ylabel(f"Spearman ρ(metric, {tgt})"); ax.set_title(f"What predicts {tgt}?")
+        if any_data: ax.legend(fontsize=6)
+    save(fig, "11_intrinsic_vs_outcome.png", "Which intrinsic metric predicts SFT disruption (drift/Fisher)?")
+
+# 12. FACTS — per-layer broad-metric correlation matrix + trajectories
+def fig_facts_corr():
+    for m in models_present():
+        p = os.path.join(ART, m, "facts.npz")
+        if not os.path.exists(p): continue
+        z = np.load(p, allow_pickle=True)
+        names = list(z["names"]); corr = z["corr"]; n = len(names)
+        fig, ax = plt.subplots(figsize=(0.62*n+3, 0.62*n+2))
+        im = ax.imshow(corr, cmap="RdBu_r", vmin=-1, vmax=1)
+        ax.set_xticks(range(n)); ax.set_xticklabels(names, rotation=90, fontsize=6)
+        ax.set_yticks(range(n)); ax.set_yticklabels(names, fontsize=6)
+        for i in range(n):
+            for j in range(n):
+                v = corr[i, j]
+                if not np.isnan(v) and abs(v) >= 0.6 and i != j:
+                    ax.text(j, i, f"{v:.1f}", ha="center", va="center", fontsize=5,
+                            color="white" if abs(v) > 0.8 else "black")
+        fig.colorbar(im, ax=ax, fraction=0.046)
+        save(fig, f"12_facts_corr_{m}.png", f"Broad per-layer metric correlations (facts) — {m}")
+
+def fig_facts_traj():
+    for m in models_present():
+        p = os.path.join(ART, m, "facts.npz")
+        if not os.path.exists(p): continue
+        z = np.load(p, allow_pickle=True)
+        names = list(z["names"])
+        groups = [("representation", ["F_eff_rank", "F_anisotropy", "F_intrinsic_dim", "F_cka_adjacent", "F_act_kurtosis"]),
+                  ("information", ["F_ll_kl_to_final", "F_ll_top1_depth", "F_tuned_lens_kl", "F_tuned_lens_depth"]),
+                  ("parameters", ["F_w_stable_rank", "F_w_ht_alpha", "F_down_ht_alpha", "F_w_eff_rank"])]
+        fig, axes = plt.subplots(1, 3, figsize=(16, 4.2))
+        for gi, (title, keys) in enumerate(groups):
+            ax = axes[gi]; plotted = False
+            for k in keys:
+                if k in z.files:
+                    v = z[k]; v = (v - np.nanmin(v)) / (np.nanmax(v) - np.nanmin(v) + 1e-9)
+                    ax.plot(range(len(v)), v, marker=".", label=k[2:]); plotted = True
+            ax.set_title(title); ax.set_xlabel("layer"); ax.set_ylabel("normalized")
+            if plotted: ax.legend(fontsize=6)
+        save(fig, f"13_facts_traj_{m}.png", f"Layer trajectories by angle (normalized) — {m}")
+
+def fig_facts_topfacts():
+    ms = [m for m in models_present() if os.path.exists(os.path.join(ART, m, "facts.json"))]
+    if not ms: return
+    # collect correlations that are strong AND consistent across models
+    from collections import defaultdict
+    acc = defaultdict(list)
+    for m in ms:
+        j = jload(os.path.join(ART, m, "facts.json"))
+        if not j: continue
+        for a, b, v in j.get("top_correlations", []):
+            key = tuple(sorted([a, b]))
+            acc[key].append(v)
+    rows = [(k, np.mean(v), len(v)) for k, v in acc.items() if len(v) >= max(2, len(ms)//2)]
+    rows.sort(key=lambda x: -abs(x[1])); rows = rows[:20]
+    if not rows: return
+    fig, ax = plt.subplots(figsize=(9, 0.45*len(rows)+1.5))
+    y = range(len(rows))
+    ax.barh(list(y), [r[1] for r in rows],
+            color=["crimson" if r[1] > 0 else "navy" for r in rows])
+    ax.set_yticks(list(y)); ax.set_yticklabels([f"{a} — {b} (n={n})" for (a, b), v, n in rows], fontsize=7)
+    ax.invert_yaxis(); ax.axvline(0, color="k", lw=0.5); ax.set_xlabel("mean Spearman ρ across models")
+    save(fig, "14_facts_consistent.png", "Cross-model CONSISTENT facts (strong, recurring per-layer correlations)")
+
 # 9. cross-scale scaling ladder (the long-context-at-scale angle)
 def fig_scaling():
     ms = [m for m in models_present() if m in SIZE_B]
@@ -258,6 +367,11 @@ def write_index():
         ("H3 — retention–plasticity Pareto", "07_pareto_"),
         ("Coupling summary across models", "08_coupling_summary"),
         ("Cross-scale scaling ladder", "09_scaling_ladder"),
+        ("Intrinsic metric×metric coupling map", "10_intrinsic_corr_"),
+        ("Which intrinsic metric predicts SFT disruption", "11_intrinsic_vs_outcome"),
+        ("FACTS — broad per-layer metric correlations", "12_facts_corr_"),
+        ("FACTS — layer trajectories by angle", "13_facts_traj_"),
+        ("FACTS — cross-model consistent facts", "14_facts_consistent"),
     ]
     for title, pref in sections:
         figs = sorted([n for n,_ in made if n.startswith(pref)])
@@ -270,7 +384,9 @@ def write_index():
 
 def main():
     for fn in [fig_sitemaps, fig_disjoint, fig_coupling, fig_driftmap, fig_niah,
-               fig_forgetting, fig_pareto, fig_summary, fig_scaling]:
+               fig_forgetting, fig_pareto, fig_summary, fig_scaling,
+               fig_intrinsic_corr, fig_intrinsic_summary,
+               fig_facts_corr, fig_facts_traj, fig_facts_topfacts]:
         try: fn()
         except Exception as e: print("[viz] section failed", fn.__name__, e)
     write_index()
