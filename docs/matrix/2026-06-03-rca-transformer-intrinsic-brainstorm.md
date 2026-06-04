@@ -28,11 +28,23 @@ User asked for "no similar work / not hand-wavy" → ran a 4-year arXiv/Scholar 
 
 Logged 28 prior-work IDs to `knowledge-sources.md`.
 
+## MoE-specific angles + audit (added 2026-06-03, §11)
+
+User: "再看看针对 MoE 模型有什么可以利用的点." Motivated — plausible RCA bases are MoE (Qwen3-30B-A3B / 235B-A22B, DeepSeek-R1, Llama-4). Brainstormed 9 MoE angles (M1-M9) + same-day novelty search (6 queries).
+
+- **Honest scoping**: MoE sparsity is in the FFN → MoE is a *forgetting* lever, NOT a long-context lever (long-ctx bottleneck is attention/KV, shared across experts).
+- **Forgetting side is saturated**: M3=`[loramoe]` (ACL 2024), M4=`[esft]` (EMNLP 2024), M8=`[same-moe]` (2026), multi-domain=`[des-moe]` (EMNLP 2025), M2/M6 standard, M1 examined-and-inferior. **None novel.**
+- **The one genuine find — Super-Expert ↔ attention-sink identity**: `[super-experts]` (2507.23279) shows a *tiny* set of experts **induce the sinks**; pruning them → sink decay >90% → model collapse. `[sink-native-moe]` (2602.01203): sink weight = implicit gating → heads are a native MoE. **This is the cleanest empirical anchor for the §10.3-1 unifying-observation paper**: long-context load-bearers = forgetting-vulnerable sites. Super-expert detection is task-free / HF-native (Qwen3-MoE).
+- **Surviving angle `M★`** (narrow gap, must verify): select the *protected* expert set by the **super-expert / sink-induction criterion** (not task-affinity like ESFT/DES-MoE) for fine-tuning-without-forgetting. `[super-experts]` studies compression only → fine-tuning use is unclaimed. Needs a dedicated "super-expert + fine-tuning + forgetting" search before committing.
+- **Subsumption win**: dense base → protect sinks/massive-act; MoE base → protect super experts (which *are* the sink inducers). One principle, two instantiations.
+
+Logged 8 IDs to `knowledge-sources.md` §"MoE prior-work audit".
+
 ## Output artifacts
 
-- `notes/ideas/rca-transformer-intrinsic-2026-06-03.md` (**NEW** — full 2-round brainstorm + §10 prior-work audit, T2)
-- `notes/ideas/README.md` — new Sources row + "RCA model building — 12 ideas" section + audit verdict banner
-- `docs/matrix/knowledge-sources.md` — new "RCA prior-work audit" section (~28 IDs)
+- `notes/ideas/rca-transformer-intrinsic-2026-06-03.md` (**NEW** — full 2-round brainstorm + §10 prior-work audit + §11 MoE audit, T2)
+- `notes/ideas/README.md` — new Sources row + "RCA model building — 12 ideas" section + audit verdict banner + MoE-audit banner
+- `docs/matrix/knowledge-sources.md` — new "RCA prior-work audit" (~28 IDs) + "MoE prior-work audit" (8 IDs) sections
 - This entry + matrix index row
 
 ## Knowledge sources to chase (not yet in knowledge-sources.md)

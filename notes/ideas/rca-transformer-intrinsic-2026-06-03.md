@@ -2,7 +2,7 @@
 
 > **Date**: 2026-06-03
 > **Topic**: How to build Nokia's RCA model solving two challenges — (1) long context at **inference**, (2) catastrophic forgetting at **training** — with a method that is *insightful, easy to adapt, lightweight, model-agnostic, task-free*, derived from **transformer-intrinsic phenomena** (sinks, massive activations, induction heads, etc.).
-> **Status**: brainstorm captured (two rounds) + **prior-work audit done (§10)**. ⚠️ **Audit verdict: none of R1-R12 is novel as a standalone mechanism** — the 2025-2026 literature is saturated. Only honestly-open paths are a *unifying-observation* paper or a *verified-new-phenomenon*. See §10.3-10.4 before drafting any plan.
+> **Status**: brainstorm captured (two rounds) + **prior-work audit done (§10)** + **MoE angles audited (§11)**. ⚠️ **Audit verdict: none of R1-R12 (dense) nor M1-M9 (MoE) is novel as a standalone mechanism** — both the dense and MoE 2025-2026 literatures are saturated. Honestly-open paths: a *unifying-observation* paper (§10.3-1, best empirical anchor = the **Super-Expert ↔ attention-sink** identity, §11.2) or a *verified-new-phenomenon* (sink key-bias §10.2 / super-expert-anchored adaptation §11.3). See §10.4 + §11.4 before drafting any plan.
 > **Relation to other work**: complements / contrasts Plan 08 v0 (mem-X soft-prompt wrapper). The mem-X v1 **3-regime law** is used here as a constraint prior (see [`../plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`](../plans/08-model-outputs-delta-w/v1-results-2026-06-03.md)).
 
 ---
@@ -259,3 +259,61 @@ Decision deferred to user. The brutally honest take: as a *method* paper with a 
 ### 10.5 Sources logged
 
 All closest-prior IDs added to `docs/matrix/knowledge-sources.md` under "RCA / transformer-intrinsic prior-work audit (2026-06-03)".
+
+---
+
+## 11. MoE-specific angles (added 2026-06-03)
+
+> User: "再看看针对 MoE 模型有什么可以利用的点，来满足我们的需求." Motivation is real — most plausible RCA bases are **MoE**: Qwen3-30B-A3B / 235B-A22B, DeepSeek-R1 (1 shared + 8 routed of 256), Llama-4 Scout/Maverick (1 shared + 1 routed). Same brainstorm-then-audit discipline as §10.
+
+### 11.0 Honest scoping — MoE is a *forgetting* lever, NOT a long-context lever
+
+MoE sparsity lives in the **FFN**; the long-context bottleneck lives in **attention / KV** (shared across experts). So MoE *per se* does **not** address our inference-time long-context challenge — that stays an attention-side problem (sinks, §10). What MoE buys is a **natural discrete decomposition of capability across experts**, which is a clean substrate for the *catastrophic-forgetting* challenge: "confine the write to a few experts / the router / the shared expert" is far more natural than dense layer-band LoRA. **Net: MoE strengthens the forgetting half, leaves the long-context half to the attention-side levers.**
+
+### 11.1 The 9 MoE angles + inline prior-work verdict
+
+| ID | angle | mechanism | challenge | closest prior (2023-2026) | verdict |
+|---|---|---|---|---|---|
+| **M1** | Shared-expert-only adaptation (freeze routed, tune only always-on shared expert) | the shared expert is the FFN analog of the attention sink — the one always-on privileged compute path | forget | **ESFT** (`[esft]`, EMNLP 2024) §6.3 studies train-shared vs train-non-shared variants; finds non-shared is key. DeepSeekMoE shared-expert design. | ☠️ examined & found inferior — DROP |
+| **M2** | Router-only fine-tuning (freeze ALL experts, train only gating) | re-compose existing expert skills for RCA; zero expert drift | forget | textbook recipe ("fine-tune gating network only"); LoRA-on-router; DES-MoE adaptive router (`[des-moe]`). | ☠️ standard — DROP |
+| **M3** | Expert expansion / add LoRA experts (freeze pretrained, add new RCA experts + widen router) | new knowledge isolated in new experts → zero forgetting by construction | forget | **LoRAMoE** (`[loramoe]`, ACL 2024) verbatim; **Lifelong-MoE** (`[lifelong-moe]`, ICML 2023) expand+freeze+reg. | ☠️ verbatim hit — DROP |
+| **M4** | Importance-guided expert freezing (probe routing freq on code/math, freeze high-affinity, train rest) | MoE-native analog of induction-head freeze | forget | **ESFT** (`[esft]`) verbatim — tune only top-affinity experts, freeze rest; **DES-MoE** (`[des-moe]`) domain-correlation expert isolation. | ☠️ verbatim hit — DROP |
+| **M5** | Cold/dead-expert recycling (repurpose under-utilized experts for RCA) | low-activation experts contribute little → minimal forgetting | forget | expert-pruning + ESFT-complement; routing-collapse literature. | ☠️ derivative — DROP |
+| **M6** | Router temperature / z-loss control for long ctx (stabilize routing as sequence grows) | router logits blow up / late tokens dropped at long ctx | long-ctx (weak) | **router z-loss** (ST-MoE), similarity-preserving balancing (`omi2025`), MaxScore capacity (`dong2025`). | ☠️ standard — DROP |
+| **M7** | Input-adaptive conditional compute for logs (route boilerplate→cheap expert, needle→full) | 99% of logs are boilerplate; MoE already does conditional compute | efficiency only | expert-choice routing; capacity-aware inference. Doesn't touch attention/KV → not a capability fix. | ☠️ efficiency-only — DROP |
+| **M8** | Routing-drift regularizer / diagnostic (penalize change in routing dist on general data during RCA SFT) | forgetting ⇔ general tokens re-routed away from their experts | forget | **Same** (`[same-moe]`, 2026): explicitly models *router drift* + *expert drift*, spectral-aware routing. | ☠️ done — DROP |
+| **M9** | Load-balance-free RCA specialization (relax aux loss so RCA tokens concentrate on a few new experts) | let RCA form its own specialist experts without forcing spread onto general experts | forget | implied by ESFT routing-concentration finding + LoRAMoE localized balancing. | ⚠️ thin, derivative |
+
+**Conclusion (forgetting side): the MoE continual-learning / PEFT space is as crowded as the dense one.** ESFT + DES-MoE + LoRAMoE + Same + Lifelong-MoE collectively preempt M1-M6, M8. None is a novel mechanism.
+
+### 11.2 The one genuinely interesting find — **Super Experts ↔ attention sinks** (a true MoE-intrinsic bridge)
+
+Two 2025-2026 papers connect MoE experts to the *exact* attention-sink phenomenon the §10 dense brainstorm was built on:
+
+- **Super Experts** (`[super-experts]`, arXiv:2507.23279): a *tiny* number of experts in an MoE **induce the attention sinks**. Pruning these "super experts" drives the **attention-sink decay rate >90%** and collapses the model to near-zero on some tasks (measured on Qwen3-30B-A3B). They are the MoE analog of **massive activations** (`[massive-act]`) — the load-bearing site.
+- **Attention Sink Forges Native MoE** (`[sink-native-moe]`, arXiv:2602.01203): the sink's attention weight *is* an implicit gating factor → attention heads already form a "native MoE"; designating top-m heads as frozen "shared heads" + routing the rest fixes head collapse.
+
+**Why this matters for us**: it unifies the dense brainstorm and the MoE brainstorm into one site. In an MoE base, the privileged load-bearing site = **super experts** (which induce the sinks). They are simultaneously (a) the long-context stabilizers (induce sinks essential for long ctx) and (b) the most dangerous parameters to update during SFT (pruning/perturbing them collapses capability). That is **exactly the §10.3-1 unifying observation, now with an empirical MoE anchor**: *the sites that carry long-context ability are the same sites whose disruption causes forgetting.*
+
+### 11.3 The surviving angle — **Super-Expert-anchored unified adaptation** (`M★`)
+
+> All of `[super-experts]` / `[esft]` / `[des-moe]` / `[same-moe]` select protected experts by **task/domain affinity** or study super experts for **compression/pruning**. **Nobody (as of this search) selects the protected set by the super-expert / attention-sink-induction criterion *for the purpose of fine-tuning without forgetting*.** That is the gap.
+
+Recipe sketch:
+1. **Identify** super experts via the `[super-experts]` criterion (activation-outlier / sink-induction score) — task-free, one forward pass on generic data.
+2. **Protect** them: freeze (or grad-mask, MoE analog of R6) the super experts during RCA SFT → preserves both long-context stability *and* code/math capability.
+3. **Adapt** elsewhere: train RCA into the non-super experts (or the router), where disruption is cheap.
+4. **Claim**: one task-free, model-agnostic, HF-basic criterion (super-expert detection) simultaneously protects long-context behavior and prevents forgetting — validated on RCA + RULER + GSM8K/HumanEval, on Qwen3-MoE.
+
+**Novelty verdict**: ⚠️ **narrow gap, must verify** (same discipline as R1 / sink-key-bias). Threats: (a) ESFT/DES-MoE already do criterion-based expert freezing — differentiation is the *selection criterion* (sink-induction, not task-affinity) + the *joint long-ctx↔forgetting framing*; (b) `[super-experts]` could spawn a fine-tuning follow-up any day. **Needs a dedicated "super expert + fine-tuning + forgetting" search before committing.**
+
+### 11.4 Net effect on the program
+
+- MoE does **not** rescue the "novel mechanism" goal — the forgetting-MoE space is saturated (M1-M9 mostly dead).
+- MoE **does** give the **strongest empirical anchor for the §10.3-1 unifying-observation paper**: the **Super-Expert ↔ sink** identity is the cleanest evidence that "long-context load-bearers = forgetting-vulnerable sites." If we pursue path (A), this is the centerpiece figure, and Qwen3-MoE is HF-native (easy to adapt, model-agnostic across MoE family).
+- This also **subsumes** the dense §10 story: dense base → protect sinks/massive-activations; MoE base → protect super experts (which *are* the sink inducers). One principle, two architectural instantiations → a stronger, more general paper.
+- dLLM note: super experts / sink-induction in **diffusion MoE** is entirely unstudied → another future-room lever consistent with §8.
+
+### 11.5 Sources logged
+
+New IDs in `knowledge-sources.md` (§"MoE prior-work audit"): `[super-experts]`, `[sink-native-moe]`, `[esft]`, `[des-moe]`, `[loramoe]`, `[same-moe]`, `[lifelong-moe]`, `[gated-attn-sinkfree]`.

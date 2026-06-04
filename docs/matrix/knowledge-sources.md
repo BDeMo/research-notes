@@ -639,6 +639,24 @@ Closest-preempting work found in the 2022-2026 lit review for the RCA brainstorm
 - **[sink-ctr]** Attention Sinks: Catch-Tag-Release (NeurIPS 2025, arXiv:2502.00919). Sinks tag tokens with semantic directions; low-rank-capturable.
 - **[massive-act]** Sun et al. 2024 — Massive Activations in LLMs. Few channels with 100-1000× activation act as implicit bias; deleting breaks the model. Basis for R6.
 
+## MoE prior-work audit (added 2026-06-03)
+
+For the MoE-specific RCA angles (`notes/ideas/rca-transformer-intrinsic-2026-06-03.md` §11). MoE = forgetting lever (crowded), not a long-context lever.
+
+### The genuine bridge — experts ↔ attention sinks (the one interesting find)
+
+- **[super-experts]** Unveiling Super Experts in MoE LLMs (arXiv:2507.23279). A *tiny* set of experts **induce the attention sinks**; pruning them → sink decay rate >90% → near-zero on some tasks (Qwen3-30B-A3B). MoE analog of `[massive-act]`; the load-bearing site. **Studies compression, NOT fine-tuning → the gap for our "super-expert-anchored adaptation" (§11.3).**
+- **[sink-native-moe]** Attention Sink Forges Native MoE in Attention Layers (arXiv:2602.01203). Sink attention weight = implicit gating factor → heads form a "native MoE"; freeze top-m "shared heads" + route the rest to fix head collapse; better long-context retrieval after removing vanilla sinks.
+- **[gated-attn-sinkfree]** Gated Attention for LLMs: Attention-Sink-Free (arXiv:2505.06708). Query-dependent sparse gating at SDPA output eliminates attention sinks; +10 on RULER length-generalization; <2M extra params; dense + MoE variants.
+
+### MoE continual-learning / PEFT (preempts our M1-M9)
+
+- **[esft]** ESFT — Expert-Specialized Fine-Tuning / "Let the Expert Stick to His Last" (arXiv:2407.01906, EMNLP 2024). Tune only highest-task-affinity experts, freeze rest + router; routing for a task is highly concentrated; -90% storage, -30% train time, better general-task retention. **= our M4 verbatim; §6.3 studies shared-vs-non-shared (= our M1).**
+- **[des-moe]** DES-MoE — Dynamic Expert Specialization (arXiv:2509.16882, EMNLP 2025). Adaptive router (distillation) + real-time expert-domain correlation + 3-phase progressive freezing; 6 domains incl. math+code; **89% less forgetting** than full FT, 98% general-cap retention. **= our M4/M8.**
+- **[loramoe]** LoRAMoE (arXiv:2312.09979, ACL 2024). Freeze backbone, add parallel LoRA experts + router, localized balancing splits experts into world-knowledge vs task groups → alleviates world-knowledge forgetting under large SFT data. **= our M3 verbatim.**
+- **[same-moe]** Same — Stabilized MoE for Multimodal Continual Instruction Tuning (arXiv:2602.01990). Models **router drift + expert drift**; spectral-aware routing + curvature-aware Riemannian expert scaling + adaptive expert freezing. **= our M8 verbatim.**
+- **[lifelong-moe]** Lifelong-MoE (arXiv:2305.12281, ICML 2023). Expand experts + gating dims, freeze old experts/gatings, output-level regularization → lifelong pretraining without forgetting. **= our M3 (expansion variant).**
+
 ## Conversations / internal
 
 ### [conv-2026-05-26] First brainstorm session

@@ -162,6 +162,8 @@ Born from reading Cartridges / Activation Beacon / Gisting / Generative Adapter 
 
 > ⚠️ **Prior-work audit (2026-06-03, source §10)**: a 2022-2026 lit review found **none of R1-R12 is novel as a standalone mechanism** — the space is saturated. Exact hits: **R8 = OPLoRA (AAAI 2026)**, **R10 = Sparse Memory Finetuning (Meta 2025)**, **R4 = SSA/SSMax**, **R3 = ReasonCache/KV Packet**, **R5 = Logit-Lens-Loss/SelfAug**, **R6 = MoFO/MIGU**, **R2 = Mechanistic-Forgetting-2026/ABFT**, **R7 = trained steering vectors**, **R11 = SAE-FT/SAE-FD**. R1 (sink-as-writable-memory) has only a thin unclaimed core. **Revised recommendation**: drop the "novel mechanism" framing; pursue either (A) a *unifying-observation* paper (same intrinsic sites solve long-ctx AND forgetting, RCA+code+math co-eval) or (B) a *verified-new-phenomenon* (sink key-bias-only tuning, unverified). See source §10.3-10.4.
 
+> ⚠️ **MoE angles audit (2026-06-03, source §11)**: MoE is a *forgetting* lever, **not** a long-context lever (sparsity is in the FFN, the long-ctx bottleneck is attention/KV). The MoE continual-learning space is equally saturated — M1-M9 mostly dead (**M3=LoRAMoE**, **M4=ESFT**, **M8=Same**, **M2/M6=standard**, multi-domain=DES-MoE). **Best find: the Super-Expert ↔ attention-sink identity** (`[super-experts]` 2025 + `[sink-native-moe]` 2026) — a few experts *induce* the sinks; pruning them collapses the model. This is the cleanest empirical anchor for path (A): long-context load-bearers = forgetting-vulnerable sites, now with an MoE instantiation (**super-expert-anchored adaptation**, narrow gap, must verify). See source §11.2-11.4.
+
 ---
 
 ## Top picks at a glance
