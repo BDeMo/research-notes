@@ -66,6 +66,7 @@ Kill criteria:
 - [`paper-draft-2026-06-04.md`](paper-draft-2026-06-04.md) — **paper-level writeup** (abstract → method → results → repro): the consolidated story
 - [`metrics-reference.md`](metrics-reference.md) — **metric codebook**: every metric's derivation / rationale / interpretation / range + the full correlation ranking
 - [`ideas-brainstorm-2026-06-04.md`](ideas-brainstorm-2026-06-04.md) — **idea list** (62 methods): one per coupling cell + criterion / inference-time / architectural / optimizer / theory / blue-sky, each with motivation + expected insight
+- [`metrics-curation-2026-06-04.md`](metrics-curation-2026-06-04.md) — **metric triage**: soundness × interestingness rating table (39 metrics) → KEEP/SUPPORT/FILTER, + 12 metric-driven ideas (I1–I12)
 - [`matrix.md`](matrix.md) — **living done/todo ledger** (one-screen status + results + queue); update after every work block
 - [`README.md`](README.md) — this file (problem, hypotheses, phases, success criteria)
 - [`validation.md`](validation.md) — **Phase 1 observation matrix** (levels × granularities × metrics × probes) + Phase 2 method design + ablations + stats

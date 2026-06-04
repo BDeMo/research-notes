@@ -27,6 +27,7 @@
 | P | **Paper-level writeup** consolidated | ✅ | `paper-draft-2026-06-04.md` |
 | C | **Metric codebook** (derivation/range/interp) + full ranking | ✅ | `metrics-reference.md` |
 | I | **Idea list** (62 methods, motivation+insight) | ✅ | `ideas-brainstorm-2026-06-04.md` |
+| Cur | **Metric triage** (soundness×interest, filter 17 naive/dup) + 12 metric-driven ideas | ✅ | `metrics-curation-2026-06-04.md` |
 | B | Behavioural LC (NIAH acc@length) + retention Δ per dataset (close angle 12) | ⏳ | — |
 | S | Scale axis 0.6→32B on the confirmed couplings | ⏳ | ladder data partly collected |
 | M | Method design (Phase-2 variant per granularity) + paper framing | ⏳ | `validation.md` §Phase-2 |
