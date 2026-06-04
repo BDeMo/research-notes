@@ -63,6 +63,7 @@ Kill criteria:
 | **3** | **Paper eval**: benchmarks, metrics, baselines, cross-domain/task/model | RCA only as showcase | headline numbers |
 
 ## Files in this plan
+- [`matrix.md`](matrix.md) — **living done/todo ledger** (one-screen status + results + queue); update after every work block
 - [`README.md`](README.md) — this file (problem, hypotheses, phases, success criteria)
 - [`validation.md`](validation.md) — **Phase 1 observation matrix** (levels × granularities × metrics × probes) + Phase 2 method design + ablations + stats
 - [`channels.md`](channels.md) — **Phase 3 eval**: benchmarks, metrics, baselines, cross-domain/task/model settings, base models, detailed protocol
