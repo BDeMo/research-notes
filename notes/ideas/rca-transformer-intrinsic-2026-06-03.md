@@ -2,7 +2,7 @@
 
 > **Date**: 2026-06-03
 > **Topic**: How to build Nokia's RCA model solving two challenges — (1) long context at **inference**, (2) catastrophic forgetting at **training** — with a method that is *insightful, easy to adapt, lightweight, model-agnostic, task-free*, derived from **transformer-intrinsic phenomena** (sinks, massive activations, induction heads, etc.).
-> **Status**: brainstorm captured (two rounds) + **prior-work audit done (§10)** + **MoE angles audited (§11)**. ⚠️ **Audit verdict: none of R1-R12 (dense) nor M1-M9 (MoE) is novel as a standalone mechanism** — both the dense and MoE 2025-2026 literatures are saturated. Honestly-open paths: a *unifying-observation* paper (§10.3-1, best empirical anchor = the **Super-Expert ↔ attention-sink** identity, §11.2) or a *verified-new-phenomenon* (sink key-bias §10.2 / super-expert-anchored adaptation §11.3). See §10.4 + §11.4 before drafting any plan.
+> **Status**: brainstorm captured (two rounds) + **prior-work audit done (§10)** + **MoE angles audited (§11)**. ⚠️ **Audit verdict: none of R1-R12 (dense) nor M1-M9 (MoE) is novel as a standalone mechanism** — both the dense and MoE 2025-2026 literatures are saturated. Honestly-open paths: a *unifying-observation* paper (§10.3-1, best empirical anchor = the **Super-Expert ↔ attention-sink** identity, §11.2) or a *verified-new-phenomenon* (sink key-bias §10.2 / super-expert-anchored adaptation §11.3). **§12 prioritizes everything under the refined (data-agnostic / intrinsic / non-task-specific-training) constraints → the program collapses onto ONE P0 thesis: a data-agnostic, training-free *intrinsic-site protection rule* (dense=sinks/massive-act, MoE=super-experts), validated by a dual long-ctx↔forgetting eval. Start with the §12.3 de-risk experiment (needs no RCA data).** See §10.4 + §11.4 + §12 before drafting any plan.
 > **Relation to other work**: complements / contrasts Plan 08 v0 (mem-X soft-prompt wrapper). The mem-X v1 **3-regime law** is used here as a constraint prior (see [`../plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`](../plans/08-model-outputs-delta-w/v1-results-2026-06-03.md)).
 
 ---
@@ -317,3 +317,50 @@ Recipe sketch:
 ### 11.5 Sources logged
 
 New IDs in `knowledge-sources.md` (§"MoE prior-work audit"): `[super-experts]`, `[sink-native-moe]`, `[esft]`, `[des-moe]`, `[loramoe]`, `[same-moe]`, `[lifelong-moe]`, `[gated-attn-sinkfree]`.
+
+---
+
+## 12. Doable points + prioritization (added 2026-06-03, filtered by refined constraints)
+
+> User refined the constraints: the method should be **(D) data-agnostic**, **(I) transformers-intrinsic**, and **(T) light-weight training is OK but ideally NOT task-specific training**. This is a strong filter: it moves the *novel contribution* away from "train an RCA-specific adapter" and toward "a data-agnostic, intrinsic rule that *constrains/protects* whatever training happens". Every "train a task-specific module" angle is demoted (and was preempted anyway).
+
+### 12.1 The filter applied to every surviving idea
+
+| candidate | D | I | train type | novelty still open? | priority |
+|---|---|---|---|---|---|
+| **P0a — Unifying-observation + intrinsic protection rule** (dense: sinks / massive-act) | ✓ | ✓ | **adds none** (constrains the existing SFT) | ⚠️ narrow — the *joint long-ctx↔forgetting* framing + site-selection criterion | **P0** |
+| **P0b — Super-expert-anchored protection** (MoE instantiation of P0a) | ✓ | ✓ | **adds none** | ⚠️ narrow — super-experts studied for compression, not FT-protection (verify) | **P0** |
+| **P0c — De-risk measurement study** (no RCA data needed) | ✓ | ✓ | none | enabling experiment | **P0 — do first** |
+| R7 task-direction steering | ~ (needs contrast pairs) | ✓ | ~zero (extract vector) | ☠️ preempted | P2 — baseline / inference topping |
+| sink **key-bias-only** tuning (§10.2) | ✓ | ✓ | tiny, task-ish | ⚠️ unverified | P2 — verify then maybe component |
+| R6 massive-act grad-mask | ✓ | ✓ | adds none | ☠️ MoFO/MIGU | P2 — component of P0a, not standalone |
+| R1 sink-anchored memory (trained) | ~ | ✓ | task-ish (self-sup possible) | ⚠️ thin | P3 — component / ablation |
+| R8 OPLoRA · R10 sparse-write · R2 induction-freeze · R3 KV-reweighter | ✗ **task-specific module** | ✓ | task-specific | ☠️ preempted | **baselines only** |
+| R9 layer-skip · R12 early-exit | ✓ | ✓ | none | ☠️ mature | drop |
+
+**Conclusion**: under (D)+(I)+(T), the program collapses cleanly onto **one paper** = the *unifying-observation paper* whose **method contribution is a data-agnostic, training-free protection rule**, instantiated on **both** dense (sinks / massive activations) and MoE (super experts). Everything else is a baseline, a component, or dropped.
+
+### 12.2 The P0 thesis (the only thing worth building, stated sharply)
+
+> **Claim**: the transformer-intrinsic sites that carry long-context behavior — attention sinks / massive activations (dense), super experts that induce those sinks (MoE) — are the *same* sites whose perturbation during fine-tuning causes catastrophic forgetting. Therefore a single **data-agnostic, training-free** rule — *detect these sites on generic text, then protect them (freeze / gradient-mask) during any SFT* — improves long-context retention **and** prevents forgetting of code/math, with **zero task-specific trainable parameters added**.
+
+Why it satisfies all three constraints:
+- **(D) data-agnostic**: the sites are detected by a forward pass on *any* generic text (sink position / activation-magnitude / super-expert score). No RCA labels, no task data, in the *method*.
+- **(I) intrinsic**: sinks (`[sink-streaming]`, `[sink-emerge]`), massive activations (`[massive-act]`), super experts (`[super-experts]`) are universal transformer phenomena.
+- **(T) no task-specific training added**: the method is a *constraint on* the (unavoidable) RCA SFT — a freeze mask / grad mask — it introduces no new task-trained module. (Optional component can be trained with a *task-agnostic* self-supervised infilling objective, still not RCA-specific.)
+
+Novelty position (honest): the *mechanism* (freeze/grad-mask by an importance criterion) is known (MoFO/MIGU/ESFT/DES-MoE). The **unclaimed contribution is two-fold**: (1) the **site-selection criterion** = *long-context-load-bearing / sink-induction* (NOT task-affinity, NOT raw gradient magnitude); (2) the **joint claim** that the *same* sites govern long-context AND forgetting, validated by a dual RCA + RULER + GSM8K/HumanEval eval. Main threat = `[mech-forget]` (localizes forgetting to attention heads) — differentiate by the long-context-coupling + the sink-induction criterion.
+
+### 12.3 Concrete next actions (ordered, cheap-first)
+
+1. **P0c de-risk experiment — needs NO RCA data, ~1–2 days.** On Qwen3-8B (dense) + Qwen3-30B-A3B (MoE):
+   - (a) detect sites on generic text: sink positions, top massive-activation channels, super experts (sink-decay criterion).
+   - (b) run a *small proxy-domain* SFT (any non-code/math corpus), measure which sites shift, and correlate site-shift with forgetting (ΔGSM8K / ΔHumanEval) and with long-ctx (ΔRULER).
+   - **Goal**: confirm or kill the P0 thesis ("same sites, both problems") before any RCA work. This is pure intrinsic + data-agnostic.
+2. **Targeted novelty search** "super-expert / sink-induction + fine-tuning + forgetting" — gates whether P0b's gap is real (10 min, blocking for the plan).
+3. **If P0c is positive + gap holds** → draft `notes/plans/09-intrinsic-site-protection/` (validation = dual eval; channels = HF Qwen3 dense+MoE; budget = small, mostly inference + light SFT). RCA data enters only as the *application* eval, not as the method.
+4. **Defer** all trained-adapter angles (R1/R2/R3/R8/R10) to "baselines" in that plan.
+
+### 12.4 Honest caveat on the long-context leg
+
+Under (T = no task-specific training), the *novel* long-context contribution is thin: the strongest data-agnostic long-context lever is training-free sink-based KV handling, which is essentially `[sink-streaming]` (known). So the long-context win in P0 is **"protection preserves the base's existing long-context machinery"**, not a new long-context method. The *forgetting* leg + the *unifying observation* carry the paper; long-context rides along as the second half of the "same sites" story. Be explicit about this in the plan so we don't over-claim a long-context method.

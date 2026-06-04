@@ -40,9 +40,19 @@ User: "再看看针对 MoE 模型有什么可以利用的点." Motivated — pla
 
 Logged 8 IDs to `knowledge-sources.md` §"MoE prior-work audit".
 
+## Prioritization under refined constraints (added 2026-06-03, §12)
+
+User refined: method should be **data-agnostic + transformers-intrinsic + light training OK but ideally NOT task-specific training**. Applied as a filter to all R/M angles:
+
+- The constraint moves the *novel contribution* from "train an RCA adapter" → "a data-agnostic intrinsic rule that *constrains/protects* training". Every trained-task-specific-module angle (R1/R2/R3/R8/R10) demotes to **baseline** (and was preempted anyway).
+- **Program collapses onto ONE P0 thesis**: *the intrinsic sites carrying long-context behavior (sinks/massive-act dense; super-experts MoE) are the same sites whose perturbation causes forgetting → detect them on generic text (data-agnostic, training-free) and protect them (freeze/grad-mask) during any SFT → long-ctx retention + no code/math forgetting, zero task-specific params added.*
+- Satisfies all three constraints; only-surviving novelty = (1) site-selection criterion (sink-induction, not task-affinity / not raw grad-magnitude) + (2) the joint long-ctx↔forgetting claim with dual eval. Main threat `[mech-forget]`.
+- **Next actions (cheap-first)**: (1) **P0c de-risk experiment — NO RCA data needed**: on Qwen3-8B + Qwen3-30B-A3B, detect sites on generic text, run small proxy-domain SFT, correlate site-shift with ΔGSM8K/ΔHumanEval (forget) and ΔRULER (long-ctx). (2) targeted "super-expert + fine-tuning + forgetting" search. (3) if positive → draft `notes/plans/09-intrinsic-site-protection/`.
+- **Honest caveat**: under no-task-training, the *novel* long-context leg is thin (training-free sink-KV ≈ StreamingLLM); forgetting + the unifying observation carry the paper.
+
 ## Output artifacts
 
-- `notes/ideas/rca-transformer-intrinsic-2026-06-03.md` (**NEW** — full 2-round brainstorm + §10 prior-work audit + §11 MoE audit, T2)
+- `notes/ideas/rca-transformer-intrinsic-2026-06-03.md` (**NEW** — full 2-round brainstorm + §10 prior-work audit + §11 MoE audit + §12 prioritization, T2)
 - `notes/ideas/README.md` — new Sources row + "RCA model building — 12 ideas" section + audit verdict banner + MoE-audit banner
 - `docs/matrix/knowledge-sources.md` — new "RCA prior-work audit" (~28 IDs) + "MoE prior-work audit" (8 IDs) sections
 - This entry + matrix index row

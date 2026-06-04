@@ -164,6 +164,8 @@ Born from reading Cartridges / Activation Beacon / Gisting / Generative Adapter 
 
 > ⚠️ **MoE angles audit (2026-06-03, source §11)**: MoE is a *forgetting* lever, **not** a long-context lever (sparsity is in the FFN, the long-ctx bottleneck is attention/KV). The MoE continual-learning space is equally saturated — M1-M9 mostly dead (**M3=LoRAMoE**, **M4=ESFT**, **M8=Same**, **M2/M6=standard**, multi-domain=DES-MoE). **Best find: the Super-Expert ↔ attention-sink identity** (`[super-experts]` 2025 + `[sink-native-moe]` 2026) — a few experts *induce* the sinks; pruning them collapses the model. This is the cleanest empirical anchor for path (A): long-context load-bearers = forgetting-vulnerable sites, now with an MoE instantiation (**super-expert-anchored adaptation**, narrow gap, must verify). See source §11.2-11.4.
 
+> ✅ **Prioritization under refined constraints (2026-06-03, source §12)**: filtered by *data-agnostic + transformers-intrinsic + non-task-specific training*, the whole R/M space collapses onto **ONE P0 thesis** — a **data-agnostic, training-free intrinsic-site protection rule** (detect sinks/massive-act on dense, super-experts on MoE, on generic text; freeze/grad-mask them during any SFT) that improves long-ctx retention AND prevents code/math forgetting with **zero task-specific trainable params**. All "train a task-specific adapter" angles (R1/R2/R3/R8/R10) demote to baselines. **First action: the §12.3 de-risk measurement experiment — needs NO RCA data.** See source §12.
+
 ---
 
 ## Top picks at a glance
