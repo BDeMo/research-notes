@@ -55,6 +55,59 @@ target, then design the gate around it.
 \tableofcontents
 
 % =====================================================================
+\section{Experiments: what was run, what is running, what is planned}
+\label{sec:experiments}
+
+\subsection{Compute environment}
+Three Kubernetes pods (shared, multi-tenant): \texttt{sam-dev-test}
+($1{\times}$H200-143GB), \texttt{sam-dev-ray} ($4{\times}$H100-80GB),
+\texttt{sam-dev} ($4{\times}$H100-80GB). Qwen3-8B is present on all
+three; Qwen3-14B only on \texttt{sam-dev}. Each probe run trains one
+wrapper (one seed) on a single GPU and evaluates all assigned
+benchmarks; seeds are sharded one-per-GPU to use the cluster in
+parallel. All runs use the memory-safe probe (\code{scripts/probe\_v2.py}):
+last-position hidden states are cloned and the full activation tensors
+freed, a single encoder pass is taken per chunk, and the CUDA cache is
+flushed periodically --- a fix introduced after an out-of-memory
+postmortem on the 80\,GB cards (retained all-position
+\code{hidden\_states} views $+$ redundant encoder passes).
+
+\subsection{Runs ledger}
+\begin{center}\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{l l c c p{3.4cm} l}
+\toprule
+run & purpose & seeds & $n$/bench & benchmarks & status\\
+\midrule
+Phase 0 & prediction-derived signals, free-gen scored & 4--5 & 800 & QuALITY, MuSR, RULER, Hotpot, Trivia, SQuAD, MARCO & done (\S\ref{sec:phase0})\\
+seed-42 probe & native-MC $+$ 37-layer signals (single seed) & 1 & 150 & QuALITY, MuSR, RULER, Hotpot, Trivia & done (\S\ref{sec:seed42})\\
+9-seed extended & full battery, multi-seed (robust) & 9 & 1350 & QuALITY, MuSR, RULER, Hotpot, Trivia & \textbf{done} (\S\ref{sec:multiseed})\\
+new-bench (8B) & 4 more answer-type angles & 5 & 150 & QuALITY-hard, SQuAD-v2, NarrativeQA, MS-MARCO & running (seed42 done) \\
+14B cross-scale & does the signal hold at $2{\times}$ scale? & --- & --- & main 5 & deferred (pod busy)\\
+gate (Phase 4) & input-conditioned do-no-harm gate & --- & --- & public-only & planned (\S\ref{sec:gate-target})\\
+\bottomrule
+\end{tabular}
+\end{center}
+The robust conclusions (\S\ref{sec:multiseed}) rest on the
+\emph{9-seed extended} run; Phase 0 and seed-42 are earlier, smaller
+passes kept for traceability and because seed-42 illustrates the
+granularity effect (and one single-seed artifact the 9-seed run
+corrects).
+
+\subsection{Probe protocol (per eval item)}
+On the frozen base we run: (i) the \textbf{wrapper} (memory prefix $+$
+query) with hidden-state output; (ii) \textbf{\noctx{}} (query only);
+(iii) a \textbf{memory-ablation} pass (wrapper prompt with attention to
+the $K$ memory tokens masked) for the causal-influence signal; (iv)
+greedy generation for wrapper and \noctx{}; (v) for MC benchmarks,
+per-option log-likelihood scoring; (vi) a teacher-forced pass over the
+wrapper's own generated answer for answer-span statistics. From these we
+log the native black-box outcome (\S\ref{sec:native}) and the full
+intrinsic battery across granularities and angles
+(\S\ref{sec:intrinsic}) --- $\sim$6--10 forward passes per item,
+$\sim$50 GPU-min per seed for five benchmarks at $n{=}150$.
+
+% =====================================================================
 \section{Settings}
 \label{sec:settings}
 
@@ -308,12 +361,15 @@ the achievable gate ceiling.
 \section{Results and interpretation}
 \label{sec:results}
 
-\paragraph{Status.} The full 9-seed dataset is in flight; tables below
-are the completed \textbf{seed 42} ($n{=}150$/bench) plus the Phase-0
-free-generation study ($5{,}600$ items). Multi-seed bands (pooling
-$\sim$$1{,}350$ items/bench) will tighten and re-rank these.
+\paragraph{Status.} The \textbf{9-seed multi-seed study
+($n{=}1350$/bench) is complete} and is the robust result
+(\S\ref{sec:multiseed}); it \emph{supersedes} the single-seed seed-42
+rankings (\S\ref{sec:seed42}) and corrects one of them. Seed-42 tables
+are kept for traceability and because they illustrate the granularity
+effect.
 
 \subsection{Phase 0 --- base rates (free-gen scored, $5{,}600$ items)}
+\label{sec:phase0}
 \begin{center}\small
 \begin{tabular}{l rrr rrr}
 \toprule
@@ -334,6 +390,7 @@ Hotpot $0.44\!\to\!0.09$) --- compression discards usable context. So
 the gate is a compressibility detector, not a corruption filter.
 
 \subsection{Seed-42 gate signal sheet (native-MC + per-layer)}
+\label{sec:seed42}
 \begin{center}\small
 \begin{tabular}{l l l r l}
 \toprule
@@ -386,6 +443,47 @@ failure.
 trading deployability for accuracy --- a fallback if intrinsic signals
 prove insufficient under multi-seed.
 \end{enumerate}
+
+\subsection{Multi-seed result (9 seeds, $n{=}1350$/bench) --- robust}
+\label{sec:multiseed}
+Pooling seeds $\{42,7,11,13,1,5,17,99,23\}$ with the full extended
+battery sharpens and \emph{corrects} the single-seed picture.
+\begin{center}\small
+\begin{tabular}{l l l r r}
+\toprule
+bench & best signal & angle & AUROC & Spearman\\
+\midrule
+trivia\_qa  & \code{seq\_logprob}  & confidence & \textbf{0.769} & $+0.357$\\
+            & \code{ll\_kl\_wb@34} & divergence & 0.229 (inv.)   & $-0.40$\\
+hotpot\_qa  & \code{top5\_mass\_w} & confidence & \textbf{0.761} & $+0.316$\\
+quality     & (none robust)        & ---        & $\le 0.55$     & ---\\
+musr\_mm    & (none)               & ---        & $\le 0.52$     & ---\\
+ruler\_niah & undefined            & ---        & ---            & ---\\
+\bottomrule
+\end{tabular}
+\end{center}
+\begin{enumerate}
+\item \textbf{Wrapper output confidence robustly predicts correctness}
+on extractive QA (\code{seq\_logprob}/\code{top5\_mass\_w}, AUROC
+$0.76$--$0.77$); the cheapest granularity (output/span) wins, and
+per-layer \code{ll\_conf} aggregates add only a little (trivia: final
+$0.60\!\to\!$max $0.66$).
+\item \textbf{Wrapper$\to$base divergence is inversely predictive}
+(\code{ll\_kl\_wb},\,\code{kl\_0w},\,\code{js},\,\code{tv}): a larger
+distribution shift $\Rightarrow$ the wrapper is more likely
+\emph{wrong} (trivia \code{ll\_kl\_wb@34} $\rho{=}{-}0.40$). A natural
+gate input, used inversely.
+\item \textbf{The single-seed QuALITY ``layer-30 KL'' peak ($0.68$,
+\S\ref{sec:seed42}) was an artifact} --- it falls to $\approx 0.47$ at
+9 seeds. No intrinsic signal robustly predicts QuALITY correctness;
+this is exactly why the multi-seed study was necessary.
+\item \textbf{Where there is no signal (musr/ruler), the gate should
+close} (do no harm) --- the correct behaviour, not a failure.
+\end{enumerate}
+\noindent\textbf{Gate input (decided):} wrapper output \emph{confidence}
+$+$ wrapper$\to$base \emph{divergence} (inverse), both robust at
+$n{=}1350$; per-layer features are secondary inputs to the multivariate
+probe.
 
 % =====================================================================
 \section{The gate target and next steps}
