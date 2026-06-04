@@ -1572,6 +1572,124 @@ def _quick_sft_pairs(model, tok, pairs, steps, lr, use_ckpt=False, maxlen=512):
         torch.nn.utils.clip_grad_norm_(tp, 1.0); opt.step()
     if use_ckpt: model.gradient_checkpointing_disable()
 
+# ================================================================ H3 CAUSAL TEST
+# Hypothesis: protecting the long-context-coupled heads during SFT preserves
+# long-context (NIAH) + general (MMLU) better than no/random/post-hoc protection,
+# at matched new-domain learning. Protection = freeze (grad-mask) the heads' q/o.
+def _zscore(x):
+    x = np.asarray(x, float); s = x.std()
+    return (x - x.mean()) / (s + 1e-9)
+
+def _h3_select(model_name, kind, k, L, H):
+    """Pick protected (layer,head) set. lc = top by combined LC-coupling z-score
+    (retrieval+attn_distance+v_norm), detected on generic text (data-agnostic)."""
+    gridf = os.path.join(ART, model_name, "grid_wikitext.npz")
+    rng = np.random.RandomState(0)
+    if kind == "none":
+        return []
+    if kind == "random" or not os.path.exists(gridf):
+        flat = [(l, h) for l in range(L) for h in range(H)]
+        idx = rng.choice(len(flat), size=min(k, len(flat)), replace=False)
+        return [flat[i] for i in idx]
+    z = np.load(gridf, allow_pickle=True)
+    def g(key): return z["H_" + key] if "H_" + key in z.files else np.zeros((L, H))
+    if kind == "lc":
+        score = _zscore(g("retrieval")) + _zscore(g("attn_distance")) + _zscore(g("v_norm"))
+    elif kind == "retrieval":
+        score = g("retrieval")
+    elif kind == "attn_distance":
+        score = g("attn_distance")
+    elif kind == "deltaw":
+        score = g("dW_drift")  # post-hoc oracle ([mech-forget]-style): heads that DID drift
+    else:
+        score = g(kind)
+    idx = np.dstack(np.unravel_index(np.argsort(score.ravel())[::-1][:k], score.shape))[0]
+    return [tuple(map(int, x)) for x in idx]
+
+@torch.no_grad()
+def _niah_acc(model, tok, lengths=(2000, 6000), samples=6):
+    ok = tot = 0
+    for Ln in lengths:
+        for d in (0.0, 0.25, 0.5, 0.75, 1.0):
+            for s in range(samples):
+                code = f"{random.randint(10000,99999)}"; key = f"K{s}"
+                body = filler_to_len(tok, Ln); ins = int(len(body) * d)
+                ctx = body[:ins] + f" The special {key} value is {code}. " + body[ins:]
+                prompt = ("Read the text and answer.\n" + ctx +
+                          f"\nQuestion: What is the special {key} value? Answer with the number only:")
+                ids = tok(prompt, return_tensors="pt", truncation=True, max_length=Ln + 200).input_ids.cuda()
+                g = model.generate(ids, max_new_tokens=10, do_sample=False, pad_token_id=tok.pad_token_id)
+                ans = tok.decode(g[0, ids.shape[1]:], skip_special_tokens=True)
+                tot += 1; ok += int(code in ans)
+    return round(ok / max(tot, 1), 4)
+
+@torch.no_grad()
+def _gsm8k_acc(model, tok, n=80):
+    from datasets import load_dataset
+    try: ds = load_dataset("openai/gsm8k", "main", split="test")
+    except Exception: return None
+    idx = list(range(len(ds))); random.Random(7).shuffle(idx)
+    ok = 0; tot = 0
+    for i in idx[:n]:
+        r = ds[i]; gold = r["answer"].split("####")[-1].strip().replace(",", "")
+        ids = tok(f"Question: {r['question']}\nAnswer:", return_tensors="pt", truncation=True, max_length=512).input_ids.cuda()
+        g = model.generate(ids, max_new_tokens=180, do_sample=False, pad_token_id=tok.pad_token_id)
+        out = tok.decode(g[0, ids.shape[1]:], skip_special_tokens=True)
+        nums = [c.replace(",", "") for c in __import__("re").findall(r"-?[\d,]+", out)]
+        tot += 1; ok += int(bool(nums) and nums[-1] == gold)
+    return round(ok / max(tot, 1), 4)
+
+def cmd_h3(args):
+    model_id = MODELS.get(args.model, args.model)
+    log(f"H3 {args.model} protect={args.protect} k={args.protect_k} domain={args.domain} steps={args.steps}")
+    model, tok = load_model(model_id, eager=False)
+    cfg = model.config; L, H, hd = cfg.num_hidden_layers, cfg.num_attention_heads, head_dim_of(cfg)
+    res = {"model": args.model, "protect": args.protect, "k": args.protect_k, "domain": args.domain, "steps": args.steps}
+    # ---- before ----
+    try: res["before_mmlu"] = eval_mmlu(model, tok, args.n_eval)
+    except Exception as e: log("mmlu pre fail", e); res["before_mmlu"] = None
+    try: res["before_niah"] = _niah_acc(model, tok)
+    except Exception as e: log("niah pre fail", e); res["before_niah"] = None
+    try: res["before_dom"] = _gsm8k_acc(model, tok, args.n_eval) if args.domain == "gsm8k" else None
+    except Exception as e: res["before_dom"] = None
+    prot = _h3_select(args.model, args.protect, args.protect_k, L, H)
+    res["n_protected"] = len(prot)
+    log(f"protecting {len(prot)} heads ({args.protect})")
+    # ---- SFT (attn q/k/v/o proj only; mask protected q/o grads) ----
+    pairs = load_grid_dataset(tok, args.domain, n=args.steps + 64)[1]
+    feats = _pairs_to_feats(tok, pairs, 512)
+    if not feats: log("no sft data; abort"); free(model); return
+    for p in model.parameters(): p.requires_grad_(False)
+    tp = []
+    for a in _attn_modules(model):
+        if a is None: continue
+        for nm in ["q_proj", "k_proj", "v_proj", "o_proj"]:
+            w = getattr(a, nm).weight; w.requires_grad_(True); tp.append(w)
+    opt = torch.optim.AdamW(tp, lr=args.lr)
+    model.train()
+    for s in range(args.steps):
+        b = feats[s % len(feats):s % len(feats) + 1]
+        ids, labels = collate(b, tok.pad_token_id)
+        out = model(ids.cuda(), labels=labels.cuda()); opt.zero_grad(); out.loss.backward()
+        if prot: mask_head_grads(model, prot, hd)
+        torch.nn.utils.clip_grad_norm_(tp, 1.0); opt.step()
+        if s % 100 == 0: log(f"  h3sft {s}/{args.steps} loss {float(out.loss):.4f}")
+    model.eval()
+    # ---- after ----
+    try: res["after_mmlu"] = eval_mmlu(model, tok, args.n_eval)
+    except Exception as e: res["after_mmlu"] = None
+    try: res["after_niah"] = _niah_acc(model, tok)
+    except Exception as e: res["after_niah"] = None
+    try: res["after_dom"] = _gsm8k_acc(model, tok, args.n_eval) if args.domain == "gsm8k" else None
+    except Exception as e: res["after_dom"] = None
+    # deltas
+    for m in ["mmlu", "niah", "dom"]:
+        b, a = res.get("before_" + m), res.get("after_" + m)
+        res["d_" + m] = round(a - b, 4) if (a is not None and b is not None) else None
+    json.dump(res, open(tag_path(args.model, f"h3_{args.protect}_{args.domain}.json"), "w"), indent=2)
+    log(f"H3 done {args.protect}: dNIAH={res.get('d_niah')} dMMLU={res.get('d_mmlu')} dDOM={res.get('d_dom')}")
+    free(model)
+
 # ---------------------------------------------------------------- collate/util
 def collate(batch, pad):
     m = max(len(x[0]) for x in batch)
@@ -1609,9 +1727,13 @@ def main():
     p.add_argument("--dataset", required=True); p.add_argument("--ctxlen", type=int, default=1024)
     p.add_argument("--n_texts", type=int, default=12); p.add_argument("--fisher_batches", type=int, default=8)
     p.add_argument("--sft_steps", type=int, default=80); p.add_argument("--lr", type=float, default=2e-5)
+    p = sub.add_parser("h3"); p.add_argument("--model", required=True)
+    p.add_argument("--protect", default="none"); p.add_argument("--protect_k", type=int, default=40)
+    p.add_argument("--domain", default="gsm8k"); p.add_argument("--steps", type=int, default=600)
+    p.add_argument("--lr", type=float, default=5e-5); p.add_argument("--n_eval", type=int, default=120)
     args = ap.parse_args()
     {"detect": cmd_detect, "niah": cmd_niah, "sft": cmd_sft, "capeval": cmd_capeval,
-     "intrinsic": cmd_intrinsic, "facts": cmd_facts, "grid": cmd_grid}[args.cmd](args)
+     "intrinsic": cmd_intrinsic, "facts": cmd_facts, "grid": cmd_grid, "h3": cmd_h3}[args.cmd](args)
 
 if __name__ == "__main__":
     main()
