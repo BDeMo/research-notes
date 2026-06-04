@@ -1,21 +1,24 @@
-# RCA model building via transformer-intrinsic adaptation — brainstorm
+# Long-context inference + catastrophic forgetting via transformer-intrinsic site protection — brainstorm
 
-> **Date**: 2026-06-03 (reorganized conclusion-first same day)
-> **Topic**: build Nokia's RCA model solving two challenges — (1) long context at **inference**, (2) catastrophic forgetting at **training** — with a method that is *data-agnostic, transformers-intrinsic, lightweight, ideally non-task-specific*.
-> **Status**: 2 brainstorm rounds (dense R1–R12, MoE M1–M9) + full 2022-2026 prior-work audit + prioritization under refined constraints. **Conclusion is in §1 — read that first.** §4 = the raw brainstorm, §5 = the audit, §6 = the surviving direction, §7 = pre-audit material kept for the record.
+> **Date**: 2026-06-03 (reorganized conclusion-first; **re-scoped to a general method 2026-06-03**)
+> **Topic**: a **general, data-agnostic, transformers-intrinsic** method targeting **two universal transformer problems** — (1) **long-context inference** and (2) **catastrophic forgetting** at training. The method is the contribution; it is *not* RCA-specific.
+> **Why RCA appears here**: RCA (long logs + SFT on a new domain) is a downstream application where **both** pains coincide, so it is a natural *motivating + evaluation* case — and the Nokia RCA release is the eventual project payoff. **RCA is an application/eval, not the target of the method.** (File kept under its original `rca-...` name for link stability; the scope is now general.)
+> **Status**: 2 brainstorm rounds (dense R1–R12, MoE M1–M9) + full 2022-2026 prior-work audit + prioritization under refined constraints. **Conclusion is in §1 — read that first.** §4 = raw brainstorm, §5 = audit, §6 = surviving direction, §7 = pre-audit material kept for the record.
 > **Relation to other work**: complements / contrasts Plan 08 v0 (mem-X soft-prompt wrapper). The mem-X v1 **3-regime law** is a constraint prior (see [`../plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`](../plans/08-model-outputs-delta-w/v1-results-2026-06-03.md)).
 
 ---
 
 ## 1. TL;DR — current conclusion (read this first)
 
+**Scope**: a **general method for two universal transformer problems — long-context inference + catastrophic forgetting**. RCA is an application where both coincide (the eval/motivation), *not* the target.
+
 **Verdict after the audit (§5)**: none of the 12 dense angles (R1–R12) nor the 9 MoE angles (M1–M9) is novel **as a standalone mechanism** — the 2025-2026 dense *and* MoE literatures are both saturated (OPLoRA, Sparse-Memory-FT, ESFT, DES-MoE, Same, MoFO/MIGU, SAE-FT, …).
 
-**Under the refined constraints** — **(D) data-agnostic · (I) transformers-intrinsic · (T) light training OK but ideally NOT task-specific** — the whole space collapses onto a single defensible program:
+**Under the refined constraints** — **(D) data-agnostic · (I) transformers-intrinsic · (T) light training OK but ideally NOT task-specific** — the whole space collapses onto a single defensible, *general* program:
 
-> **P0 thesis.** The transformer-intrinsic sites that carry long-context behavior — **attention sinks / massive activations** (dense), the **super experts that induce those sinks** (MoE) — are the *same* sites whose perturbation during fine-tuning causes catastrophic forgetting. So one **data-agnostic, training-free** rule — *detect these sites on generic text, then protect them (freeze / gradient-mask) during any SFT* — improves long-context retention **and** prevents code/math forgetting, **adding zero task-specific trainable parameters**.
+> **P0 thesis (a general claim about transformers).** The transformer-intrinsic sites that carry long-context behavior — **attention sinks / massive activations** (dense), the **super experts that induce those sinks** (MoE) — are the *same* sites whose perturbation during fine-tuning causes catastrophic forgetting. The two failure modes are **read-time overload** (long context) and **write-time perturbation** (forgetting) of one shared substrate. So one **data-agnostic, training-free** rule — *detect these sites on generic text, then regulate/protect them (freeze / gradient-mask) during any SFT* — improves long-context retention **and** prevents capability forgetting, **adding zero task-specific trainable parameters**. This holds for *any* model and *any* fine-tuning domain; RCA is simply the application where both pains are acute at once.
 
-**Priorities** (full table §6.3): **P0c** de-risk measurement experiment (needs **no RCA data**) → **P0a** dense + **P0b** MoE (super-expert) instantiation of the protection rule. Everything that *trains a task-specific module* (R1/R2/R3/R8/R10) is demoted to a **baseline**; R9/R12 dropped; R6/R7/sink-key-bias kept as components.
+**Priorities** (full table §6.3): **P0c** de-risk measurement experiment (model-agnostic, **no task data**) → **P0a** dense + **P0b** MoE (super-expert) instantiation of the protection rule. Everything that *trains a task-specific module* (R1/R2/R3/R8/R10) is demoted to a **baseline**; R9/R12 dropped; R6/R7/sink-key-bias kept as components.
 
 **Next action** (§6.4): run the P0c experiment on Qwen3-8B + Qwen3-30B-A3B, then a targeted novelty search on "super-expert + fine-tuning + forgetting", then draft `notes/plans/09-intrinsic-site-protection/`.
 
@@ -23,17 +26,19 @@
 
 ---
 
-## 2. The problem (as posed by user)
+## 2. The problem — two general transformer challenges (RCA is downstream)
 
-Build the RCA model with two challenges:
-- **Inference**: long context (long logs / stack traces / system state).
-- **Training**: catastrophic forgetting (SFT on RCA drifts away pretrained code/math ability).
+The **method targets two universal problems**, independent of any task:
+- **Long-context inference**: as context grows, attention entropy explodes / lost-in-the-middle / KV blows up.
+- **Catastrophic forgetting**: SFT on *any* new domain drifts away pretrained ability (e.g. code/math).
 
-**Paper goals (do first)**: model strong on **RCA** *and* still strong on **code & math** (capability preserved). Method should use techniques the big-model/agent world is **not yet using** but the OSS community accepts (HuggingFace-basic, or AG2-basic), be **easy to adapt + lightweight**, ideally **model-agnostic + task-free**, derived from **transformer-intrinsic phenomena**.
+**Paper goals (the method, do first)**: a method that **improves long-context behavior AND prevents forgetting**, using techniques the big-model/agent world is **not yet using** but the OSS community accepts (HuggingFace-basic, or AG2-basic), **easy to adapt + lightweight**, ideally **model-agnostic + task-free**, derived from **transformer-intrinsic phenomena**. Eval = a *general* suite (long-context benchmark + a continual-SFT forgetting benchmark), with code/math as the preserved-capability probe.
 
-**Project goals (after paper)**: in-domain generalization to other RCA datasets/abilities; final deliverable = **a Nokia-owned RCA model release**.
+**Why RCA (the application)**: RCA = long logs/stack traces (long context) + SFT on a new domain (forgetting) → the **one application where both challenges fire simultaneously**, so it is the natural showcase eval. It is *not* the method's target and the method must stand on the two general phenomena alone.
 
-**Derived release constraint**: cleanest IP story = *frozen public base + small Nokia-owned module* → pushes toward **frozen-base + tiny-trainable (or zero-trainable) designs**.
+**Project goals (after the paper)**: apply the general method to build a Nokia RCA model — in-domain generalization to other RCA datasets/abilities; final deliverable = **a Nokia-owned RCA model release**. (Downstream payoff, not the paper's contribution.)
+
+**Derived release constraint**: cleanest IP story = *frozen public base + small Nokia-owned module* → pushes toward **frozen-base + tiny-trainable (or zero-trainable) designs** — which also happens to be exactly what the general data-agnostic protection rule is.
 
 **Refined method constraints (locked 2026-06-03)**: **(D) data-agnostic · (I) transformers-intrinsic · (T) light training OK, ideally non-task-specific.** These are the filter used in §6.
 
@@ -144,7 +149,7 @@ This **unifies dense and MoE into one site**: in an MoE base, the privileged loa
 
 ### 5.4 The two honestly-open paths
 
-1. **Unifying-observation paper** (not a new mechanism). No paper uses **one intrinsic site to solve BOTH** long-context inference AND training-time forgetting, on **RCA + code + math**. Hardest to preempt because it's about the *relationship*. Main threat `[mech-forget]` (localizes forgetting to attention heads) → differentiate via the long-ctx coupling + sink-induction criterion + RCA testbed. **→ this is P0.**
+1. **Unifying-observation paper** (not a new mechanism). No paper uses **one intrinsic site to solve BOTH** long-context inference AND training-time forgetting. Hardest to preempt because it's about the *relationship* between the two phenomena — a general claim about transformers, not a task method. Main threat `[mech-forget]` (localizes forgetting to attention heads) → differentiate via the long-ctx coupling + the sink-induction site-selection criterion. RCA is the application where both fire at once (showcase eval). **→ this is P0.**
 2. **Verified-new-phenomenon**: sink **key-bias-only** tuning (§5.2) or the *joint dynamics* of context-absorption vs capability-disruption at the same site. Needs a dedicated search first.
 
 ---
@@ -183,7 +188,7 @@ Recipe sketch: **(1) identify** super experts via the `[super-experts]` criterio
 
 1. **P0c de-risk experiment — needs NO RCA data, ~1–2 days.** On Qwen3-8B (dense) + Qwen3-30B-A3B (MoE): (a) detect sites on generic text (sink positions, top massive-act channels, super experts via sink-decay); (b) run a *small proxy-domain* SFT (non-code/math corpus), measure which sites shift, correlate site-shift with forgetting (ΔGSM8K/ΔHumanEval) and long-ctx (ΔRULER). **Goal: confirm/kill the P0 thesis before any RCA work.**
 2. **Targeted novelty search** "super-expert / sink-induction + fine-tuning + forgetting" — gates P0b (10 min, blocking).
-3. **If P0c positive + gap holds** → draft `notes/plans/09-intrinsic-site-protection/` (validation = dual eval; channels = HF Qwen3 dense+MoE; budget = small, mostly inference + light SFT). RCA data enters only as the *application* eval.
+3. **If P0c positive + gap holds** → draft `notes/plans/09-intrinsic-site-protection/`. **Eval is general-first** (the method is the contribution): long-context benchmark (RULER / long-doc QA) for the read side; a continual-SFT forgetting benchmark (SFT on an arbitrary domain, measure retention on GSM8K / HumanEval / MMLU) for the write side; **RCA used last as the "both pains at once" showcase**, not as the method's definition. Channels = HF Qwen3 dense+MoE; budget = small (mostly inference + light SFT).
 4. **Defer** all trained-adapter angles (R1/R2/R3/R8/R10) to "baselines" in that plan.
 
 ### 6.5 Honest caveat on the long-context leg
@@ -201,8 +206,8 @@ Under (T), the *novel* long-context contribution is thin: the strongest data-agn
 - **Medium** (~4 wk): R1 + R2 + R8 + R4 (~1M params; eval RCA + RULER + GSM8K + HumanEval).
 - **Heavy** (~8 wk): R1 + R3 + R7 + R6 + R5 (full frozen base).
 
-### 7.2 RCA-specific "free toppings" (inference-time, keep task-free claim — still usable)
-Structured input anchors `[STACK] [LOG] [STATE] [QUERY]` · outlier-line amplification (entropy filter) · causal-DAG-aware chunking (timestamp/causal order) · `<verbatim>` wrapping of code/stack lines.
+### 7.2 RCA "free toppings" (application layer only — NOT part of the general method or its eval)
+For the *downstream Nokia application*, not the paper: structured input anchors `[STACK] [LOG] [STATE] [QUERY]` · outlier-line amplification (entropy filter) · causal-DAG-aware chunking (timestamp/causal order) · `<verbatim>` wrapping of code/stack lines. These keep the general method task-free; they live in the RCA deployment, not in the method or the general benchmark.
 
 ### 7.3 Anti-patterns (NOT to do — still valid)
 Full SFT / all-layer LoRA · custom new architecture · RCA-specific special tokens *in the method* · per-task MoE expert · data-synthesis/curriculum as the main contribution · pure RAG · pure prompt-engineering · DPO/RLHF on Nokia data · distill to small model.

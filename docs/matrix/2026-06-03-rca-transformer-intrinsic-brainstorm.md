@@ -50,6 +50,15 @@ User refined: method should be **data-agnostic + transformers-intrinsic + light 
 - **Next actions (cheap-first)**: (1) **P0c de-risk experiment — NO RCA data needed**: on Qwen3-8B + Qwen3-30B-A3B, detect sites on generic text, run small proxy-domain SFT, correlate site-shift with ΔGSM8K/ΔHumanEval (forget) and ΔRULER (long-ctx). (2) targeted "super-expert + fine-tuning + forgetting" search. (3) if positive → draft `notes/plans/09-intrinsic-site-protection/`.
 - **Honest caveat**: under no-task-training, the *novel* long-context leg is thin (training-free sink-KV ≈ StreamingLLM); forgetting + the unifying observation carry the paper.
 
+## Re-scope to a general method (2026-06-03)
+
+User clarified: **the contribution is NOT RCA-specific** — it is a *general* method for **long-context inference + catastrophic forgetting** (two universal transformer problems). RCA is just the application where both pains coincide (showcase eval + Nokia project payoff), not the target. Edits:
+- Source file H1 retitled "Long-context inference + catastrophic forgetting via transformer-intrinsic site protection" (filename kept `rca-...` for link stability); intro + §1 + §2 reframed general-first.
+- P0 thesis restated as a **general claim about transformers**: two failure modes = *read-time overload* (long ctx) + *write-time perturbation* (forgetting) of one shared substrate (sinks/massive-act/super-experts).
+- Eval reframed **general-first**: long-context benchmark (RULER/long-doc QA) + continual-SFT forgetting benchmark (retention on GSM8K/HumanEval/MMLU); RCA used last as the "both at once" showcase. RCA "free toppings" demoted to application-layer-only.
+- Dropped the old "(C) RCA application paper" path (contradicts the general framing).
+- README idea-index section retitled + banners reframed; stale §10/§11/§12 refs fixed to §5/§6.
+
 ## Reorganization (2026-06-03, conclusion-first)
 
 The source file had grown into a chronological pile (brainstorm → dLLM → §10 dense audit → §11 MoE audit → §12 prioritization), with the conclusion buried at the bottom under now-superseded optimistic sections. Rewrote it **conclusion-first**, no facts lost:
