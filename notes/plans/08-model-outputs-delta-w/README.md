@@ -21,6 +21,33 @@ Full fact-dump at [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md). Source
 
 **v1.5 gating study**: [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex) / [`pdf`](v1.5-intrinsic-gating-study-2026-06-04.pdf) studies intrinsic "do-no-harm" signals for suppressing the wrapper when it would hurt a frozen-base model.
 
+## Leader update — 2026-06-04
+
+**High-level message.** Plan 08 now has a more positive and actionable story:
+the learned memory wrapper is not a universal replacement for long context, but
+it is a useful **controlled compression module**. The v1 result tells us where it
+helps; v1.5 turns that boundary into a method by learning when to open or close
+the wrapper.
+
+**Good news.**
+- The v1 experiments produced a clear characterization rather than a dead end:
+  soft-prompt memory helps when gist-level compression is enough, and fails when
+  the task needs exact detail preservation.
+- This naturally motivates a do-no-harm gate: keep the frozen base model safe,
+  use the wrapper on compressible inputs, and fall back to base / full context
+  when the wrapper is likely to hurt.
+- Multi-seed probing found practical gate signals. Wrapper confidence and
+  sequence log probability are useful correctness indicators; large
+  wrapper-to-base divergence is a warning signal.
+
+**Lesson.** The right framing is controlled adaptation, not "one wrapper solves
+all long-context tasks." For RCA, this is exactly the behavior we want: improve
+long-context evidence handling without erasing the base model's general ability.
+
+**Next.** Implement the first gated wrapper using confidence + divergence
+features, then evaluate whether it preserves Regime-A gains while closing on
+Regime-B/C cases where lossy memory is unsafe.
+
 ---
 
 ## North star (what this plan was originally about)
