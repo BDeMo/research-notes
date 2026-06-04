@@ -1,10 +1,19 @@
-# Plan 09 — Intrinsic-site protection: long-context ↔ forgetting coupling → anti-forgetting method
+# Plan 09 — **Janus**: intrinsic-site protection (long-context ↔ forgetting coupling)
 
-> **Status**: drafting
+> **Codename**: **Janus** (working; one site, two faces — *read*-time long-context overload vs *write*-time forgetting perturbation. "dual-frontier" is the descriptive alias. Name is not load-bearing; change freely.)
+> **Status**: drafting (novelty audit done 2026-06-04, brainstorm §5.5–5.6). **Phase-0 detectors validated on Qwen3-8B 2026-06-03** → [`phase0-results-2026-06-03.md`](phase0-results-2026-06-03.md). **Phase-1 exploration 8 models / 7 H100s 2026-06-04** → [`phase1-results-2026-06-04.md`](phase1-results-2026-06-04.md). Key empirical findings: (1) sink heads ≠ retrieval heads (Jaccard 0) across 0.6→14B → protect the **retrieval heads**, not the sink; (2) ρ(retrieval, SFT-drift) > ρ(sink, SFT-drift) in nearly every model (direction robust, clears 0.4 gate only on smallest 2 Qwen3 → **H2 partial**); (3) grad-mask protection causally removes the coupling; (4) **to fix**: harden NIAH probe + induce real forgetting (math-SFT was too gentle to test H3).
 > **Created**: 2026-06-03
 > **Owner**: Mingjia
-> **Parent**: P0 thesis in [`../../ideas/rca-transformer-intrinsic-2026-06-03.md`](../../ideas/rca-transformer-intrinsic-2026-06-03.md) (§1 + §6). Design rules: §0 of that file.
+> **Parent**: P0 thesis in [`../../ideas/rca-transformer-intrinsic-2026-06-03.md`](../../ideas/rca-transformer-intrinsic-2026-06-03.md) (§1 + §6). Design rules: §0. Novelty audit: §5.5–5.6.
 > **One-liner**: First **measure** whether the transformer-intrinsic sites that carry long-context behavior are the *same* sites whose perturbation during fine-tuning causes catastrophic forgetting (a broad, multi-level observation study on RCA + code + math). Then, **only if the coupling is real**, design a data-agnostic anti-forgetting method that protects exactly those sites.
+
+## Novelty position (locked after the 2026-06-04 audit — read before building)
+
+Every *single* leg is already published (long-ctx via retrieval/sink heads `[retrieval-head]` `[duo-attn]`; forgetting-localizes-to-heads `[mech-forget]`; MoE-forgetting via task-affinity expert freezing DAS/ESFT/DES-MoE; feature-space anti-forgetting `[sae-fd]`; the two single-leg sink fixes `[focusft]` long-ctx + `[sink-forget]` forgetting). **The contribution is the conjunction, stated precisely:**
+
+1. **The *predictive* coupling (science).** The read-side, **data-agnostic** intrinsic-importance ranking (retrieval-head / sink-mass / super-expert score, detected on generic text) **predicts a priori** the write-side forgetting-disruption ranking. This lets us protect the load-bearing sites *before* SFT with a **task-agnostic** criterion. The thing to beat is `[mech-forget]`, whose damaged-set is **post-hoc by ΔW**; ours is **a-priori by long-context importance**, and we show the two coincide (H2).
+2. **The headline instantiation = MoE super-expert protection** (cleanest, least-crowded; §5.6a). Nobody selects the protected set by the **intrinsic super-expert / sink-induction** criterion for FT-without-forgetting — all MoE work uses task/domain affinity.
+3. **One lever, both axes, dual eval** — must beat the *stack* of the two single-leg fixes (`[focusft]` + `[sink-forget]`), else there is no paper (the bar Phase-1/P0c must clear).
 
 ---
 
@@ -59,3 +68,11 @@ Kill criteria:
 - [`channels.md`](channels.md) — **Phase 3 eval**: benchmarks, metrics, baselines, cross-domain/task/model settings, base models, detailed protocol
 - [`budget.md`](budget.md) — GPU-hours, $, wall-clock, decision gates
 - [`references.md`](references.md) — closest prior (links to `knowledge-sources.md` IDs)
+- [`phase0-results-2026-06-03.md`](phase0-results-2026-06-03.md) — Phase-0 detector validation on Qwen3-8B (actual run)
+- [`phase1-results-2026-06-04.md`](phase1-results-2026-06-04.md) — **Phase-1 exploration, 8 models / 7 H100s (actual run)** — H2 partial, sink≠retrieval robust, NIAH+forgetting setup needs hardening
+- `figs/` — headline figures from the Phase-1 run; `runs/` — Phase-0 detector + raw JSON
+
+## Status vs success criteria (live, after Phase-1 exploration 2026-06-04)
+- **H1 (coexistence)** — ✅ detectors find the small site sets at every scale (Phase-1 R1).
+- **H2 (coupling)** — ◐ *partial*: ρ(retrieval, drift) > ρ(sink, drift) robustly (direction), but clears the ≥0.4 gate only on the two smallest Qwen3 (magnitude). Re-measure on a forgetting-inducing setup before a verdict.
+- **H3 (causal)** — ⏳ untested: the gentle math-SFT setup didn't induce forgetting; protection mechanism works mechanically (R4) but needs a setup that actually forgets (R6).

@@ -639,6 +639,16 @@ Closest-preempting work found in the 2022-2026 lit review for the RCA brainstorm
 - **[sink-ctr]** Attention Sinks: Catch-Tag-Release (NeurIPS 2025, arXiv:2502.00919). Sinks tag tokens with semantic directions; low-rank-capturable.
 - **[massive-act]** Sun et al. 2024 — Massive Activations in LLMs. Few channels with 100-1000× activation act as implicit bias; deleting breaks the model. Basis for R6.
 
+### Long-context head science + joint-coupling threats (added 2026-06-04, for Plan 09/Janus §5.6)
+
+- **[retrieval-head]** Retrieval Head Mechanistically Explains Long-Context Factuality (Wu et al., arXiv:2404.15574, ICLR 2025). Retrieval heads: **universal, sparse (<5%), intrinsic** (exist at pretrain, stable after continual pretrain), **causal** for NIAH; pruning them → retrieval failure + hallucination. The canonical long-context **read-side** site. **= Janus read-side criterion.**
+- **[ret-dyn]** Retrieval Heads are Dynamic (arXiv:2602.11162). Retrieval heads vary per-context, are **irreplaceable** (compensation by static heads insufficient). → detectors must average over many needle variants. **Informs Janus Phase-0 stability.**
+- **[duo-attn]** DuoAttention (arXiv:2410.10819). Clean split: **retrieval heads** (full attention) vs **streaming/sink heads** (recent+sink only); uses it for **KV compression at inference**. Janus reuses the split as the *site oracle* but for **training-time protection**. Empirically confirmed by our R2 (sink≠retrieval, Jaccard≈0 across 0.6→14B).
+- **[lccp-dyn]** Learning Dynamics of Long-Context Continual Pre-training (arXiv:2604.02650). Retrieval heads stable (>93% overlap), refined (not reconfigured) during long-ctx **continual pre-training**; touches forgetting. **Threat to Janus long-ctx leg** — but it is CPT-dynamics (descriptive), not downstream-SFT forgetting + protection.
+- **[rl-circuits]** Mechanistic origins of forgetting: RL vs SFT (arXiv:2605.28860). Differential circuit vulnerability at head level (DBM masks); RL preserves circuits better than SFT. Adjacent — head-level forgetting, no long-ctx coupling, no protection method.
+- **[sink-forget]** Attention sink → catastrophic forgetting (arXiv:2410.05648, RoBERTa/CL). Sink → over-smoothing → forgetting; mitigate via a learned pre-scaling layer. **Single-leg threat (forgetting) to Janus** — encoder, NLU, forgetting-only.
+- **[focusft]** FocuSFT (arXiv:2605.09932). Bilevel opt; fast-weights pull attention off sinks at **training** time; +14pp BABILong, sink mass ÷529. **Single-leg threat (long-ctx-at-training) to Janus** — decoder, long-ctx-only. Janus must beat the `[sink-forget]`+`[focusft]` *stack*.
+
 ## MoE prior-work audit (added 2026-06-03)
 
 For the MoE-specific RCA angles (`notes/ideas/rca-transformer-intrinsic-2026-06-03.md` §11). MoE = forgetting lever (crowded), not a long-context lever.
@@ -656,6 +666,11 @@ For the MoE-specific RCA angles (`notes/ideas/rca-transformer-intrinsic-2026-06-
 - **[loramoe]** LoRAMoE (arXiv:2312.09979, ACL 2024). Freeze backbone, add parallel LoRA experts + router, localized balancing splits experts into world-knowledge vs task groups → alleviates world-knowledge forgetting under large SFT data. **= our M3 verbatim.**
 - **[same-moe]** Same — Stabilized MoE for Multimodal Continual Instruction Tuning (arXiv:2602.01990). Models **router drift + expert drift**; spectral-aware routing + curvature-aware Riemannian expert scaling + adaptive expert freezing. **= our M8 verbatim.**
 - **[lifelong-moe]** Lifelong-MoE (arXiv:2305.12281, ICML 2023). Expand experts + gating dims, freeze old experts/gatings, output-level regularization → lifelong pretraining without forgetting. **= our M3 (expansion variant).**
+- **[das-moe]** DAS — Domain Advantage Score two-stage MoE FT (OpenReview zBgjWTWgCh, 2026). Stage-1 align router+attn; stage-2 train only top-k **domain-affinity** experts (~1-8% params); shows reduced forgetting on code↔math continual FT. **Selection by task/domain affinity → the MoE criterion competitor Janus must beat (intrinsic super-expert vs task-affinity).**
+- **[expert-condenser]** ExpertCondenser / MoECondenser (arXiv:2604.23036, OpenReview DxbLY3Fctc). Always-active gated **condenser experts** consolidate **long-tail** experts; +4pts over ESFT/DenseMixer on math+commonsense. Preserves the *opposite* end (long-tail, not super-experts) → complementary baseline.
+
+### Super-expert protection gate (Janus §5.6a, 2026-06-04)
+Verdict from the targeted search: every MoE anti-forgetting method selects experts by **task/domain affinity** (`[esft]`, `[des-moe]`, `[das-moe]`, `[same-moe]`) or **long-tail preservation** (`[expert-condenser]`); `[super-experts]` only does **compression**. **Nobody protects the intrinsic super-expert / sink-induction set during downstream SFT to prevent forgetting** → this is the cleanest open instantiation and Janus's headline (P0b).
 
 ## Conversations / internal
 

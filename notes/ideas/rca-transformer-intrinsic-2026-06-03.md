@@ -212,6 +212,44 @@ This **unifies dense and MoE into one site**: in an MoE base, the privileged loa
 
 **To log in `knowledge-sources.md`:** `[zerotuning]` (ZeroTuning, sink scalar knob) · `[act-sink]` (ACT, 2406.15765) · `[pasta]` (PASTA special-token PEFT, EACL'23) · `[sinklora]` · `[sink-forget]` (2410.05648, sink→CL forgetting + pre-scaling) · `[focusft]` (2605.09932, sink-dilution long-ctx SFT) · `[sink-survey]` (2604.10098).
 
+### 5.6 Joint-claim + MoE-gate + feature-leg search (2026-06-04, round 2) — P0b survives; the coupling wedge is real but *narrow and predictive*
+
+> Triggered by user 2026-06-04 ("做剩下的 search,也做一遍 related work,保证 novelty;feature 层面有没有能同时解决的"). Three searches: (a) super-expert + FT + forgetting (the P0b gate), (b) the JOINT long-ctx↔forgetting coupling, (c) feature/SAE joint mechanism.
+
+**(a) P0b gate — super-expert protection for FT-without-forgetting: SURVIVES (this is now the sharpest novelty).**
+
+| who freezes/selects experts to stop forgetting | selection criterion | verdict vs us |
+|---|---|---|
+| **DAS** (OpenReview zBgjWTWgCh) two-stage, freeze all but top-k | **domain affinity** | task-specific — we differ (intrinsic) |
+| **ESFT** `[esft]` / **DES-MoE** `[des-moe]` | task/domain affinity | baselines (criterion competitors) |
+| **Same** (stabilized MoE) | task-relevant + router stab | task-specific |
+| **ExpertCondenser / MoECondenser** (2604.23036, DxbLY3Fctc) | preserve **long-tail** experts via gated condensers | *opposite* end (long-tail, not super-experts) |
+| `[super-experts]` (2507.23279) | super-expert / sink-induction (**intrinsic, data-agnostic, post-training-stable**) | **only does compression — NOT FT-protection** |
+
+→ **Gap confirmed**: nobody protects the **super-expert / sink-induction set** (intrinsic criterion) *during downstream SFT to prevent forgetting*. `[super-experts]` even reports SEs are **data-agnostic and consistent after post-training** — exactly the property a data-agnostic protection rule needs. This is the cleanest, least-crowded instantiation → make MoE-super-expert the **headline**.
+
+**(b) The JOINT coupling — narrow wedge survives, but it must be stated as a *predictive* claim.** New near-threats:
+
+| paper | what it shows | why it's NOT us |
+|---|---|---|
+| `[mech-forget]` (2601.18699) | forgetting localizes to heads; 15–23% reorganized; ablating **ΔW-disrupted** heads restores 47% | defines the damaged set **post-hoc by ΔW** (write-side, after training). We **predict it a priori by read-side long-ctx importance** — the coincidence of the two rankings is the novel claim. |
+| **LCCP-dynamics** (2604.02650, `[lccp-dyn]`) | retrieval heads stable (>93%), refined during long-ctx **continual pre-training**; mentions forgetting | continual **pre-training** for long-ctx, not downstream-**SFT** forgetting; descriptive, no protection method keyed on the criterion |
+| **RL-vs-SFT circuits** (2605.28860, `[rl-circuits]`) | differential circuit vulnerability; RL preserves circuits > SFT | head-level forgetting, no long-ctx coupling, no method |
+| **DuoAttention** (2410.10819, `[duo-attn]`) | clean split: **retrieval heads** vs **streaming/sink heads** | uses the taxonomy for **KV compression (inference)**, not training-time protection |
+| `[retrieval-head]` (2404.15574, ICLR'25) + **Retrieval-Heads-are-Dynamic** (2602.11162, `[ret-dyn]`) | retrieval heads: universal, sparse(<5%), **intrinsic**, causal; dynamic & irreplaceable | establishes the read-side site; nobody links it to **SFT forgetting + protection** |
+
+→ **Surviving novelty (precise)**: *the read-side, data-agnostic intrinsic-importance ranking (retrieval-head / sink / super-expert score) **predicts** the write-side forgetting-disruption ranking, so one can protect the load-bearing sites **before** SFT with a **task-agnostic** criterion.* No paper makes this **predictive** link or turns it into a downstream-SFT protection rule keyed on the **long-context** criterion. `[mech-forget]` is the thing to beat: our criterion is *a priori & read-side*, theirs is *post-hoc & ΔW*.
+
+**(c) Feature/SAE leg — owned on the forgetting half; weak edge.** **SAE-FD** (2605.25525, `[sae-fd]`): SAE-feature distillation for continual learning (anchor active features, cosine+magnitude loss) — already the feature-space anti-forgetting method. SAFE (2025.findings-emnlp.496) = SAE features for hallucination/steering. SAE-retrieval (2603.13277) = SAE features as retrieval units. → Nobody does SAE features for the **joint** long-ctx+forgetting, but (i) SAE-FD is a strong incumbent on the forgetting half, (ii) an SAE adds a trained dictionary = violates the "zero-task-param / data-agnostic" appeal, (iii) the feature route's edge over the head/expert route is unclear. **Verdict**: keep SAE as an *analysis lens / optional baseline* (`[sae-fd]` becomes a feature-space baseline), **not** the main mechanism. The head/expert/super-expert site is the cleaner story.
+
+**Empirical check (2026-06-03 Phase-0 run on Qwen3-8B, forward-only):** detectors reproduce all three phenomena (BOS sink L13H12=1.0; **5 massive-act channels**, ch2276≈410× median; retrieval heads sparse, hub at L23). **Bonus**: top sink heads (L7–13) vs top retrieval heads (L17–31) are **disjoint** (Jaccard 0, ρ=0.09) — confirms DuoAttention and means **the long-ctx site to protect is the *retrieval heads*, not the sink** (further kills sink-only Path B). Full note: `plans/09-intrinsic-site-protection/phase0-results-2026-06-03.md`.
+
+**Net effect on the plan:**
+1. **Headline instantiation = MoE super-expert protection** (P0b) — least crowded, sharpest differentiation (intrinsic vs task-affinity).
+2. **The scientific core = the *predictive* coupling** (H2 restated): read-side importance ranking predicts write-side disruption ranking. Beating `[mech-forget]` means showing our *a-priori read-side* criterion matches/beats their *post-hoc ΔW* criterion for choosing what to protect.
+3. **New mandatory baselines/threats** to add to `channels.md`: `[mech-forget]` (ΔW-disrupted-head protection), DAS, ExpertCondenser, `[duo-attn]` (retrieval/streaming split as the site oracle), `[sae-fd]` (feature-space anti-forgetting), `[focusft]`+`[sink-forget]` (the two single-leg fixes — must beat their stack).
+4. **New `knowledge-sources.md` IDs**: `[das-moe]` (zBgjWTWgCh) · `[expert-condenser]` (2604.23036) · `[lccp-dyn]` (2604.02650) · `[rl-circuits]` (2605.28860) · `[duo-attn]` (2410.10819) · `[ret-dyn]` (2602.11162) · `[sae-fd]` (2605.25525) · `[retrieval-head]` (2404.15574).
+
 ---
 
 ## 6. The surviving direction — P0 in depth
@@ -247,7 +285,7 @@ Recipe sketch: **(1) identify** super experts via the `[super-experts]` criterio
 ### 6.4 Next actions (cheap-first)
 
 1. **P0c de-risk experiment — needs NO RCA data, ~1–2 days.** On Qwen3-8B (dense) + Qwen3-30B-A3B (MoE): (a) detect sites on generic text (sink positions, top massive-act channels, super experts via sink-decay); (b) run a *small proxy-domain* SFT (non-code/math corpus), measure which sites shift, correlate site-shift with forgetting (ΔGSM8K/ΔHumanEval) and long-ctx (ΔRULER). **Goal: confirm/kill the P0 thesis before any RCA work.**
-2. **Targeted novelty search** "super-expert / sink-induction + fine-tuning + forgetting" — gates P0b (10 min, blocking).
+2. ~~**Targeted novelty search** "super-expert / sink-induction + fine-tuning + forgetting" — gates P0b.~~ **DONE 2026-06-04 (§5.6): gate PASSES.** All MoE-forgetting work selects experts by task/domain affinity (DAS/ESFT/DES-MoE/Same) or long-tail (ExpertCondenser); nobody uses the intrinsic super-expert/sink-induction criterion for FT-protection. P0b is the headline.
 3. **If P0c positive + gap holds** → draft `notes/plans/09-intrinsic-site-protection/`. **Eval is general-first** (the method is the contribution): long-context benchmark (RULER / long-doc QA) for the read side; a continual-SFT forgetting benchmark (SFT on an arbitrary domain, measure retention on GSM8K / HumanEval / MMLU) for the write side; **RCA used last as the "both pains at once" showcase**, not as the method's definition. Channels = HF Qwen3 dense+MoE; budget = small (mostly inference + light SFT).
 4. **Defer** all trained-adapter angles (R1/R2/R3/R8/R10) to "baselines" in that plan.
 
