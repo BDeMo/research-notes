@@ -141,7 +141,8 @@ Born from reading Cartridges / Activation Beacon / Gisting / Generative Adapter 
 > **Unifying lens / P0 thesis**: the intrinsic load-bearing sites (attention sinks, massive activations; super-experts on MoE) are *both* the long-context carriers **and** the forgetting-vulnerable sites. Two failure modes = read-time overload (long ctx) + write-time perturbation (forgetting) of one shared substrate → one data-agnostic protection rule fixes both.
 > **Constraint prior**: mem-X v1 3-regime law → verbatim-needle tasks are **Regime C** so favor *overlay existing KV/sinks*, not *add new soft tokens*.
 > **Future room (not now)**: extensible AR → **dLLM** via a `site_selector` abstraction; dLLM is natively better at Regime C (masked reconstruction = infilling) + has a free adaptive-compute knob. See source §8.
-> Full brainstorm + audit + prioritization (conclusion-first): [`rca-transformer-intrinsic-2026-06-03.md`](rca-transformer-intrinsic-2026-06-03.md).
+> **Design rules** (DR1–DR15, the durable constraints) + full brainstorm + audit + prioritization (conclusion-first): [`rca-transformer-intrinsic-2026-06-03.md`](rca-transformer-intrinsic-2026-06-03.md).
+> **Plan drafted**: [`../plans/09-intrinsic-site-protection/`](../plans/09-intrinsic-site-protection/) — measure-first observation study of the long-ctx↔forgetting coupling, then a targeted anti-forgetting method. `S = D`.
 
 | ID | Title | ★ | S | φ | M | Plan | Meta |
 |---|---|---|---|---|---|---|---|

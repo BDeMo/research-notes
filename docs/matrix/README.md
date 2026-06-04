@@ -54,7 +54,7 @@
 | 2026-05-26 | Inference-time training (X-W framing) | Brainstorm of 50 ideas + 3 detailed plans + Doc-to-LoRA reading | [`2026-05-26-inference-time-training.md`](2026-05-26-inference-time-training.md) |
 | 2026-05-28 | Methods reading + new plan brainstorm | Read 4 methods (Cartridges / Activation Beacon / Gisting / Generative Adapter) for plan 08 v0; 5 J-series ideas + 3 existing ★★+ candidates | [`2026-05-28-methods-reading-and-new-plans.md`](2026-05-28-methods-reading-and-new-plans.md) |
 | 2026-06-03 | mem-X v1 results harvest (plan 08 v0) | Extracted facts from 7-day Phase A→Y burst; **3-regime law** (A wins / B at-chance / C collapse) is the v1 paper claim; OPD+RL stages dropped; J5 empirically answered | [`2026-06-03-mem-x-v1-harvest.md`](2026-06-03-mem-x-v1-harvest.md) |
-| 2026-06-03 | RCA model building brainstorm + prior-work audit | 2 rounds → 12 transformer-intrinsic angles (R1–R12) for long-ctx + anti-forgetting; **2022-2026 lit review verdict: none novel as standalone mechanism** (R8=OPLoRA, R10=Sparse-Mem-FT, etc.); pivot to unifying-observation or new-phenomenon | [`2026-06-03-rca-transformer-intrinsic-brainstorm.md`](2026-06-03-rca-transformer-intrinsic-brainstorm.md) |
+| 2026-06-03 | Long-ctx↔forgetting brainstorm + audit + Plan 09 | 2 rounds → R1–R12 + M1–M9; **2022-2026 audit: none novel as standalone mechanism**; re-scoped to a *general* long-ctx + forgetting method (RCA = application); distilled **design rules DR1–DR15**; drafted **Plan 09** (measure-first coupling study → intrinsic-site anti-forgetting) | [`2026-06-03-rca-transformer-intrinsic-brainstorm.md`](2026-06-03-rca-transformer-intrinsic-brainstorm.md) |
 
 ---
 

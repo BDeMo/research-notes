@@ -5,6 +5,40 @@
 > **Why RCA appears here**: RCA (long logs + SFT on a new domain) is a downstream application where **both** pains coincide, so it is a natural *motivating + evaluation* case — and the Nokia RCA release is the eventual project payoff. **RCA is an application/eval, not the target of the method.** (File kept under its original `rca-...` name for link stability; the scope is now general.)
 > **Status**: 2 brainstorm rounds (dense R1–R12, MoE M1–M9) + full 2022-2026 prior-work audit + prioritization under refined constraints. **Conclusion is in §1 — read that first.** §4 = raw brainstorm, §5 = audit, §6 = surviving direction, §7 = pre-audit material kept for the record.
 > **Relation to other work**: complements / contrasts Plan 08 v0 (mem-X soft-prompt wrapper). The mem-X v1 **3-regime law** is a constraint prior (see [`../plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`](../plans/08-model-outputs-delta-w/v1-results-2026-06-03.md)).
+> **Promoted to a plan**: [`../plans/09-intrinsic-site-protection/`](../plans/09-intrinsic-site-protection/) — Phase-1 observation study of the long-ctx↔forgetting coupling, then a targeted anti-forgetting method.
+
+---
+
+## 0. Design rules (distilled — the durable constraints for this line of work)
+
+> Standing principles distilled from the user's requirements (**U**) and the good points that survived the brainstorm/audit (**E** = emerged). **Any idea or plan under this topic must comply.** These are the constitution; §1 is the current conclusion; the rest is derivation.
+
+**Goal**
+- **DR1 (U)** Solve **two general transformer problems**: long-context inference **and** catastrophic forgetting. The *method* is the contribution and must stand on these two alone.
+- **DR2 (U)** **RCA is the application where both coincide** (showcase eval + Nokia release payoff), never the method's target. Code/math are the preserved-capability probes.
+
+**Method constraints (the filter)**
+- **DR3 (U)** **Data-agnostic** — the method's core decisions come from a forward pass on *generic* text; no task labels inside the method.
+- **DR4 (U)** **Transformers-intrinsic** — built on phenomena universal to transformers (attention sinks, massive activations, induction/retrieval heads, super experts), not architecture-specific tricks.
+- **DR5 (U)** **Lightweight + model-agnostic** — frozen public base + small/zero trainable module; portable across model families & sizes.
+- **DR6 (U)** **Light training OK, but not task-specific** — prefer a *constraint on* training (freeze / grad-mask / regularize) over a new task-trained adapter. If something is trained, use a task-agnostic objective (e.g. self-supervised infilling).
+- **DR7 (U)** **OSS-acceptable, not big-lab-exotic** — implementable with HF-basic (forward hooks, grad masks, PEFT one-liners) or AG2-basic; no bespoke kernels.
+
+**Scientific principle (the thesis)**
+- **DR8 (E)** **Shared-substrate hypothesis** — the intrinsic load-bearing sites are *both* the long-context carriers *and* the forgetting-vulnerable sites. Two failure modes = **read-time overload** (long ctx) + **write-time perturbation** (forgetting) of one substrate.
+- **DR9 (E)** **Site-selection by an intrinsic criterion**, *not* by task affinity (ESFT/DES-MoE) or raw gradient magnitude (MoFO/MIGU). The criterion (sink-induction / massive-activation / super-expert) is the unclaimed novelty.
+- **DR10 (E)** **Overlay, don't add** (mem-X 3-regime law) — reuse the base's existing KV / sink positions; never add new soft tokens that destroy verbatim needles (Regime C).
+
+**Novelty discipline**
+- **DR11 (U+E)** **Brainstorm → audit → only then build.** No angle is "ours" until a 4-year lit check clears it. The honest contribution is the *unifying observation + the criterion*, not a new single mechanism (all single mechanisms are preempted — §5).
+- **DR12 (E)** **Differentiate from the nearest threat explicitly** — here `[mech-forget]` already localizes forgetting to attention heads; our edge is the long-ctx↔forgetting *coupling* + the intrinsic site criterion.
+
+**Evaluation**
+- **DR13 (E)** **General-first eval** — long-context benchmark (read side) + continual-SFT forgetting benchmark (write side); RCA last as the both-at-once showcase. Cross-domain / cross-task / cross-model required.
+- **DR14 (E)** **4-seed gate** for every headline number (mem-X v1 lesson: single-seed "wins" evaporated).
+
+**Future room**
+- **DR15 (U)** **AR → dLLM extensible** — anchor on the architecture-agnostic *principle*; abstract "site" as a `site_selector`; favor the DR8 substrate framing over AR-only induction heads.
 
 ---
 
@@ -22,7 +56,7 @@
 
 **Next action** (§6.4): run the P0c experiment on Qwen3-8B + Qwen3-30B-A3B, then a targeted novelty search on "super-expert + fine-tuning + forgetting", then draft `notes/plans/09-intrinsic-site-protection/`.
 
-**Honest caveat** (§6.5): under (T), the *novel* long-context leg is thin (data-agnostic long-ctx ≈ training-free sink-KV = StreamingLLM). The **forgetting leg + the unifying observation carry the paper**; long-context rides along as the second half of the "same sites" story.
+**Honest caveat** (§6.5, sharpened by the 2026-06-04 search §5.5): **both legs are now individually preempted** — `[sink-forget]` (2410.05648) already publishes "sink → forgetting + fix"; `[focusft]` (2605.09932) already publishes "sink dilutes long-ctx at training + fix". The **ONLY** surviving contribution is the **joint claim**: one site-selection criterion, the *same* sites, governing BOTH legs, co-evaluated on a decoder LLM (+ MoE super-expert instantiation). P0c must beat stacking the two single-leg fixes or there is no paper. Path B (sink-key-bias-only tuning) is **closed**.
 
 ---
 
@@ -152,6 +186,32 @@ This **unifies dense and MoE into one site**: in an MoE base, the privileged loa
 1. **Unifying-observation paper** (not a new mechanism). No paper uses **one intrinsic site to solve BOTH** long-context inference AND training-time forgetting. Hardest to preempt because it's about the *relationship* between the two phenomena — a general claim about transformers, not a task method. Main threat `[mech-forget]` (localizes forgetting to attention heads) → differentiate via the long-ctx coupling + the sink-induction site-selection criterion. RCA is the application where both fire at once (showcase eval). **→ this is P0.**
 2. **Verified-new-phenomenon**: sink **key-bias-only** tuning (§5.2) or the *joint dynamics* of context-absorption vs capability-disruption at the same site. Needs a dedicated search first.
 
+### 5.5 Path-B verification search (2026-06-04) — sink-key-bias is CLOSED; two new threats to P0; the joint wedge survives
+
+> Triggered by user 2026-06-04 ("先把 (B) 的 sink key-bias gap 搜清楚再决定框架"). Dedicated 4-search pass on "tune only the attention-sink key-bias / sink positions to fix long-context and/or forgetting". **Verdict: Path B (sink-key-bias-only tuning as a *new mechanism*) is closed. Worse — both legs of P0 now have direct single-leg prior work. The ONLY surviving wedge is the *joint* claim (same site → both, one lever, co-eval).**
+
+| claim under test | closest prior | status |
+|---|---|---|
+| sink = a *key bias* (the framing) | `[sink-emerge]` (2410.10781, ICLR'25): sink = implicit key bias; proposes learnable K-biases k* | ☠️ framing owned (as pre-train arch choice) |
+| tune the sink as a *single knob* | **ZeroTuning** (`[zerotuning]`, 2026): scalar bias on first-token logit, inference-time, redistributes whole map | ☠️ inference knob done |
+| training-free sink calibration | **ACT** (2406.15765): per-head offline sink calibration at inference | ☠️ done |
+| **PEFT on only the special/sink-token reps** | **PASTA** (EACL'23, `[pasta]`): train only special-token ([CLS]/[SEP]) hidden vectors per layer, frozen base, **0.029% params** | ☠️ mechanism owned (BERT/NLU) |
+| sink-token attention inside long-ctx PEFT | **SinkLoRA** | ☠️ done |
+| **attention sink → catastrophic forgetting** | **RoBERTa-CL** (2410.05648, `[sink-forget]`): sink → over-smoothing → forgetting; mitigate via learned **pre-scaling** layer (probe→FT) | ⚠️ **NEW threat to P0 forgetting-leg** |
+| **sink dilutes long-ctx at *training* time** | **FocuSFT** (2605.09932, `[focusft]`): bilevel opt, fast-weights pull attention off sinks; +14pp BABILong, sink mass ÷529 | ⚠️ **NEW threat to P0 long-ctx-leg** |
+| the area as a whole | **Attention-Sink Survey** (2604.10098, 2026, `[sink-survey]`): taxonomizes gated-attn / mod-softmax / learnable-bias / registers | ⚠️ space fully mapped |
+
+**Two consequences for the plan:**
+
+1. **Drop Path B / demote sink-key-bias to "dead component," not "P2-verify."** PASTA (PEFT on only special-token reps, 0.029%) + ZeroTuning (single-scalar sink knob) + `[sink-emerge]` (key-bias framing) jointly close "tune only the sink key-bias." It is not a paper.
+2. **P0's *two legs are individually preempted*** — this is the important update. `[sink-forget]` already publishes "attention sink → forgetting" *with a fix*; `[focusft]` already publishes "sink dilutes long-context at training time *with a fix*." So neither the forgetting-leg nor the long-ctx-leg is novel **alone**.
+
+**What still survives (and is now evidence-backed, not hopeful):** **nobody connects the two legs.** `[sink-forget]` is encoder/RoBERTa, continual-learning NLU, forgetting-only. `[focusft]` is decoder, long-context-only. **No paper shows the *same* intrinsic site is the shared root of BOTH long-context-at-inference AND forgetting-at-training, regulated by *one* site-selection criterion, co-evaluated on a decoder LLM (+ the super-expert/MoE instantiation of §6.2).** That is exactly the §5.4-1 / §6.1-(2) **joint claim** — the unifying observation. The search *narrows* P0 to its only defensible core and kills the fallbacks around it.
+
+**Bar this raises for P0c (§6.4):** the de-risk experiment must now produce a result that is *surprising given* `[sink-forget]` + `[focusft]` existing separately — e.g. (a) the *same* detected site set predicts BOTH ΔRULER (long-ctx) and ΔGSM8K/ΔHumanEval (forgetting) with one criterion, and (b) one protection lever Pareto-dominates applying the two separate single-leg fixes. If P0c can't beat "just stack `[focusft]` + `[sink-forget]`," there is no paper. Add both as mandatory baselines.
+
+**To log in `knowledge-sources.md`:** `[zerotuning]` (ZeroTuning, sink scalar knob) · `[act-sink]` (ACT, 2406.15765) · `[pasta]` (PASTA special-token PEFT, EACL'23) · `[sinklora]` · `[sink-forget]` (2410.05648, sink→CL forgetting + pre-scaling) · `[focusft]` (2605.09932, sink-dilution long-ctx SFT) · `[sink-survey]` (2604.10098).
+
 ---
 
 ## 6. The surviving direction — P0 in depth
@@ -177,7 +237,7 @@ Recipe sketch: **(1) identify** super experts via the `[super-experts]` criterio
 | **P0a — Unifying-observation + intrinsic protection** (dense: sinks/massive-act) | ✓ | ✓ | **adds none** | ⚠️ narrow (joint framing + criterion) | **P0** |
 | **P0b — Super-expert-anchored protection** (MoE) | ✓ | ✓ | **adds none** | ⚠️ narrow (verify §6.2) | **P0** |
 | **P0c — De-risk measurement study** (no RCA data) | ✓ | ✓ | none | enabling | **P0 — do first** |
-| sink **key-bias-only** tuning | ✓ | ✓ | tiny, task-ish | ⚠️ unverified | P2 — verify → maybe component |
+| sink **key-bias-only** tuning | ✓ | ✓ | tiny, task-ish | ☠️ **closed** (PASTA + ZeroTuning + `[sink-emerge]`, §5.5) | dropped — not a paper, not a component |
 | R6 massive-act grad-mask | ✓ | ✓ | adds none | ☠️ MoFO/MIGU | P2 — component of P0a |
 | R7 task-direction steering | ~ (contrast pairs) | ✓ | ~zero | ☠️ preempted | P2 — baseline / inference topping |
 | R1 sink-anchored memory (trained) | ~ | ✓ | task-ish | ⚠️ thin | P3 — component / ablation |
@@ -241,7 +301,7 @@ IP advantage holds regardless of which surviving mechanism wins: customer never 
 
 ## 9. Open decision questions (refreshed post-audit)
 
-1. **Path**: commit to P0 (unifying-observation + protection rule)? Or also keep (B) verified-new-phenomenon (sink key-bias) alive as a parallel bet?
+1. **Path**: ~~commit to P0, or also keep (B) sink-key-bias alive?~~ **Resolved 2026-06-04 (§5.5): Path B is closed** (PASTA + ZeroTuning + `[sink-emerge]`). P0 (unifying joint observation) is the only survivor — and even its two legs are individually preempted (`[sink-forget]`, `[focusft]`), so the joint claim must carry everything. Remaining open: does the §6.2 super-expert-protection gap survive its own search (§6.4-action-2, still TODO)?
 2. **Base(s)**: dense (Qwen3-8B) + MoE (Qwen3-30B-A3B) both, or MoE-first (super-expert anchor is the sharpest story)?
 3. **Experiment scope**: validate the thesis on proxy-domain + code/math/RULER first (method-first, easier to land), and bring RCA in as the application eval second?
 4. **Nokia release boundary**: protection-mask only, or also ship optional task-direction vector / light module?

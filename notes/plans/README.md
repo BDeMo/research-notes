@@ -22,6 +22,7 @@ M: exp · proto · paper · thesis · prod · side  +  solo · collab · team ·
 | 01 | [X-Saturation Curve + Dataset Curator](01-x-saturation-curve/) | [I1](../ideas/README.md) | ★★★ | D | 1/? | paper,solo | ~$6.5K | 3 mo | Does training on the $X$-saturated residual beat baselines per FLOP? |
 | 03 | [W-Space Best-of-N](03-w-space-best-of-n/) | [D1](../ideas/README.md) | ★★ | D | | paper,solo | ~$4.8K | 3 mo | Does test-time search along the *weights* axis beat (or complement) search along the X-axis? |
 | 08 | [Model Outputs ΔW as Part of Generation](08-model-outputs-delta-w/) | [H6](../ideas/README.md) | ★★★ | D | 1/3 | thesis,solo | ~$24K | 12 mo | Can an LLM produce its own weight updates as a first-class output and improve within a session? |
+| 09 | [Intrinsic-Site Protection (long-ctx ↔ forgetting)](09-intrinsic-site-protection/) | [P0](../ideas/rca-transformer-intrinsic-2026-06-03.md) | ★★★ | D | ≈#08 | paper,solo | ~$9.4K | 3–4 mo | Are the transformer sites that carry long-context behavior the *same* sites whose perturbation causes forgetting — and does protecting them fix both? |
 
 ---
 
@@ -53,6 +54,15 @@ M: exp · proto · paper · thesis · prod · side  +  solo · collab · team ·
 - **Budget tiers**: Phase-0 toy ≈ 200 GPU-h ≈ $600 · Full PhD project ≈ 8200 GPU-h ≈ $24K
 - **Kill if**: benefit rate < harm rate at end of Phase 1.
 - **Sequels in queue**: ideas H3 (reasoning→ΔW), H7 (`<learn>` tool call), E7 (GUI agent online learning), F1 (TTT serving infra), G4 (capacity-preserving updates), G5 (privacy) all marked `←#08` or `≈#08` — they form the natural Phase 2 / sibling work around plan 08.
+
+### Plan 09 — Intrinsic-Site Protection (long-ctx ↔ forgetting)
+- **Parent**: P0 thesis in [`../ideas/rca-transformer-intrinsic-2026-06-03.md`](../ideas/rca-transformer-intrinsic-2026-06-03.md) (design rules §0) · `S = D` · `φ = ≈#08` · `M = paper,solo`
+- **One-liner**: Measure-first — are the intrinsic sites that carry long-context the *same* sites perturbed by SFT? If yes, a data-agnostic protection rule fixes both long-ctx retention and forgetting (zero task-specific params).
+- **Validation hypothesis**: Spearman ρ(long-ctx-importance, forgetting-disruption) ≥ 0.4 (H2); protecting top sites cuts forgetting ≥ 30% and beats MoFO/OPLoRA/ESFT by ≥ 5% retention without long-ctx regression (H3).
+- **Primary channels**: RULER/HELMET (long-ctx) · GSM8K/HumanEval+/MMLU (forgetting) · TRACE (continual) · RCA (showcase) · Qwen3-8B + Llama-3.1-8B + Qwen3-30B-A3B.
+- **Budget tiers**: Phase-0+1 de-risk ≈ 440 GPU-h ≈ $1.3K · Full paper ≈ 3140 GPU-h ≈ $9.4K.
+- **Kill if**: H2 ρ ≈ 0 across models/domains after Phase 1 (→ negative-result note); or H3 fails despite H2 (→ pivot to pure-measurement paper).
+- **General, not RCA-specific**: the method targets long-ctx + forgetting; RCA is the application where both coincide. Embodies design rules DR1–DR15.
 
 ---
 

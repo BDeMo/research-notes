@@ -50,6 +50,15 @@ User refined: method should be **data-agnostic + transformers-intrinsic + light 
 - **Next actions (cheap-first)**: (1) **P0c de-risk experiment — NO RCA data needed**: on Qwen3-8B + Qwen3-30B-A3B, detect sites on generic text, run small proxy-domain SFT, correlate site-shift with ΔGSM8K/ΔHumanEval (forget) and ΔRULER (long-ctx). (2) targeted "super-expert + fine-tuning + forgetting" search. (3) if positive → draft `notes/plans/09-intrinsic-site-protection/`.
 - **Honest caveat**: under no-task-training, the *novel* long-context leg is thin (training-free sink-KV ≈ StreamingLLM); forgetting + the unifying observation carry the paper.
 
+## Design rules + Plan 09 drafted (2026-06-03)
+
+User: "提炼 design rules 写在脑暴最开始；然后加一个 plan，先做验证预实验（long-ctx↔forgetting 关系），再针对性设计 anti-forgetting 方法；观察要多层面/多粒度/多指标尽量广；paper 端把 benchmarks/metrics/baselines/cross-domain·task·model/settings 写详细。"
+
+- Added **§0 Design rules (DR1–DR15)** at the top of the brainstorm file — distilled from user requirements (U) + emerged points (E): goal (DR1–2), method filter (DR3–7: data-agnostic / intrinsic / lightweight+model-agnostic / non-task-specific training / OSS-basic), scientific principle (DR8 shared-substrate, DR9 intrinsic site-selection criterion, DR10 overlay-don't-add), novelty discipline (DR11 audit-first, DR12 differentiate-from-`[mech-forget]`), eval (DR13 general-first cross-X, DR14 4-seed), future (DR15 AR→dLLM site_selector).
+- Created **`notes/plans/09-intrinsic-site-protection/`** (5-file template): README (problem + H1/H2/H3 + phases + kill gates), validation (Phase-0 tooling → **Phase-1 observation matrix**: site axis [position/head/layer/channel/direction/expert/subspace/module] × metric axis [long-ctx observables A / forgetting observables B / coupling metrics C] × factor axis [RCA·code·math·proxy / dense+MoE / lengths / dose] → Phase-2 contingent method V1–V5 → ablations + 4-seed stats), channels (**Phase-3 eval**: RULER/HELMET/∞Bench/LongBench-v2 + GSM8K/MATH/HumanEval+/MMLU/BBH/IFEval + TRACE + RCA showcase; metrics BWT/retention/F/ACC/ΔKL + acc@length/effective-ctx + Pareto; baselines EWC/L2-SP/LwF/replay/wise-ft/OPLoRA/MoFO/MIGU/SelfAug/ESFT/DES-MoE/LoRAMoE/StreamingLLM/H2O; cross-domain matrix + cross-task continual + cross-model family/dense-MoE/scale; detailed SFT+eval+detection protocol), budget (~$9.4K, Phase-0+1 de-risk ~$1.3K), references.
+- Measure-first by design: Phase-1 gate (H2 ρ≥0.4) can kill the unifying thesis cheaply before any method work; Phase-2 gate (H3) else pivot to pure-measurement paper.
+- Index wiring: `plans/README.md` row 09 + meta block (`★★★ D ≈#08 paper,solo ~$9.4K 3–4mo`); `ideas/README.md` RCA section + brainstorm header link to the plan.
+
 ## Re-scope to a general method (2026-06-03)
 
 User clarified: **the contribution is NOT RCA-specific** — it is a *general* method for **long-context inference + catastrophic forgetting** (two universal transformer problems). RCA is just the application where both pains coincide (showcase eval + Nokia project payoff), not the target. Edits:
