@@ -19,6 +19,7 @@
 
 - [`context-distillation`](../context-distillation/) — the leading $W$-axis alternative to long context.
 - [`inference-time-compute`](../inference-time-compute/) — long context is one form of $X$-scaling.
+- [`transformer-internals`](../transformer-internals/) — attention sinks / retrieval heads are the intrinsic machinery that governs *effective* context length.
 
 ## Key concepts
 

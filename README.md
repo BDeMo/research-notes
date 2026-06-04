@@ -32,16 +32,22 @@ research-notes/
 │   ├── model-editing/
 │   ├── lora-peft/
 │   ├── inference-time-compute/
-│   └── long-context/
+│   ├── long-context/
+│   ├── self-improvement/
+│   ├── catastrophic-forgetting/                     # preserving ability while fine-tuning
+│   └── transformer-internals/                       # sinks, massive activations, super experts
 └── notes/
     ├── ideas/                                       # idea catalog
     │   ├── README.md                                # index (TOC with meta per idea)
-    │   └── inference-time-training.md               # 50-idea brainstorm (X-W framing)
+    │   ├── inference-time-training.md               # 50-idea brainstorm (X-W framing)
+    │   ├── evaluation-2026-05-28.md                 # scored evaluation of all ideas
+    │   └── rca-transformer-intrinsic-2026-06-03.md  # long-ctx + forgetting (design rules + audit)
     └── plans/                                       # detailed project plans
         ├── README.md                                # index (TOC with meta per plan)
         ├── 01-x-saturation-curve/                   # data curation by inference-time difficulty
         ├── 03-w-space-best-of-n/                    # test-time search along the weights axis
-        └── 08-model-outputs-delta-w/                # self-modifying LLMs
+        ├── 08-model-outputs-delta-w/                # self-modifying LLMs
+        └── 09-intrinsic-site-protection/            # long-ctx ↔ forgetting coupling → anti-forgetting
 ```
 
 ---
@@ -52,14 +58,15 @@ research-notes/
 - **Want to know what we've done?** Skim [`docs/matrix/`](docs/matrix/). The matrix is the chronological log of this repo.
 - **What do we *know* about a topic?** Start at [`known/README.md`](known/README.md) — categories + nearness graph.
 - **Reading list?** See [`docs/matrix/knowledge-sources.md`](docs/matrix/knowledge-sources.md) — the "knowledge mother nest" (chronological intake log).
-- **What might we actually build?** See [`notes/plans/`](notes/plans/) for the 3 plans currently in draft.
+- **What might we actually build?** See [`notes/plans/`](notes/plans/) for the 4 plans currently in draft.
 - **How is this repo kept small enough to read?** See [`docs/maintenance.md`](docs/maintenance.md) — tier system, size caps, pruning, archive paths, hygiene checklist.
 
 ---
 
 ## Active topics
 
-- **Inference-time training** — the $X \leftrightarrow W$ exchange. See the [2026-05-26 session](docs/matrix/2026-05-26-inference-time-training.md) for the starting point.
+- **Inference-time training** — the $X \leftrightarrow W$ exchange. See the [2026-05-26 session](docs/matrix/2026-05-26-inference-time-training.md) for the starting point. Plans 01 / 03 / 08.
+- **Long-context inference + catastrophic forgetting** (general method; RCA as application) — the *shared-substrate* thesis: the intrinsic sites that carry long context are the same sites perturbed by fine-tuning. Design rules + audit in [`notes/ideas/rca-transformer-intrinsic-2026-06-03.md`](notes/ideas/rca-transformer-intrinsic-2026-06-03.md); measure-first [Plan 09](notes/plans/09-intrinsic-site-protection/).
 
 ---
 

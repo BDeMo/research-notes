@@ -55,6 +55,15 @@
   - **Plan 08** (`notes/plans/08-model-outputs-delta-w/`) — self-modifying LLMs. ~$24K, PhD-scale. Drafting.
 - Next concrete step suggested in the matrix: 1-day Plan 01 pilot on GSM8K + Qwen2.5-7B (≤ 20 GPU-hours).
 
+### Long-context inference + catastrophic forgetting (started 2026-06-03)
+- **General method**, not RCA-specific: RCA (Nokia release) is the *application* where both pains coincide; the method must stand on the two universal problems alone.
+- **Thesis (shared substrate)**: the intrinsic load-bearing sites — attention sinks / massive activations (dense), super experts (MoE) — carry long context *and* are the forgetting-vulnerable sites; a data-agnostic protection rule fixes both. Source + audit: [`notes/ideas/rca-transformer-intrinsic-2026-06-03.md`](../notes/ideas/rca-transformer-intrinsic-2026-06-03.md).
+- **Design rules DR1–DR15** in §0 of that file are the durable constraints (data-agnostic · transformers-intrinsic · lightweight/model-agnostic · non-task-specific training · audit-first · general-first cross-X eval · 4-seed · AR→dLLM). Any new idea/plan in this line must comply.
+- **Audit verdict**: every single mechanism (R1–R12 dense, M1–M9 MoE) is preempted; the contribution is the *unifying observation + intrinsic site-selection criterion*, not a new mechanism.
+- **Plan 09** ([`notes/plans/09-intrinsic-site-protection/`](../notes/plans/09-intrinsic-site-protection/)) — measure-first: Phase-1 observation study of the long-ctx↔forgetting coupling (gate H2: Spearman ρ ≥ 0.4) → Phase-2 protection method → Phase-3 cross-domain/task/model eval. ~$9.4K; de-risk Phase-0+1 ≈ $1.3K.
+- New `known/` categories from this line: [`catastrophic-forgetting/`](../known/catastrophic-forgetting/) + [`transformer-internals/`](../known/transformer-internals/).
+- Next concrete step: Plan 09 Phase-0 tooling (site detectors + drift meters) on Qwen3-8B + Qwen3-30B-A3B, then the coupling scatter (H2 gate).
+
 ## Archived threads
 
 (none yet)

@@ -21,6 +21,7 @@
 - [`hypernetworks`](../hypernetworks/) — hypernets in this repo's context almost always emit LoRA.
 - [`model-editing`](../model-editing/) — modern editors store edits as LoRAs.
 - [`context-distillation`](../context-distillation/) — D2L outputs a LoRA per document.
+- [`catastrophic-forgetting`](../catastrophic-forgetting/) — anti-forgetting methods (OPLoRA, LoRAMoE) constrain *where/how* the LoRA update lands.
 
 ## Key concepts
 

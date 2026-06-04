@@ -25,6 +25,8 @@ A reference can live in both: it appears in `knowledge-sources.md` once with a s
 | [`inference-time-compute/`](inference-time-compute/) | Scaling test-time *compute* along the X-axis (CoT, sampling, search). Sibling to inference-time-training (W-axis). |
 | [`long-context/`](long-context/) | Architectures, benchmarks, and limits of using long input sequences directly. |
 | [`self-improvement/`](self-improvement/) | Loops where the model generates its own training signal (STaR family, Self-Refine, Reflexion, DPO, Self-Rewarding). Bridges X-axis sampling and W-axis updates. |
+| [`catastrophic-forgetting/`](catastrophic-forgetting/) | Preserving prior ability while fine-tuning on a new domain (regularization, selective/sparse update, subspace-constrained, replay, MoE-specific). The write-side of plan 09. |
+| [`transformer-internals/`](transformer-internals/) | Architecture-universal intrinsic phenomena — attention sinks, massive activations, super experts, induction/retrieval heads. The load-bearing sites; read-side substrate of plan 09. |
 
 ---
 
@@ -43,12 +45,15 @@ graph LR
     ITC[inference-time-compute]
     LC[long-context]
     SI[self-improvement]
+    CF[catastrophic-forgetting]
+    TI[transformer-internals]
 
     ITT --- HN
     ITT --- CD
     ITT --- TTT
     ITT --- ITC
     ITT --- SI
+    ITT --- CF
 
     HN --- CD
     HN --- ME
@@ -59,12 +64,21 @@ graph LR
     CD --- SI
 
     TTT --- ME
+    TTT --- CF
 
     ME --- LP
     ME --- SI
+    ME --- CF
+    ME --- TI
 
     ITC --- LC
     ITC --- SI
+
+    LP --- CF
+
+    LC --- TI
+
+    CF --- TI
 ```
 
 ### Per-category nearest neighbors (adjacency list)
@@ -73,15 +87,17 @@ The first few entries per category are the primary neighbors; ordering is rough 
 
 | Category | Nearest |
 |---|---|
-| `inference-time-training` | `hypernetworks` · `context-distillation` · `test-time-training` · `inference-time-compute` · `self-improvement` |
+| `inference-time-training` | `hypernetworks` · `context-distillation` · `test-time-training` · `inference-time-compute` · `self-improvement` · `catastrophic-forgetting` |
 | `hypernetworks` | `inference-time-training` · `context-distillation` · `lora-peft` · `model-editing` |
 | `context-distillation` | `inference-time-training` · `hypernetworks` · `long-context` · `lora-peft` · `self-improvement` |
-| `test-time-training` | `inference-time-training` · `model-editing` |
-| `model-editing` | `hypernetworks` · `lora-peft` · `test-time-training` · `self-improvement` |
-| `lora-peft` | `hypernetworks` · `model-editing` · `context-distillation` |
+| `test-time-training` | `inference-time-training` · `model-editing` · `catastrophic-forgetting` |
+| `model-editing` | `hypernetworks` · `lora-peft` · `test-time-training` · `self-improvement` · `catastrophic-forgetting` · `transformer-internals` |
+| `lora-peft` | `hypernetworks` · `model-editing` · `context-distillation` · `catastrophic-forgetting` |
 | `inference-time-compute` | `inference-time-training` · `long-context` · `self-improvement` |
-| `long-context` | `context-distillation` · `inference-time-compute` |
+| `long-context` | `context-distillation` · `inference-time-compute` · `transformer-internals` |
 | `self-improvement` | `inference-time-compute` · `inference-time-training` · `model-editing` · `context-distillation` |
+| `catastrophic-forgetting` | `transformer-internals` · `lora-peft` · `model-editing` · `inference-time-training` · `test-time-training` |
+| `transformer-internals` | `long-context` · `catastrophic-forgetting` · `model-editing` |
 
 ### How to read the graph
 

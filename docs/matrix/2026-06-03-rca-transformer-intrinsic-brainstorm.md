@@ -50,6 +50,17 @@ User refined: method should be **data-agnostic + transformers-intrinsic + light 
 - **Next actions (cheap-first)**: (1) **P0c de-risk experiment — NO RCA data needed**: on Qwen3-8B + Qwen3-30B-A3B, detect sites on generic text, run small proxy-domain SFT, correlate site-shift with ΔGSM8K/ΔHumanEval (forget) and ΔRULER (long-ctx). (2) targeted "super-expert + fine-tuning + forgetting" search. (3) if positive → draft `notes/plans/09-intrinsic-site-protection/`.
 - **Honest caveat**: under no-task-training, the *novel* long-context leg is thin (training-free sink-KV ≈ StreamingLLM); forgetting + the unifying observation carry the paper.
 
+## Repo-wide update after Plan 09 (2026-06-03)
+
+Post-plan hygiene/sync pass ("做完plan以后，更新research-notes repo"):
+- **Root `README.md`**: layout updated (plan 09 + 2 new known categories + new ideas files); "3 plans"→"4 plans"; added the **long-context + forgetting** active topic.
+- **`memory/context.md`**: added the active thread (general method, shared-substrate thesis, design rules DR1–DR15, plan 09, new known categories, next step).
+- **`known/` expanded (+2 categories)** — this session accumulated two homeless knowledge clusters (≥3 sources each, per the new-category rule):
+  - **`known/catastrophic-forgetting/`** — regularization / selective-sparse / subspace-constrained / replay / MoE-specific / mechanistic accounts; cites `[oplora]` `[mofo]` `[migu]` `[smf]` `[esft]` `[des-moe]` `[loramoe]` `[same-moe]` `[lifelong-moe]` `[mech-forget]` `[selfaug]` `[sae-ft]` etc.
+  - **`known/transformer-internals/`** — sinks / massive activations / super experts / induction-retrieval heads / lenses / SAE features; cites `[sink-streaming]` `[sink-emerge]` `[massive-act]` `[super-experts]` `[sink-native-moe]` `[gated-attn-sinkfree]`.
+  - Updated `known/README.md` (categories table + Mermaid graph + adjacency list) and reciprocated neighbor edges in `long-context` / `model-editing` / `lora-peft`. Key new edge = **catastrophic-forgetting ↔ transformer-internals** (the plan-09 thesis).
+- **Hygiene checklist** (per `docs/maintenance.md` §5): session logged ✓ · TOC rows updated (plan 09) ✓ · new sources already logged in prior commits ✓ · central sources cross-referenced into the 2 new `known/` categories ✓ · T0/T1 caps verified (see below) ✓ · no archival due ✓.
+
 ## Design rules + Plan 09 drafted (2026-06-03)
 
 User: "提炼 design rules 写在脑暴最开始；然后加一个 plan，先做验证预实验（long-ctx↔forgetting 关系），再针对性设计 anti-forgetting 方法；观察要多层面/多粒度/多指标尽量广；paper 端把 benchmarks/metrics/baselines/cross-domain·task·model/settings 写详细。"

@@ -18,6 +18,8 @@
 - [`hypernetworks`](../hypernetworks/) — MEND family is a hypernet for editing.
 - [`lora-peft`](../lora-peft/) — most modern editors store the edit as a LoRA / small adapter.
 - [`test-time-training`](../test-time-training/) — both apply weight updates at test time; editing is supervised on a specific fact, TTT is unsupervised.
+- [`catastrophic-forgetting`](../catastrophic-forgetting/) — sequential edits forget; the null-space/capacity-preserving idea is shared.
+- [`transformer-internals`](../transformer-internals/) — locate-then-edit localizes facts to weights, akin to localizing capability to intrinsic sites.
 
 ## Key concepts
 
