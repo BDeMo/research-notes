@@ -11,6 +11,7 @@
 \usepackage{amsmath,amssymb}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{graphicx}
 \usepackage{longtable}
 \usepackage{xcolor}
 \usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
@@ -53,6 +54,64 @@ target, then design the gate around it.
 \end{abstract}
 
 \tableofcontents
+
+% =====================================================================
+\section{Deliverables and source links}
+\label{sec:deliverables}
+
+This PDF is the compiled v1.5 technical note. The links below are the
+source-of-truth entry points for the deliverables, facts, and main result
+summaries around Plan 08.
+
+\subsection{v1 wrapper facts and main result}
+\begin{itemize}
+\item \textbf{Main v1 result summary:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md}{v1-results-2026-06-03.md}.
+This is the main facts document for the \code{mem-embedding} wrapper,
+including the three-regime transfer law.
+\item \textbf{v1 pivot / lessons:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1-if-wrapper-doesnt-work-2026-06-03.md}{v1-if-wrapper-doesnt-work-2026-06-03.md}.
+This explains why v1 is framed as a characterization paper and how it
+leads to v1.5.
+\item \textbf{History / chronology:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v0-how-we-got-here.md}{v0-how-we-got-here.md}.
+\end{itemize}
+
+\subsection{v1.5 signal grid and gating deliverables}
+\begin{itemize}
+\item \textbf{Compiled report:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.pdf}{v1.5-intrinsic-gating-study-2026-06-04.pdf}.
+\item \textbf{LaTeX source:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.tex}{v1.5-intrinsic-gating-study-2026-06-04.tex}.
+\item \textbf{Signal-grid folder:}
+\href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04}{grids-2026-06-04}.
+\item \textbf{Main signal-ranking figures:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04/rank_help.png}{rank\_help.png}
+and
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04/rank_interesting.png}{rank\_interesting.png}.
+\item \textbf{Signal-grid CSVs:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04/grid_auroc_correct.csv}{grid\_auroc\_correct.csv},
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04/grid_auroc_noharm.csv}{grid\_auroc\_noharm.csv},
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04/grid_spearman_cont.csv}{grid\_spearman\_cont.csv},
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04/corr_long.csv}{corr\_long.csv}.
+\end{itemize}
+
+\subsection{v2 and idea table}
+\begin{itemize}
+\item \textbf{v2 plan:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-plan.md}{v2-plan.md}.
+\item \textbf{v2 related work:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-related-work.md}{v2-related-work.md}.
+\item \textbf{Q2 activation-memory probe:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/q2-activation-memory-probe.md}{q2-activation-memory-probe.md}.
+\item \textbf{Plan table:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/README.md}{notes/plans/README.md}.
+\item \textbf{Full idea table:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/ideas/README.md}{notes/ideas/README.md},
+including H6 (Plan 08) and related follow-ups H3/H7/G4/G5.
+\item \textbf{Original brainstorm:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/ideas/inference-time-training.md}{inference-time-training.md}.
+\end{itemize}
 
 % =====================================================================
 \section{Experiments: what was run, what is running, what is planned}
@@ -484,6 +543,98 @@ close} (do no harm) --- the correct behaviour, not a failure.
 $+$ wrapper$\to$base \emph{divergence} (inverse), both robust at
 $n{=}1350$; per-layer features are secondary inputs to the multivariate
 probe.
+
+% =====================================================================
+\section{Signal codebook: setting, definition, and rationale}
+\label{sec:codebook}
+\textbf{Setting for every correlation in this report.} Each signal is
+computed in the per-item probe protocol of \S\ref{sec:experiments}, on a
+\emph{frozen} Qwen3-8B with the wrapper trained zero-shot on
+\code{categorical\_niah} (\S\ref{sec:settings}). The rankings of
+\S\ref{sec:interesting} are pooled over \textbf{9{,}750 items across 9
+benchmarks} (main five at 9 seeds, new four at 5 seeds); targets
+\code{help} (wrapper correct $\wedge$ base wrong), \code{noharm}
+(wrapper $\ge$ base) and \code{lift} are as in \S\ref{sec:usefulness};
+AUROC/Spearman as in \S\ref{sec:corr}. ``Pass'' = which forward(s) the
+signal reads. AUROC${<}0.5$ = \emph{inverse} predictor.
+
+\subsection{Confidence / uncertainty angle (obvious --- removed in \S\ref{sec:interesting})}
+\begin{center}\footnotesize\begin{tabular}{p{3.0cm} p{3.9cm} p{6.0cm}}
+\toprule signal & pass / setting & why it relates (and why it is obvious)\\ \midrule
+\code{conf\_w}, \code{margin\_w}, \code{entropy\_w}, \code{top5\_mass\_w} & first generated-token distribution, wrapper run & model self-confidence; a sharp/low-entropy distribution $\Rightarrow$ correct. The ``model is sure $\Rightarrow$ right'' calibration effect. (\code{top5\_mass\_w} is the top \code{help} predictor, AUROC 0.653.)\\
+\code{span\_entropy\_*}, \code{span\_conf\_mean}, \code{seq\_logprob}, \code{perplexity} & teacher-forced pass over the wrapper's own greedy answer & the same confidence, aggregated over the whole answer span rather than one token.\\
+\code{conf\_0}, \code{entropy\_0}, \code{margin\_0} & \noctx{} run (base, query only) & \emph{item difficulty}: if the base is confident with no context, the item is easy and the wrapper is unlikely to make it worse. (\code{entropy\_0} is the top \code{noharm} predictor, AUROC 0.646.)\\
+\code{ll\_\{conf,margin,entropy\}\_w\_l} & logit-lens of the wrapper hidden state, per layer & depth-resolved confidence.\\
+\bottomrule\end{tabular}\end{center}
+
+\subsection{Divergence-from-base angle (interesting)}
+\begin{center}\footnotesize\begin{tabular}{p{3.0cm} p{3.9cm} p{6.0cm}}
+\toprule signal & pass / setting & why it relates (non-obviously)\\ \midrule
+\code{kl\_w0}, \code{kl\_0w}, \code{js\_w0}, \code{tv\_w0} & first-token distribution, wrapper \emph{vs} \noctx{} & how far the memory moves the base's \emph{output} distribution; a large move means the wrapper is overriding the base's prior, and empirically that override is usually wrong (inverse).\\
+\code{ll\_kl\_wb\_l@$\ell$} & logit-lens KL between wrapper and \noctx{} hidden at layer $\ell$ & deviation of the base's \emph{internal} representation at depth $\ell$. Mid--late layers ($\ell{\approx}25$--34) are where the answer decision forms; large KL there = the memory is fighting the base's own reasoning $\Rightarrow$ harm. The strongest non-obvious correlate.\\
+\code{mem\_influence\_kl}, \code{mem\_influence\_argmax\_change} & wrapper run \emph{vs} the same run with attention to the $K$ memory tokens masked & causal: how much the base actually \emph{uses} the memory. Double-edged (genuine use vs.\ wrong override).\\
+\bottomrule\end{tabular}\end{center}
+
+\subsection{Representation-geometry angle (interesting)}
+\begin{center}\footnotesize\begin{tabular}{p{3.0cm} p{3.9cm} p{6.0cm}}
+\toprule signal & pass / setting & why it relates (non-obviously)\\ \midrule
+\code{drift\_l@$\ell$}, \code{drift\_l::late} & $\lVert h_\ell^{w}{-}h_\ell^{0}\rVert/\lVert h_\ell^{0}\rVert$ at the answer position, per layer & raw magnitude by which the soft prompt perturbs the residual stream. A pure geometry quantity, yet mid--late perturbation predicts harm: gentle steering helps, violent distortion hurts.\\
+\code{drift\_mem} & $\lVert m_T{-}m_0\rVert_F$ of the recurrence & total movement of the memory state from its learned init; encodes ``how much was written'' but explodes on collapse.\\
+\code{delta\_mean/max/last/trend} & per-chunk $\lVert\Delta m_t\rVert$ over the recurrence & shape of the write process; \code{delta\_trend} (growing vs.\ decaying updates) distinguishes a recurrence that \emph{integrates} from one that \emph{chases} each chunk.\\
+\code{slot\_norm\_\{mean,std,max\}}, \code{slot\_active\_frac} & per-slot magnitudes of $m_T$ & how many of the $K$ memory slots are actually used; a degenerate (few-active) memory encodes less.\\
+\bottomrule\end{tabular}\end{center}
+
+\subsection{Relevance and agreement angles}
+\begin{center}\footnotesize\begin{tabular}{p{3.0cm} p{3.9cm} p{6.0cm}}
+\toprule signal & pass / setting & why it relates\\ \midrule
+\code{q\_chunk\_\{max,mean\}\_cos}, \code{q\_chunk\_spread} & cosine of mean-pooled query vs.\ chunk encodings (encoder) & a \emph{data}-side property: whether the query semantically matches a chunk, i.e.\ whether the answer-bearing content was even available for the memory to encode. Non-obvious because it ignores the model entirely.\\
+\code{first\_tok\_agree} & wrapper vs \noctx{} argmax (first token) & whether the memory changed the base's answer at all; no change $\Rightarrow$ safe, change $\Rightarrow$ intervention (risky). Borderline-obvious.\\
+\code{ll\_argmax\_agree\_final\_l} & layer-$\ell$ logit-lens argmax $=$ final argmax & decision-crystallisation depth: how early the answer stabilises.\\
+\bottomrule\end{tabular}\end{center}
+
+% =====================================================================
+\section{Filtering to the non-obvious correlates}
+\label{sec:interesting}
+The strongest correlates of correctness are unsurprising --- the
+wrapper's own \emph{confidence} (\code{top5\_mass\_w} AUROC $0.653$ for
+\code{help}; \code{entropy\_0} $0.646$ for \code{noharm}). These are
+``model-is-sure $\Rightarrow$ model-is-right'' and carry little design
+insight. \textbf{Dropping the entire confidence angle} leaves $151$
+signals; only \textbf{11} still clear
+$|\mathrm{AUROC}_{\text{help}}{-}0.5|\ge 0.10$, and they cluster into a
+single coherent, non-obvious story
+(Fig.~\ref{fig:interesting}):
+\begin{itemize}
+\item \textbf{Mid--late-layer wrapper$\leftrightarrow$base divergence}
+(\code{ll\_kl\_wb\_l@25}--\code{34}, peak $\ell{=}30$,
+$\mathrm{AUROC}_{\text{help}}{\approx}0.36$, \emph{inverse}): the more
+the memory bends the base's \emph{internal} distribution at the layers
+where the decision forms, the less likely it helps. Not a confidence
+signal --- a \emph{representational-conflict} signal.
+\item \textbf{Mid--late-layer residual-stream drift}
+(\code{drift\_l@24}--\code{35}, $\mathrm{AUROC}_{\text{help}}{\approx}0.40$,
+inverse): the raw magnitude by which the soft prompt perturbs the late
+hidden state predicts harm --- a pure-geometry quantity with no obvious
+tie to correctness.
+\item \textbf{Layer-localised}: early-layer KL/drift is \emph{not}
+predictive (mere format perturbation); the signal lives specifically in
+the decision-forming mid--late band ($\ell{\approx}25$--34).
+\end{itemize}
+\noindent\textbf{Reading.} The design-relevant, non-obvious signal is
+``\emph{is the memory fighting the base's own late-layer reasoning?}''
+(divergence / drift at $\ell{\approx}30$), used \emph{inversely}: high
+conflict $\Rightarrow$ suppress. A naive confidence threshold would miss
+exactly this, which is what makes it interesting for the gate.
+
+\begin{figure}[h]\centering
+\includegraphics[width=0.9\linewidth]{grids-2026-06-04/rank_interesting.png}
+\caption{Non-obvious correlates of wrapper \code{help} (confidence angle
+removed), pooled $9{,}750$ items over $9$ benchmarks, high$\to$low by
+$|\mathrm{AUROC}{-}0.5|$ ($\downarrow$ = inverse predictor). The
+survivors are mid--late-layer divergence (\code{ll\_kl\_wb}) and
+residual drift (\code{drift\_l}).}
+\label{fig:interesting}
+\end{figure}
 
 % =====================================================================
 \section{The gate target and next steps}

@@ -21,6 +21,62 @@ Full fact-dump at [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md). Source
 
 **v1.5 gating study**: [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex) / [`pdf`](v1.5-intrinsic-gating-study-2026-06-04.pdf) studies intrinsic "do-no-harm" signals for suppressing the wrapper when it would hurt a frozen-base model.
 
+## Deliverables hub
+
+Use this section as the main human entry point for Plan 08 deliverables.
+
+### v1 / wrapper facts and main result
+
+- **Main v1 result summary**: [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md)
+  — the full `mem-embedding` result harvest and three-regime transfer law.
+- **Pivot / lessons after v1**:
+  [`v1-if-wrapper-doesnt-work-2026-06-03.md`](v1-if-wrapper-doesnt-work-2026-06-03.md)
+  — why v1 becomes a characterization paper plus v1.5 options.
+- **How v0/v1 got here**: [`v0-how-we-got-here.md`](v0-how-we-got-here.md)
+  — architecture and experimental chronology.
+
+### v1.5 / signal grid and gating deliverables
+
+- **Compiled technical note**:
+  [`v1.5-intrinsic-gating-study-2026-06-04.pdf`](v1.5-intrinsic-gating-study-2026-06-04.pdf)
+  — PDF report with settings, metrics, results, and next gate target.
+- **LaTeX source**:
+  [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex)
+  — source for the compiled report.
+- **Signal grid folder**: [`grids-2026-06-04/`](grids-2026-06-04/)
+  — correlation grids and ranking figures for v1.5 gating.
+- **Help ranking figure**:
+  [`grids-2026-06-04/rank_help.png`](grids-2026-06-04/rank_help.png)
+  — top signals for wrapper help.
+- **Non-obvious ranking figure**:
+  [`grids-2026-06-04/rank_interesting.png`](grids-2026-06-04/rank_interesting.png)
+  — confidence-filtered signals, highlighting divergence/drift.
+- **Grid CSVs**:
+  [`grid_auroc_correct.csv`](grids-2026-06-04/grid_auroc_correct.csv),
+  [`grid_auroc_noharm.csv`](grids-2026-06-04/grid_auroc_noharm.csv),
+  [`grid_spearman_cont.csv`](grids-2026-06-04/grid_spearman_cont.csv),
+  [`corr_long.csv`](grids-2026-06-04/corr_long.csv).
+
+### v2 / next version
+
+- **v2 plan**: [`v2-plan.md`](v2-plan.md)
+  — cross-session latent memory with read/write tokens.
+- **v2 related work**: [`v2-related-work.md`](v2-related-work.md)
+  — crowded latent reasoning / memory-token landscape and differentiation.
+- **Q2 activation-memory probe**:
+  [`q2-activation-memory-probe.md`](q2-activation-memory-probe.md)
+  — candidate layer/site selection for later memory interfaces.
+
+### Idea table
+
+- **Ideas index table**: [`../README.md`](../README.md)
+  — plan-level index for Plans 01/03/08/09.
+- **Full idea table**: [`../../ideas/README.md`](../../ideas/README.md)
+  — source idea rows, including H6 (Plan 08) and related follow-ups H3/H7/G4/G5.
+- **Original inference-time training brainstorm**:
+  [`../../ideas/inference-time-training.md`](../../ideas/inference-time-training.md)
+  — source brainstorm behind the X/W framing and Plan 08.
+
 ## Weekly human update — week of 2026-06-01
 
 **High-level message.** Plan 08 now has a more positive and actionable story:
