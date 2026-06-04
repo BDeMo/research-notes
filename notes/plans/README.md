@@ -80,6 +80,12 @@ NN-<slug>/
 
 Numbering matches the parent idea ID in [`../ideas/README.md`](../ideas/README.md). Two-digit padded.
 
+If a plan adds child folders such as `slides/`, `grids-*`, `runs/`, `misc/`, or
+`figures/`, the plan's top-level `README.md` must include a folder organization
+section: what each child folder is for, whether it has its own `README.md`, and
+how files should be appended or archived. Nontrivial child folders should carry
+their own local `README.md`.
+
 When a plan is killed, add `postmortem.md` to the folder and set `S = K` in the table above. Do not delete.
 
 ---

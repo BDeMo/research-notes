@@ -3,6 +3,10 @@
 > 这是 Plan 08 第一个可落地版本的范围说明。
 > 完整的 self-modifying LLM 仍然是长期目标；v0 先证明一个更小的问题：
 > wrapper 能否把长上下文压缩成一个可更新的记忆状态。
+>
+> **Settings / provenance:** 这是 v0 设计文档。这里或后续引用的结果 cell
+> 统一通过 [`settings.md`](settings.md) 追溯；已经实现的 v1 recipe 是
+> [`P08-S1`](settings.md#p08-s1--v1-canonical-wrapper-recipe)。
 
 ## v0 要证明什么
 

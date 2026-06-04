@@ -5,6 +5,11 @@
 > reasoning, memory tokens, KV-cache compression, and persistent
 > conversational memory.
 >
+> **Setting / provenance**: this is external-resource provenance for
+> [`P08-S4`](settings.md#p08-s4--v2-design-setting), not a verified experiment.
+> Any future v2 result table must cite a separate result setting in
+> `settings.md`.
+>
 > The space is **crowded** — at least 13 published / preprint methods
 > overlap with the v2 idea of "embedding memory written during AR
 > generation and reused later." Differentiation will rely on the

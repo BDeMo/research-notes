@@ -4,6 +4,10 @@
 > The full self-modifying-LLM idea remains the north star; v0 proves the
 > smaller claim that a wrapper can compress long context into an updateable
 > memory state.
+>
+> **Settings / provenance:** this is a v0 design document. Any result cells or
+> later citations should resolve through [`settings.md`](settings.md); the
+> implemented v1 recipe is [`P08-S1`](settings.md#p08-s1--v1-canonical-wrapper-recipe).
 
 ## V0 Claim
 

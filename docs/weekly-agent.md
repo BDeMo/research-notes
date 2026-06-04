@@ -11,18 +11,21 @@
 
 | Thread | State | Agent action |
 |---|---|---|
-| Plan 08 / `mem-embedding` v1 | Characterization framing locked | Treat v1 as lossy-compression regime study, not universal-memory claim |
-| Plan 08 v1.5 | Intrinsic do-no-harm gating in progress | Use confidence + divergence as first gate features |
+| Plan 08 / `mem-embedding` v1 | Characterization framing locked | Treat v1 as lossy-compression regime study; cite setting `P08-S2` for result cells |
+| Plan 08 v1.5 | Intrinsic do-no-harm gating in progress | Use confidence + divergence as first gate features; cite setting `P08-S3` |
 | Plan 09 / Janus | Pilot / measurement line active | Prioritize H3 causal protection test |
 | RCA application | Motivation / showcase | Connect methods to preserving base ability during RCA adaptation |
 
 ### Plan 08 State
 
 - v1 result: learned soft-prompt memory is a narrow lossy compressor.
+- Settings registry: [`settings.md`](../notes/plans/08-model-outputs-delta-w/settings.md).
 - Regime A: gist/compression tasks can benefit.
 - Regime B: reasoning-transfer tasks are near chance.
 - Regime C: exact retrieval collapses; full context remains strong.
+- v1 headline cells use `P08-S2`.
 - v1.5 pivot: do-no-harm gate that opens only when compression is safe.
+- v1.5 signal-grid cells use `P08-S3`.
 - Current usable gate features:
   - positive: wrapper confidence, sequence log probability;
   - negative / warning: wrapper-to-base divergence.
@@ -50,6 +53,7 @@ sites can be protected during fine-tuning.
 
 - Human weekly summary: [`docs/weekly-human.md`](weekly-human.md)
 - Plan 08 main: [`notes/plans/08-model-outputs-delta-w/README.md`](../notes/plans/08-model-outputs-delta-w/README.md)
+- Plan 08 settings registry: [`notes/plans/08-model-outputs-delta-w/settings.md`](../notes/plans/08-model-outputs-delta-w/settings.md)
 - Plan 08 v1 result: [`notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`](../notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md)
 - Plan 08 v1.5 note: [`notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.tex`](../notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.tex)
 - Plan 09 main: [`notes/plans/09-intrinsic-site-protection/README.md`](../notes/plans/09-intrinsic-site-protection/README.md)

@@ -3,12 +3,11 @@
 % and it is the 1st Monday in that month.
 % Date range: Mon 2026-06-01 to Sun 2026-06-07.
 
-\begin{frame}
-  \titlepage
-  \vspace{-1.0em}
+\section{June 2026 Week 1}
+
+\begin{frame}{Reporting Period: June 2026 Week 1}
   \begin{center}
-    \small Reporting period: June 2026, Week 1 \\
-    \scriptsize Date range: Mon 2026-06-01 to Sun 2026-06-07 \\
+    \small Date range: Mon 2026-06-01 to Sun 2026-06-07 \\
     \scriptsize Goal: concise progress record; detailed facts live in linked GitHub notes.
   \end{center}
 \end{frame}
@@ -43,6 +42,113 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Goal and Significance}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Goal}
+        Train a small wrapper around a frozen base model so long context can be
+        compressed into a reusable memory signal without updating base weights.
+      \end{block}
+      \begin{itemize}
+        \item Input: long evidence context + query.
+        \item Output: answer from the frozen base, optionally helped by wrapper memory.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Why it matters}
+        RCA needs adaptation to domain evidence, but direct SFT can damage
+        general ability. The wrapper is a controlled adaptation module.
+      \end{block}
+      \begin{itemize}
+        \item Learn useful compression when it is safe.
+        \item Fall back when compression would lose details.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{High-Level Architecture: Inputs, Outputs, and Gate}
+  \centering
+  \small
+  \begin{tikzpicture}[
+    scale=0.82,
+    transform shape,
+    node distance=0.75cm and 0.75cm,
+    box/.style={draw, rounded corners, align=center, minimum width=2.3cm, minimum height=0.85cm, fill=blue!7},
+    train/.style={draw, rounded corners, align=center, minimum width=2.4cm, minimum height=0.85cm, fill=green!9},
+    warn/.style={draw, rounded corners, align=center, minimum width=2.4cm, minimum height=0.85cm, fill=red!8},
+    gate/.style={draw, diamond, aspect=2.1, align=center, inner sep=1.2pt, fill=orange!16},
+    arr/.style={-{Latex[length=2mm]}, thick},
+    dashedarr/.style={-{Latex[length=2mm]}, thick, dashed}
+  ]
+    \node[box] (ctx) {Long evidence\\context $c_{1:n}$};
+    \node[box, below=of ctx] (query) {Query $q$};
+    \node[train, right=0.85cm of ctx] (wrapper) {Trainable wrapper\\$G_\phi$};
+    \node[box, right=0.85cm of wrapper] (mem) {Soft memory\\$m$, $K=32$};
+    \node[gate, right=0.82cm of mem] (gate) {Gate\\open?};
+    \node[box, above right=0.55cm and 0.82cm of gate] (basew) {Frozen base\\$F_\theta(q,m)$};
+    \node[box, below right=0.55cm and 0.82cm of gate] (base0) {Frozen base\\$F_\theta(q)$ or\\full context};
+    \node[box, right=0.82cm of $(basew)!0.5!(base0)$] (out) {Answer $y$\\+ decision trace};
+
+    \draw[arr] (ctx) -- node[above]{train / encode} (wrapper);
+    \draw[arr] (wrapper) -- (mem);
+    \draw[arr] (mem) -- (gate);
+    \draw[arr] (query.east) -| (gate.south);
+    \draw[arr] (gate) -- node[above, sloped]{safe compression} (basew);
+    \draw[arr] (gate) -- node[below, sloped]{unsafe / unseen} (base0);
+    \draw[arr] (basew) -- (out);
+    \draw[arr] (base0) -- (out);
+
+    \node[warn, below=1.0cm of mem] (risk) {Risk: forcing wrapper\\on unseen/exact tasks\\can hurt inference};
+    \draw[dashedarr, red!70!black] (risk) -- (gate);
+  \end{tikzpicture}
+
+  \vspace{0.5em}
+  \begin{block}{Core idea}
+    The wrapper is useful only when compression is safe. The gate decides whether
+    memory should participate in inference.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Comparison: What We Are Really Testing}
+  \small
+  \begin{tabular}{p{0.24\textwidth}p{0.31\textwidth}p{0.34\textwidth}}
+    \toprule
+    Approach & Benefit & Limitation \\
+    \midrule
+    Full context & Preserves exact details & Expensive; not persistent \\
+    Direct SFT & Learns task behavior & Can regress base capabilities \\
+    Retrieval only & Good for verbatim facts & Does not learn compression / synthesis \\
+    Always-on wrapper & Learns compressed memory & Can hurt unseen or exact-retrieval cases \\
+    \textbf{Gated wrapper} & Uses memory only when safe & Needs reliable gate signals \\
+    \bottomrule
+  \end{tabular}
+
+  \vspace{0.7em}
+  \begin{block}{Positioning}
+    We are not claiming ``wrapper replaces context.'' We are testing controlled
+    adaptation: train a wrapper, measure where it helps, and gate it off when it
+    would damage the frozen base path.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Core Evidence Chain}
+  \begin{enumerate}
+    \item \textbf{Wrapper can train and learn something.}
+      It improves compressible / gist-style cases relative to no-context
+      baselines.
+    \item \textbf{But learned memory changes inference.}
+      The wrapper is not neutral: on some tasks it shifts the base away from
+      useful behavior.
+    \item \textbf{Unseen or exact-detail tasks are unsafe for forced memory.}
+      If the task needs verbatim evidence or reasoning transfer the wrapper did
+      not learn, always-on memory can lose the answer.
+    \item \textbf{Solution: gate between wrapper and base.}
+      Open the wrapper when confidence is high; close it when divergence/drift
+      says the wrapper is fighting the base.
+  \end{enumerate}
+\end{frame}
+
 \begin{frame}{Plan 08 v1: Main Result Cell}
   \small
   \begin{table}
@@ -60,6 +166,8 @@
   \vspace{-0.3em}
   \begin{itemize}
     \item \textbf{Conclusion}: wrapper works as a narrow lossy compressor.
+    \item \textbf{Setting}: P08-S2
+      (\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md\#p08-s2--v1-phase-y-three-regime-benchmark-cells}{model/data/hyperparameters}).
     \item Helps when gist-level information is sufficient; fails when exact
       detail preservation is required.
     \item Full facts:
@@ -84,6 +192,8 @@
   \begin{itemize}
     \item \textbf{Design move}: gate on ``is compression safe?'' rather than
       forcing memory onto every input.
+    \item \textbf{Setting}: P08-S3
+      (\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md\#p08-s3--v15-intrinsic-signal-probe}{probe + signal-grid setting}).
     \item Main signal-grid deliverables:
       \href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04}{grid folder},
       \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04/rank_help.png}{help ranking},
@@ -102,6 +212,8 @@
       `load` to the v1 wrapper protocol.
     \item \textbf{Differentiation}: cross-session persistence + frozen base +
       v1 bit-capacity diagnostic.
+    \item \textbf{Setting}: P08-S4
+      (\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md\#p08-s4--v2-design-setting}{design setting; no verified v2 result yet}).
     \item Links:
       \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-plan.md}{v2 plan},
       \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-related-work.md}{v2 related work}.
@@ -117,13 +229,13 @@
     Plan 08 hub &
     \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/README.md}{README / deliverables hub} \\
     v1 facts &
-    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md}{main results summary} \\
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md}{main results summary} (setting P08-S2) \\
     v1.5 report &
-    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.pdf}{compiled PDF} \\
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.pdf}{compiled PDF} (setting P08-S3) \\
     v1.5 signal grid &
-    \href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04}{CSV + figures} \\
+    \href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04}{CSV + figures} (setting P08-S3) \\
     v2 setting &
-    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-plan.md}{v2 plan} \\
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-plan.md}{v2 plan} (setting P08-S4) \\
     Idea tables &
     \href{https://github.com/BDeMo/research-notes/blob/main/notes/ideas/README.md}{ideas index} /
     \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/README.md}{plans index} \\

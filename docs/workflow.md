@@ -4,6 +4,10 @@
 > Distilled from how we actually work, not aspirational.
 >
 > **Before reading this file, read [`../memory/README.md`](../memory/README.md) first.** That folder holds the standing rules; this file holds the *how*.
+>
+> This file covers the *front half* (choose what to work on). For the *back half*
+> — how to **run** an empirical study honestly to a paper-grade result — see
+> [`meta-methodology.md`](meta-methodology.md).
 
 ---
 

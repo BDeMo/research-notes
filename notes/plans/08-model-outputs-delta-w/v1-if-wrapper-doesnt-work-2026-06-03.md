@@ -1,6 +1,10 @@
 # If the soft-prompt wrapper doesn't work — brainstorm + pivot menu
 
 **Date:** 2026-06-03 PT
+**Settings / provenance:** result cells in this memo cite
+[`settings.md`](settings.md). The Phase Y / RULER evidence uses
+[`P08-S2`](settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells);
+v2 design directions use [`P08-S4`](settings.md#p08-s4--v2-design-setting).
 **Trigger:** Phase Y multi-seed bands (16/24 done) + Phase X early
 RULER-NIAH single seed have crystallised the three-regime
 characterisation (Regime A: matches Gist on QuALITY; Regime B:
@@ -19,13 +23,13 @@ with retrieval's verbatim fidelity?
 
 ## 1. What "doesn't work" means
 
-| failure mode | evidence | conclusion |
-|---|---|---|
-| Doesn't beat the matched Gist baseline | Phase Y QuALITY 4-seed: OURS 0.193 ± 0.037 vs GIST 0.180 ± 0.051; Δ < σ | The single-seed +12 pp claim was an artefact. With variance bands the two architectures are statistically tied. |
-| Doesn't beat full-context on tasks where the base can actually use the context | MuSR-mm: OURS 0.492 ± 0.010 vs full_context 0.551 | The compression is throwing away information the base can use. |
-| Catastrophically fails on verbatim-retrieval tasks | RULER-NIAH single seed: OURS 0.000 vs full_context 0.995 vs retrieval 0.995 | Lossy compression destroys the exact string the answer requires. The wrapper has no path to "preserve verbatim". |
-| Doesn't transfer across task families | Phase~P cross-task: cat_niah → numerical_niah is a hard failure (bit-capacity wall, both wrappers at em ≈ 0) | Single-task SFT does not yield a general-purpose memory. |
-| Has bimodal seed behaviour at the held-out cat_niah cell | abstract finding (ii): 4-seed mean 0.27 ± 0.29, bimodal | Even within-distribution behaviour is fragile to initialisation. |
+| failure mode | setting | evidence | conclusion |
+|---|---|---|---|
+| Doesn't beat the matched Gist baseline | [`P08-S2`](settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells) | Phase Y QuALITY 4-seed: OURS 0.193 ± 0.037 vs GIST 0.180 ± 0.051; Δ < σ | The single-seed +12 pp claim was an artefact. With variance bands the two architectures are statistically tied. |
+| Doesn't beat full-context on tasks where the base can actually use the context | [`P08-S2`](settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells) | MuSR-mm: OURS 0.492 ± 0.010 vs full_context 0.551 | The compression is throwing away information the base can use. |
+| Catastrophically fails on verbatim-retrieval tasks | [`P08-S2`](settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells) | RULER-NIAH single seed: OURS 0.000 vs full_context 0.995 vs retrieval 0.995 | Lossy compression destroys the exact string the answer requires. The wrapper has no path to "preserve verbatim". |
+| Doesn't transfer across task families | [`P08-S1`](settings.md#p08-s1--v1-canonical-wrapper-recipe) | Phase~P cross-task: cat_niah → numerical_niah is a hard failure (bit-capacity wall, both wrappers at em ≈ 0) | Single-task SFT does not yield a general-purpose memory. |
+| Has bimodal seed behaviour at the held-out cat_niah cell | [`P08-S1`](settings.md#p08-s1--v1-canonical-wrapper-recipe) | abstract finding (ii): 4-seed mean 0.27 ± 0.29, bimodal | Even within-distribution behaviour is fragile to initialisation. |
 
 **Synthesis.** What we built is a small *lossy compressor*
 trained on one task. It works as a compressor when the task is
@@ -58,7 +62,8 @@ efficient inference, ICLR workshop on representations).
 
 ### 2.2 Direction B — Hybrid wrapper + retrieval (the easiest pivot)
 
-**Idea.** Retrieval baseline gets 0.995 on RULER and 0.493 on
+**Idea.** Under [`P08-S2`](settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells),
+retrieval baseline gets 0.995 on RULER and 0.493 on
 QuALITY. Wrapper gets 0.000 on RULER and 0.193 on QuALITY.
 **They are complementary.** Build a 2-stage router that:
 1. Decides whether the query needs verbatim retrieval or lossy

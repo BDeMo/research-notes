@@ -7,7 +7,7 @@ progress and fact record rather than a traditional weekly status report.
 ## Files
 
 - `main.tex`: Beamer wrapper. It owns the preamble and uses `\input{...}` to
-  include the active combined weekly report.
+  include weekly reports in chronological order.
 - `main_brief_research.tex`: high-level research delivery deck. It should only
   explain the research question, architecture, hypothesis, evaluation, and paper
   path.
@@ -35,7 +35,8 @@ Maintain three decks separately:
   model delivery and adoption. Target 4-8 slides depending on demo scope.
 
 When updating content, edit the corresponding `weekly/`, `brief/research/`, or
-`brief/project/` file, not the main wrapper unless switching active week.
+`brief/project/` file. Edit the main wrapper only to append a new `\input{...}`
+line or adjust deck-level metadata.
 
 ## Weekly File Rule
 
@@ -54,14 +55,18 @@ Rules:
 - Each week covers Monday through Sunday. Write the exact date range with
   weekdays in the title slide and in a top-of-file comment.
 - If a week crosses a month boundary, still use the month of that week's Monday.
-- `main.tex` should not contain weekly slide content directly. It should include
-  exactly one weekly file with `\input{weekly/YYYY-MM-wNN.tex}`.
+- `main.tex` should not contain weekly slide content directly. It should keep
+  prior weekly `\input{weekly/YYYY-MM-wNN.tex}` lines and append each new week
+  below the existing inputs in chronological order.
 - `main_brief_research.tex` should include exactly one file from
   `brief/research/YYYY-MM-wNN.tex`.
 - `main_brief_project.tex` should include exactly one file from
   `brief/project/YYYY-MM-wNN.tex`.
 - Each weekly/brief file should show the reporting month, week number, and
-  Monday-Sunday date range with weekdays on the title slide.
+  Monday-Sunday date range with weekdays in the reporting-period frame.
+- Avoid repeated covers: `main.tex` owns the single deck-level `\titlepage`.
+  Weekly files should start with a `\section{...}` and a compact reporting
+  period frame, not their own `\titlepage`.
 
 Examples:
 
@@ -88,7 +93,12 @@ pdflatex main.tex
 ## Maintenance Notes
 
 - For a new week, copy the previous weekly file, rename it using the rule above,
-  update the title slide, then update the `\input{...}` line in `main.tex`.
+  update the reporting-period frame, then append a new `\input{...}` line at
+  the end of the weekly input block in `main.tex`. Do not remove earlier week
+  inputs unless the user explicitly asks to archive or split the deck.
+- Keep parent/child documentation in sync: this `README.md` describes the slide
+  folder layout, and the parent plan `README.md` links here and summarizes what
+  each child folder is for.
 - Use an industry-style progress-report structure:
   - For bi-weekly reports and other stakeholder reports, prioritize these
     sections:

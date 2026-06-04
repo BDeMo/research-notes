@@ -10,6 +10,12 @@
 > backfilled with `mem-embedding/scripts/synth_combine_summary.py`). All
 > 10 Gist runs trained and evaluated successfully; only the final
 > wrap-up + geometry probe failed.
+>
+> **Settings / provenance:** this is a pre-final exploratory comparison. Use
+> [`settings.md`](settings.md) for the current provenance registry; these cells
+> are historical variants around [`P08-S1`](settings.md#p08-s1--v1-canonical-wrapper-recipe),
+> while final v1 headline cells use
+> [`P08-S2`](settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
 
 ---
 

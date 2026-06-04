@@ -3,12 +3,11 @@
 % and it is the 4th Monday in that month.
 % Date range: Mon 2026-05-25 to Sun 2026-05-31.
 
-\begin{frame}
-  \titlepage
-  \vspace{-1.0em}
+\section{May 2026 Week 4}
+
+\begin{frame}{Reporting Period: May 2026 Week 4}
   \begin{center}
-    \small Reporting period: May 2026, Week 4 \\
-    \scriptsize Date range: Mon 2026-05-25 to Sun 2026-05-31 \\
+    \small Date range: Mon 2026-05-25 to Sun 2026-05-31 \\
     \scriptsize Month/week is determined by the Monday of the reporting week.
   \end{center}
 \end{frame}
@@ -37,7 +36,7 @@
 \begin{frame}{Progress / Fact Record}
   \begin{itemize}
     \item \textbf{Done}: scoped Plan 08 v0 as a learned-memory wrapper project rather than full self-modifying model training.
-    \item \textbf{Done}: read the `rca-demo` SFT results as project initialization: SFT can teach RCA signals, but it is not always a win and is not enough for robust RCA foundation-model capability.
+    \item \textbf{Done}: read the \texttt{rca-demo} SFT results as project initialization: SFT can teach RCA signals, but it is not always a win and is not enough for robust RCA foundation-model capability.
     \item \textbf{Done}: defined two deliverable tracks:
       \begin{enumerate}
         \item Research paper: new architecture for memory-state next prediction.
@@ -100,10 +99,10 @@
 
 \begin{frame}{RCA-Demo Initialization: SFT Boundary Search}
   \begin{itemize}
-    \item Goal: use `rca-demo` to find how far standard SFT can push a general model toward RCA behavior.
+    \item Goal: use \texttt{rca-demo} to find how far standard SFT can push a general model toward RCA behavior.
     \item Setup:
       \begin{itemize}
-        \item Displayed base family: Qwen2.5-7B-Instruct (`q25`).
+        \item Displayed base family: Qwen2.5-7B-Instruct (\texttt{q25}).
         \item 4 RCA datasets: Nezha, OpenRCA-500, RCAEval, lincyaw/rca.
         \item Training schedules: base, curriculum chain, and joint mix.
         \item Evaluation matrix: RCA metrics + general capability benchmarks.
@@ -114,7 +113,7 @@
 
 \begin{frame}{SFT Wins: The Model Can Learn RCA Signals}
   \begin{itemize}
-    \item $q25_{mix}$ became the strongest complete row by `recommendation_f1`:
+    \item $q25_{mix}$ became the strongest complete row by \texttt{recommendation\_f1}:
       \begin{itemize}
         \item OpenRCA-500: 0.305
         \item RCAEval: 0.733
@@ -122,9 +121,9 @@
       \end{itemize}
     \item After base-mismatch re-eval, $q25_{curr\_4\_lincyaw}$ showed real cumulative curriculum signal:
       \begin{itemize}
-        \item lincyaw `service_set_f1`: 0.272 pre-fix $\rightarrow$ 0.563 post-fix.
-        \item lincyaw `primary_service_match`: 0.454 $\rightarrow$ 0.723.
-        \item RCAEval `severity_match`: 0.041 $\rightarrow$ 0.818.
+        \item lincyaw \texttt{service\_set\_f1}: 0.272 pre-fix $\rightarrow$ 0.563 post-fix.
+        \item lincyaw \texttt{primary\_service\_match}: 0.454 $\rightarrow$ 0.723.
+        \item RCAEval \texttt{severity\_match}: 0.041 $\rightarrow$ 0.818.
       \end{itemize}
     \item Takeaway: SFT is useful for injecting RCA structure, service identification, and recommendation behavior.
   \end{itemize}
@@ -155,7 +154,7 @@
         \item wrapper absorbs long context, tool observations, and RCA/debug traces;
         \item failures can be isolated to memory compression instead of the whole model.
       \end{itemize}
-    \item This turns `rca-demo` from a final SFT path into evidence for the RCA foundation-model architecture choice.
+    \item This turns \texttt{rca-demo} from a final SFT path into evidence for the RCA foundation-model architecture choice.
   \end{itemize}
 \end{frame}
 
@@ -249,20 +248,20 @@
 
 \begin{frame}{Demo Assets Already Available in RCA-Demo}
   \begin{itemize}
-    \item \textbf{Done}: `rca-chat` Gradio probe exists and can load matrix checkpoints:
+    \item \textbf{Done}: \texttt{rca-chat} Gradio probe exists and can load matrix checkpoints:
       \begin{itemize}
         \item $q25_{base}$, $q25_{mix}$, $q25_{curr\_*}$;
         \item public RCA datasets plus optional private Liang DTS bundle.
       \end{itemize}
     \item \textbf{Done}: long-context builder script exists:
       \begin{itemize}
-        \item `scripts/compression/build_long_context_rca_benchmark.py`;
-        \item converts prepared `cases.jsonl` into chunked RCA items with distractors.
+        \item \texttt{scripts/compression/build\_long\_context\_rca\_benchmark.py};
+        \item converts prepared \texttt{cases.jsonl} into chunked RCA items with distractors.
       \end{itemize}
     \item \textbf{Done}: prompt-strategy preparation script exists:
       \begin{itemize}
-        \item `scripts/compression/prepare_compression_eval.py`;
-        \item emits `full_context`, `summary`, `retrieval`, and `learned_memory` prompt rows.
+        \item \texttt{scripts/compression/prepare\_compression\_eval.py};
+        \item emits \texttt{full\_context}, \texttt{summary}, \texttt{retrieval}, and \texttt{learned\_memory} prompt rows.
       \end{itemize}
     \item \textbf{Not verified yet}: no end-to-end generation/score run has been completed for this demo path.
   \end{itemize}
@@ -328,26 +327,26 @@ python3 scripts/compression/prepare_compression_eval.py \
   \end{table}
 
   \vspace{0.4em}
-  \textbf{Not verified yet}: the current `learned_memory` row is a deterministic memory-compressor baseline until the trainable wrapper is run.
+  \textbf{Not verified yet}: the current \texttt{learned\_memory} row is a deterministic memory-compressor baseline until the trainable wrapper is run.
 \end{frame}
 
 \begin{frame}{Demo Output Layout and Metrics}
   \begin{itemize}
     \item \textbf{Planned output layout} mirrors matrix cells:
       \begin{itemize}
-        \item `runs/long_context_rca_demo/eval/<model_id>/<strategy>/predictions.jsonl`
-        \item `metrics.json`
-        \item `case_scores.jsonl`
-        \item `eval_command.txt`
+        \item \texttt{runs/long\_context\_rca\_demo/eval/<model\_id>/<strategy>/predictions.jsonl}
+        \item \texttt{metrics.json}
+        \item \texttt{case\_scores.jsonl}
+        \item \texttt{eval\_command.txt}
       \end{itemize}
     \item \textbf{Metrics to report}:
       \begin{itemize}
-        \item RCA quality: `recommendation_f1`, `root_cause_f1`, `primary_service_match`, `service_set_f1`;
-        \item grounding: `evidence_overlap`;
-        \item format: `json_parseable`, `json_repaired`, `degenerate`;
+        \item RCA quality: \texttt{recommendation\_f1}, \texttt{root\_cause\_f1}, \texttt{primary\_service\_match}, \texttt{service\_set\_f1};
+        \item grounding: \texttt{evidence\_overlap};
+        \item format: \texttt{json\_parseable}, \texttt{json\_repaired}, \texttt{degenerate};
         \item compression: prompt token estimate, compression ratio, latency if available.
       \end{itemize}
-    \item \textbf{TODO}: wire `prompts.jsonl` into generation and scoring.
+    \item \textbf{TODO}: wire \texttt{prompts.jsonl} into generation and scoring.
   \end{itemize}
 \end{frame}
 
@@ -355,8 +354,8 @@ python3 scripts/compression/prepare_compression_eval.py \
   \begin{itemize}
     \item \textbf{Baseline model for first demo}: $q25_{mix}$.
       \begin{itemize}
-        \item Existing matrix says it is the strongest complete RCA row by `recommendation_f1`.
-        \item RCAEval `recommendation_f1` = 0.733.
+        \item Existing matrix says it is the strongest complete RCA row by \texttt{recommendation\_f1}.
+        \item RCAEval \texttt{recommendation\_f1} = 0.733.
         \item JSON format is stable in the public RCA matrix.
       \end{itemize}
     \item \textbf{Control model}: $q25_{base}$.

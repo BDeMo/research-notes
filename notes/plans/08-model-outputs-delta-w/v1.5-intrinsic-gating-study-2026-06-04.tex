@@ -65,6 +65,11 @@ summaries around Plan 08.
 
 \subsection{v1 wrapper facts and main result}
 \begin{itemize}
+\item \textbf{Settings registry:}
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md}{settings.md}.
+Every result cell in this report should trace to a setting ID; v1
+headline cells use \textbf{P08-S2}, and v1.5 signal-grid cells use
+\textbf{P08-S3}.
 \item \textbf{Main v1 result summary:}
 \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md}{v1-results-2026-06-03.md}.
 This is the main facts document for the \code{mem-embedding} wrapper,
@@ -134,16 +139,16 @@ postmortem on the 80\,GB cards (retained all-position
 \subsection{Runs ledger}
 \begin{center}\footnotesize
 \setlength{\tabcolsep}{4pt}
-\begin{tabular}{l l c c p{3.4cm} l}
+\begin{tabular}{l l l c c p{3.0cm} l}
 \toprule
-run & purpose & seeds & $n$/bench & benchmarks & status\\
+run & setting & purpose & seeds & $n$/bench & benchmarks & status\\
 \midrule
-Phase 0 & prediction-derived signals, free-gen scored & 4--5 & 800 & QuALITY, MuSR, RULER, Hotpot, Trivia, SQuAD, MARCO & done (\S\ref{sec:phase0})\\
-seed-42 probe & native-MC $+$ 37-layer signals (single seed) & 1 & 150 & QuALITY, MuSR, RULER, Hotpot, Trivia & done (\S\ref{sec:seed42})\\
-9-seed extended & full battery, multi-seed (robust) & 9 & 1350 & QuALITY, MuSR, RULER, Hotpot, Trivia & \textbf{done} (\S\ref{sec:multiseed})\\
-new-bench (8B) & 4 more answer-type angles & 5 & 150 & QuALITY-hard, SQuAD-v2, NarrativeQA, MS-MARCO & running (seed42 done) \\
-14B cross-scale & does the signal hold at $2{\times}$ scale? & --- & --- & main 5 & deferred (pod busy)\\
-gate (Phase 4) & input-conditioned do-no-harm gate & --- & --- & public-only & planned (\S\ref{sec:gate-target})\\
+Phase 0 & P08-S3 & prediction-derived signals, free-gen scored & 4--5 & 800 & QuALITY, MuSR, RULER, Hotpot, Trivia, SQuAD, MARCO & done (\S\ref{sec:phase0})\\
+seed-42 probe & P08-S3 & native-MC $+$ 37-layer signals (single seed) & 1 & 150 & QuALITY, MuSR, RULER, Hotpot, Trivia & done (\S\ref{sec:seed42})\\
+9-seed extended & P08-S3 & full battery, multi-seed (robust) & 9 & 1350 & QuALITY, MuSR, RULER, Hotpot, Trivia & \textbf{done} (\S\ref{sec:multiseed})\\
+new-bench (8B) & P08-S3 & 4 more answer-type angles & 5 & 150 & QuALITY-hard, SQuAD-v2, NarrativeQA, MS-MARCO & running (seed42 done) \\
+14B cross-scale & P08-S3 & does the signal hold at $2{\times}$ scale? & --- & --- & main 5 & deferred (pod busy)\\
+gate (Phase 4) & P08-S4 & input-conditioned do-no-harm gate & --- & --- & public-only & planned (\S\ref{sec:gate-target})\\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -169,6 +174,14 @@ $\sim$50 GPU-min per seed for five benchmarks at $n{=}150$.
 % =====================================================================
 \section{Settings}
 \label{sec:settings}
+
+Unless a table states otherwise, numeric signal/correlation results in
+this report use setting
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md#p08-s3--v15-intrinsic-signal-probe}{P08-S3}.
+The underlying wrapper recipe is
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md#p08-s1--v1-canonical-wrapper-recipe}{P08-S1};
+v1 three-regime background comparisons use
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells}{P08-S2}.
 
 \subsection{Frozen base and the wrapper}
 The base $f_\theta$ is \textbf{Qwen3-8B} (hidden size $d=4096$, $36$
@@ -420,6 +433,11 @@ the achievable gate ceiling.
 \section{Results and interpretation}
 \label{sec:results}
 
+Setting for all result cells in this section:
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md#p08-s3--v15-intrinsic-signal-probe}{P08-S3},
+unless explicitly labeled as v1 three-regime background
+(\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells}{P08-S2}).
+
 \paragraph{Status.} The \textbf{9-seed multi-seed study
 ($n{=}1350$/bench) is complete} and is the robust result
 (\S\ref{sec:multiseed}); it \emph{supersedes} the single-seed seed-42
@@ -429,6 +447,7 @@ effect.
 
 \subsection{Phase 0 --- base rates (free-gen scored, $5{,}600$ items)}
 \label{sec:phase0}
+Setting for every cell in this table: P08-S3.
 \begin{center}\small
 \begin{tabular}{l rrr rrr}
 \toprule
@@ -450,6 +469,7 @@ the gate is a compressibility detector, not a corruption filter.
 
 \subsection{Seed-42 gate signal sheet (native-MC + per-layer)}
 \label{sec:seed42}
+Setting for every cell in this subsection: P08-S3 (single-seed slice).
 \begin{center}\small
 \begin{tabular}{l l l r l}
 \toprule
@@ -505,6 +525,7 @@ prove insufficient under multi-seed.
 
 \subsection{Multi-seed result (9 seeds, $n{=}1350$/bench) --- robust}
 \label{sec:multiseed}
+Setting for every cell in this subsection: P08-S3 (robust 9-seed slice).
 Pooling seeds $\{42,7,11,13,1,5,17,99,23\}$ with the full extended
 battery sharpens and \emph{corrects} the single-seed picture.
 \begin{center}\small
@@ -550,7 +571,9 @@ probe.
 \textbf{Setting for every correlation in this report.} Each signal is
 computed in the per-item probe protocol of \S\ref{sec:experiments}, on a
 \emph{frozen} Qwen3-8B with the wrapper trained zero-shot on
-\code{categorical\_niah} (\S\ref{sec:settings}). The rankings of
+\code{categorical\_niah} (\S\ref{sec:settings}; setting
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md#p08-s3--v15-intrinsic-signal-probe}{P08-S3}).
+The rankings of
 \S\ref{sec:interesting} are pooled over \textbf{9{,}750 items across 9
 benchmarks} (main five at 9 seeds, new four at 5 seeds); targets
 \code{help} (wrapper correct $\wedge$ base wrong), \code{noharm}

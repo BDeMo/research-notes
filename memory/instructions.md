@@ -62,6 +62,26 @@
 - Archive paths use `<original-parent>/_archive/...`. `git mv` only.
 - Run the [hygiene checklist](../docs/maintenance.md#5-hygiene-checklist-per-session) at end of every session.
 
+### 2026-06-04 · Result cells must trace to settings
+**Source**: user instruction in 2026-06-04 session.
+**Verbatim**: "记住，你要做好setting管理，每个有结果的文件，每个结果来自什么setting都要写清楚，但是不是每个都写全部，你可以统一写一个setting文件，然后link过去。把所有文档过一遍，每个cell来自于哪个settings，都写清楚，包括外部资源来源的link以及内部设置（比如：超参数等）。"
+**Rule**: every file that reports results, tables, figures, or benchmark cells must state which setting produced each result. Do not duplicate full hyperparameters in every cell; use stable setting IDs that link to a centralized setting/provenance file for the plan or project.
+**How to apply**:
+- Create or maintain a central `settings.md` / `provenance.md` per active plan when results appear.
+- Each result table/cell must include either a `setting` column, a caption-level setting ID, or nearby prose linking to the relevant setting.
+- The setting entry must include: code/data source links, external resource links, base model, wrapper/model variant, datasets, benchmark protocol, seeds, key hyperparameters, compute/runtime context, artifact locations, and known caveats.
+- For slides and short human reports, include only the setting ID and link; detailed numbers and facts live in the linked markdown/PDF/CSV artifacts.
+
+### 2026-06-04 · Slide decks append inputs and avoid repeated covers
+**Source**: user instruction in 2026-06-04 session.
+**Verbatim**: "每次更新main，不要搞那么多封面，然后之前week的input也不要删，就往下继续append input就好了。上一层的readme要有下一层readme和文件夹的说明，以及怎么组织文件的方法，都更新一下。"
+**Rule**: when updating a slide `main.tex`, keep previous weekly `\input{...}` lines and append the new week below them. Do not replace/delete older week inputs. Avoid repeated title/cover slides: the main deck owns the single deck-level cover, and weekly input files should not each call `\titlepage`.
+**How to apply**:
+- Append new weekly inputs in chronological order.
+- Existing weekly inputs are historical record and remain in `main.tex` unless the user explicitly requests an archive/split.
+- Parent README files must describe child folders, link child `README.md` files, and explain the organization/update method for the next layer.
+- Child folders with nontrivial structure should carry their own `README.md`.
+
 ---
 
 *If an instruction is later replaced, do NOT delete it. Add a `~~strikethrough~~ (superseded YYYY-MM-DD by …)` marker and the new entry below.*

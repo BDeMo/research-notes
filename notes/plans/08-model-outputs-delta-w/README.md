@@ -21,6 +21,10 @@ Full fact-dump at [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md). Source
 
 **v1.5 gating study**: [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex) / [`pdf`](v1.5-intrinsic-gating-study-2026-06-04.pdf) studies intrinsic "do-no-harm" signals for suppressing the wrapper when it would hurt a frozen-base model.
 
+**Settings registry**: [`settings.md`](settings.md) is the source of truth for
+which model/data/hyperparameter setting produced each result cell. New result
+tables should cite setting IDs from this file.
+
 ## Deliverables hub
 
 Use this section as the main human entry point for Plan 08 deliverables.
@@ -29,6 +33,7 @@ Use this section as the main human entry point for Plan 08 deliverables.
 
 - **Main v1 result summary**: [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md)
   — the full `mem-embedding` result harvest and three-regime transfer law.
+  Result cells use setting [`P08-S2`](settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
 - **Pivot / lessons after v1**:
   [`v1-if-wrapper-doesnt-work-2026-06-03.md`](v1-if-wrapper-doesnt-work-2026-06-03.md)
   — why v1 becomes a characterization paper plus v1.5 options.
@@ -43,8 +48,14 @@ Use this section as the main human entry point for Plan 08 deliverables.
 - **LaTeX source**:
   [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex)
   — source for the compiled report.
+- **Gate-signal metric candidates**:
+  [`v1.5-metric-candidates-2026-06-04.md`](v1.5-metric-candidates-2026-06-04.md)
+  — generality × novelty × interest × soundness screen of current + new gate
+  signals (plan-09-style curation) with a code-&-validate shortlist; includes the
+  index of where the v1.5 facts/grids/analysis live.
 - **Signal grid folder**: [`grids-2026-06-04/`](grids-2026-06-04/)
   — correlation grids and ranking figures for v1.5 gating.
+  Result cells use setting [`P08-S3`](settings.md#p08-s3--v15-intrinsic-signal-probe).
 - **Help ranking figure**:
   [`grids-2026-06-04/rank_help.png`](grids-2026-06-04/rank_help.png)
   — top signals for wrapper help.
@@ -61,6 +72,7 @@ Use this section as the main human entry point for Plan 08 deliverables.
 
 - **v2 plan**: [`v2-plan.md`](v2-plan.md)
   — cross-session latent memory with read/write tokens.
+  Design claims use setting [`P08-S4`](settings.md#p08-s4--v2-design-setting).
 - **v2 related work**: [`v2-related-work.md`](v2-related-work.md)
   — crowded latent reasoning / memory-token landscape and differentiation.
 - **Q2 activation-memory probe**:
@@ -179,8 +191,29 @@ Kill criteria:
 - If Phase 1 cannot achieve "rate of beneficial > rate of catastrophic" → kill.
 - If learned $\Delta W$ is observably indistinguishable from random noise (verifier accepts uniformly) → killing learnt-update; fall back to D2L-style context-conditioned updates.
 
+## Folder organization
+
+This plan is organized by artifact type and version line:
+
+- Root markdown/LaTeX files are plan-level notes, result summaries, and design
+  docs.
+- [`slides/`](slides/) contains Beamer decks. Its local guide is
+  [`slides/README.md`](slides/README.md). Weekly progress inputs live under
+  `slides/weekly/` and are appended in `slides/main.tex` chronologically.
+- [`grids-2026-06-04/`](grids-2026-06-04/) contains v1.5 signal-grid CSVs and
+  ranking figures. The setting/provenance for these cells is
+  [`P08-S3`](settings.md#p08-s3--v15-intrinsic-signal-probe).
+- [`misc/`](misc/) contains supporting notes that are not primary entry points.
+  If it grows beyond ad hoc support material, add/update `misc/README.md`.
+
+Rule for child folders: if a folder contains more than one artifact type, its
+parent README must say what the folder is for and link the folder's own
+`README.md` when present.
+
 ## Files in this plan
 - [`README.md`](README.md) — this file
+- [`settings.md`](settings.md) — central settings/provenance registry for result cells
+- [`slides/README.md`](slides/README.md) — slide/deck organization and update rules
 - [`v0-learned-memory-wrapper.md`](v0-learned-memory-wrapper.md) — practical v0 scope
 - [`v0-learned-memory-wrapper_zh.md`](v0-learned-memory-wrapper_zh.md) — Chinese v0 scope
 - [`v0-budget.md`](v0-budget.md) — practical v0 budget
