@@ -1,0 +1,434 @@
+% =====================================================================
+%  v1.5 — Intrinsic-Signal "Do-No-Harm" Gating for a Frozen-Base
+%  Soft-Prompt Memory Wrapper.
+%  Self-contained technical note: ALL settings + ALL metric definitions
+%  (black-box / benchmark-native AND intrinsic, incl. per-layer) with
+%  interpretation. Plan 08, mem-X line. Created 2026-06-04.
+%  Compile: pdflatex v1.5-intrinsic-gating-study-2026-06-04.tex
+% =====================================================================
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{longtable}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue,urlcolor=blue]{hyperref}
+\usepackage{microtype}
+
+\newcommand{\OURS}{\textsc{Wrap}}
+\newcommand{\GIST}{\textsc{Gist}}
+\newcommand{\noctx}{\texttt{no\_context}}
+\newcommand{\fullctx}{\texttt{full\_context}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\title{\textbf{Intrinsic-Signal ``Do-No-Harm'' Gating for a Frozen-Base
+Soft-Prompt Memory Wrapper}\\[2pt]
+\large Settings, Metric Definitions, and a Signal--Usefulness
+Correlation Study (v1.5)}
+\author{Plan 08 (mem-X line) --- internal technical note}
+\date{2026-06-04}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+v1 of this project showed that a learned $K$-token soft-prompt memory
+wrapper around a \emph{frozen} LLM is a \emph{narrow lossy compressor}:
+it matches the Gist-Tokens baseline on QuALITY but \emph{negatively
+transfers} on benchmarks it never trained for (verbatim retrieval,
+multi-hop QA), sometimes scoring \emph{below} the base model with no
+wrapper at all. Because the whole point of a frozen base is that adding
+a module should not \emph{lose} points, v1.5 asks: can we \emph{gate}
+the wrapper's intervention --- suppress it when it would hurt --- using
+cheap signals computable at inference? This note fixes \textbf{all
+experimental settings} (\S\ref{sec:settings}) and \textbf{all metric
+definitions} (\S\ref{sec:metrics}), both the benchmark-native black-box
+outcomes and the intrinsic signals (including \emph{per-layer} logit-lens
+quantities), then reports the first correlation study
+(\S\ref{sec:results}) identifying \emph{which} intrinsic signals --- and
+at \emph{which layers} --- predict the benchmark's own usefulness
+measure. The design principle: first learn what correlates with the
+target, then design the gate around it.
+\end{abstract}
+
+\tableofcontents
+
+% =====================================================================
+\section{Settings}
+\label{sec:settings}
+
+\subsection{Frozen base and the wrapper}
+The base $f_\theta$ is \textbf{Qwen3-8B} (hidden size $d=4096$, $36$
+decoder layers), \emph{frozen} throughout; only the wrapper trains. The
+wrapper $\phi_\psi$ ($\approx 218$M trainable params, $2.67\%$ of the
+base) maintains a memory state $m_t\in\mathbb{R}^{K\times d}$, $K=32$.
+
+\paragraph{Write side (recurrence).} For each context chunk $c_t$
+($t=1{:}N$, $N=6$ chunks of $\le 256$ tokens), a single Perceiver-IO
+cross-attention$+$FFN block $g_\phi$ (heads $h=8$, FFN mult $2$,
+$L=1$ layer) produces a candidate, and the wrapper exposes the residual:
+\begin{equation}
+\Delta m_t = \mathrm{LN}\!\big(g_\phi(m_{t-1},c_t)-m_{t-1}\big),
+\qquad
+m_t = m_{t-1} + \alpha_{\mathrm{upd}}\cdot \Delta m_t,
+\end{equation}
+with $\alpha_{\mathrm{upd}}$ a learned scalar (init $1.0$). $\Delta m_t$
+is published on \code{MemoryState.extra["last\_delta"]} for geometry
+probes.
+
+\paragraph{Read side (combine).} At query time the final memory $m_T$ is
+delivered to the base. The canonical mode is \code{xattn}: a second
+cross-attention lets memory re-read the raw chunk pool
+$H_{\mathrm{chunks}}$, then the refined memory is prepended as a soft
+prefix:
+\begin{equation}
+m_T' = m_T + \alpha_{\mathrm{ro}}\cdot
+\mathrm{LN}\!\big(\mathrm{CrossAttn}(m_T,H_{\mathrm{chunks}})\big),
+\qquad
+\text{inputs\_embeds} = [\,m_T';\, x\,],
+\end{equation}
+where $x$ are the query-token embeddings. Seven combine modes exist
+(\code{prefix}, \code{residual}, \code{interleave}, \code{hybrid},
+\code{xattn}, \code{xattn\_residual}, \code{gated}); only \code{gated}
+is unimplemented and is the \emph{target} of v1.5
+(\S\ref{sec:gate-target}). No combine mode ever moves a base weight.
+
+\paragraph{Answer head (auxiliary, training only).} For categorical
+training tasks a $\mathrm{Linear}(d,n_{\mathrm{cls}})$ head on
+$\mathrm{pool}(m_T)$ supplies a direct class-prediction gradient that
+bypasses the frozen base.
+
+\paragraph{Joint training loss.}
+\begin{equation}
+\mathcal{L} = \mathcal{L}_{\mathrm{CE}}
++ \lambda_{\mathrm{kl}}\,\mathrm{KL}(p_{\mathrm{student}}\Vert p_{\mathrm{teacher}})
++ \lambda_{\mathrm{div}}\,\tfrac{1}{T-1}\!\sum_t \cos(\Delta m_t,\Delta m_{t-1})
++ \lambda_{\mathrm{ah}}\,\mathcal{L}_{\mathrm{ah}},
+\end{equation}
+teacher $=$ same base reading the full context (\fullctx{}).
+
+\subsection{Training recipe (locked)}
+\begin{center}\small
+\begin{tabular}{llll}
+\toprule
+knob & value & knob & value\\
+\midrule
+base & Qwen3-8B (frozen, bf16) & combine & \code{xattn}\\
+$K$ (memory tokens) & 32 & $h$ heads / $L$ layers & 8 / 1\\
+train dataset & \code{categorical\_niah} & $N$ train items & 500\\
+$N$ chunks & 6 & max chunk tokens & 256\\
+optimiser & AdamW, lr $3\!\times\!10^{-5}$, const & steps & 1800 (SFT)\\
+$\lambda_{\mathrm{kl}}$ & 1.0 & $\lambda_{\mathrm{div}}$ & 0.1\\
+$\lambda_{\mathrm{ah}}$ (answer head) & 0.5 & seeds & \{42,7,11,13,1,5,17,99,23\}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Evaluation protocol}
+The wrapper is trained \emph{only} on \code{categorical\_niah} and
+evaluated \textbf{zero-shot} on public benchmarks via a
+\code{--eval-dataset} flag (wrapper weights never updated on eval data).
+For every eval item we run, on the same frozen base:
+(i) the \textbf{wrapper} (memory prefix $+$ query); and
+(ii) \textbf{\noctx{}} (query only) --- which \emph{is} the base
+\emph{without} the wrapper, since the wrapper replaces the document with
+$K$ memory tokens. \noctx{} is therefore the do-no-harm reference
+(\S\ref{sec:usefulness}). We also have the standard baselines
+\fullctx{} (base reads the full document), \code{retrieval} (BM25 top-2
+chunks), \code{summary}.
+
+\paragraph{Compute fan-out.} The probe (\code{scripts/probe\_v2.py})
+trains one wrapper per seed and evaluates all 5 benchmarks with full
+instrumentation. Seeds are sharded one-per-GPU across 8 GPUs
+(\code{sam-dev-test} H200 $\times$1; \code{sam-dev-ray} H100 $\times$4;
+\code{sam-dev} H100 $\times$4) to produce a multi-seed dataset.
+
+\subsection{Benchmarks}
+\label{sec:benchmarks}
+All are public long-context QA, evaluated zero-shot. ``Answer space''
+drives the native metric (\S\ref{sec:native}).
+\begin{center}\small
+\begin{tabular}{lllr l}
+\toprule
+benchmark & source & answer space & $n_{\mathrm{eval}}$ & native metric\\
+\midrule
+QuALITY      & Pang et al.\ 2022      & 4-way MC (A--D)     & 150 & accuracy (likelihood)\\
+MuSR-mm      & Sprague et al.\ 2024   & MC (murder myst.)   & 150 & accuracy (likelihood)\\
+RULER-NIAH   & Hsieh et al.\ 2024     & 6-digit value       & 150 & contains-recall\\
+HotpotQA     & Yang et al.\ 2018      & free-form span      & 150 & SQuAD EM/F1\\
+TriviaQA-RC  & Joshi et al.\ 2017     & span $+$ aliases    & 150 & EM/F1 (max over aliases)\\
+SQuAD v2     & Rajpurkar et al.\ 2018 & span / no-answer    & --- & EM/F1 ($+$abstain)\\
+NarrativeQA  & Ko\v{c}isk\'y et al.\ 2018 & open-ended       & --- & ROUGE-L, BLEU\\
+MS MARCO     & Bajaj et al.\ 2016     & free-form          & --- & ROUGE-L, BLEU-1\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+% =====================================================================
+\section{Metric definitions}
+\label{sec:metrics}
+
+We separate three families: (a) the benchmark-\emph{native} black-box
+\emph{outcome} metrics (\S\ref{sec:native}); (b) the \emph{usefulness}
+labels derived from them, which are what a gate should track
+(\S\ref{sec:usefulness}); and (c) the \emph{intrinsic signals} that are
+candidate gate \emph{inputs} (\S\ref{sec:intrinsic}).
+
+\subsection{Black-box (benchmark-native) outcome metrics}
+\label{sec:native}
+\textbf{Principle: score by the benchmark's own method.} Notably, the
+multiple-choice benchmarks are natively scored by \emph{likelihood}, not
+free-form generation; our earlier free-generation $+$ letter-parsing
+under-counted the base (e.g.\ \fullctx{} appeared as $0.079$ on QuALITY
+purely as a parsing artifact).
+
+\paragraph{(MC) Length-normalised option log-likelihood.}
+For options $o^{(1)},\dots,o^{(C)}$ with token sequences
+$o=(o_1,\dots,o_{|o|})$, score each by the mean log-prob of its
+continuation given the prompt $P$:
+\begin{equation}
+s(o)=\frac{1}{|o|}\sum_{i=1}^{|o|}\log p_\theta\!\big(o_i\mid P,o_{<i}\big),
+\qquad
+\widehat{o}=\arg\max_o s(o),\quad
+\mathrm{acc}=\mathbf{1}[\widehat{o}=o^\star].
+\end{equation}
+We also record the continuous \emph{margin}
+$\;\mathrm{mc\_margin}=s(o^\star)-\max_{o\ne o^\star}s(o)\;$ and the
+gold log-prob $s(o^\star)$ --- richer (less noisy) targets than binary
+accuracy at $n{=}150$.
+
+\paragraph{(span) SQuAD EM / F1.} With SQuAD normalisation
+$\mathcal{N}(\cdot)$ (lowercase; strip punctuation; drop articles
+\{a,an,the\}; collapse whitespace):
+\begin{equation}
+\mathrm{EM}=\mathbf{1}[\mathcal{N}(\hat y)=\mathcal{N}(y)],\qquad
+\mathrm{F1}=\frac{2\,\mathrm{prec}\cdot\mathrm{rec}}{\mathrm{prec}+\mathrm{rec}},
+\end{equation}
+on the multiset of normalised tokens; over a reference/alias set $R$ the
+score is $\max_{y\in R}$ (TriviaQA aliases, NarrativeQA refs). HotpotQA
+sup-fact/joint metrics are \emph{not} applicable (the wrapper predicts
+no supporting facts). SQuAD~v2: a no-answer item scores $1$ iff the model
+abstains; our current harness restricts to answerable items
+(SQuAD-1.1-style) --- an open gap.
+
+\paragraph{(retrieval) RULER contains-recall.}
+$\;\mathrm{em\_value}=\mathbf{1}[\,y \subseteq \hat y\,]\;$ (the planted
+6-digit value appears in the output; official \code{acc\_match\_str\_any}).
+
+\paragraph{(generation) ROUGE-L / BLEU.} ROUGE-L is the LCS-based F-score
+$\tfrac{2 P_{\mathrm{lcs}}R_{\mathrm{lcs}}}{P_{\mathrm{lcs}}+R_{\mathrm{lcs}}}$,
+$P_{\mathrm{lcs}}=\mathrm{LCS}(\hat y,y)/|\hat y|$,
+$R_{\mathrm{lcs}}=\mathrm{LCS}(\hat y,y)/|y|$; BLEU-$n$ is the
+brevity-penalised geometric mean of clipped $n$-gram precisions. Both
+taken max/over the reference set. ROUGE-L is the reported headline for
+NarrativeQA and MS MARCO.
+
+\subsection{Usefulness labels (the gate's target) and reference}
+\label{sec:usefulness}
+Let $u_w$ be the wrapper's native correctness on an item and $u_b$ the
+reference's. We define per item:
+\begin{align*}
+\texttt{correct} &= \mathbf{1}[u_w \ge \tau] \quad(\tau{=}0.5),\\
+\texttt{noharm}  &= \mathbf{1}[u_w \ge u_b],\\
+\texttt{help} &= \mathbf{1}[u_w{>}\tau \wedge u_b{\le}\tau],\quad
+\texttt{hurt} = \mathbf{1}[u_w{\le}\tau \wedge u_b{>}\tau],\\
+\texttt{cont} &= \text{continuous target (MC: } \mathrm{mc\_margin};\ \text{else native value)}.
+\end{align*}
+\textbf{Two references.} Against \noctx{} (base without wrapper) the
+wrapper is already harmless on $80$--$100\%$ of items per benchmark
+(\S\ref{sec:results}); the damaging gap is against \fullctx{}
+(compression discards usable context). Hence the gate is best understood
+as a \emph{compressibility detector}: decide when lossy memory is safe
+vs.\ when to fall back to more context. The \emph{ideal} gate maximises
+\texttt{noharm} (never drop below the base) while keeping \texttt{help}.
+
+\subsection{Intrinsic signals (candidate gate inputs)}
+\label{sec:intrinsic}
+All are computed at inference without the gold label. Let the wrapper
+run produce final-token next-token distribution $p_w$ and per-layer
+last-token hidden states $h_\ell^{w}$ ($\ell=0{:}36$); the \noctx{} run
+gives $p_0$, $h_\ell^{0}$.
+
+\paragraph{Final-layer signals.}
+Entropy $H(p)=-\sum_v p_v\log p_v$; confidence $\mathrm{conf}=\max_v p_v$;
+margin $=p_{(1)}-p_{(2)}$ (top-two gap); divergence
+$\mathrm{kl\_w0}=\mathrm{KL}(p_w\Vert p_0)$; agreement
+$\mathbf{1}[\arg\max p_w=\arg\max p_0]$. Reported as \code{entropy\_w},
+\code{conf\_w}, \code{margin\_w}, \code{kl\_w0}, \code{first\_tok\_agree}.
+
+\paragraph{Per-layer logit-lens signals (the multi-layer probe).} Project
+each layer's last-token hidden through the frozen final norm and
+unembedding $W_U$ to get an early ``readout'' distribution:
+\begin{equation}
+\pi_\ell = \mathrm{softmax}\!\big(W_U\,\mathrm{LN}_f(h_\ell)\big).
+\end{equation}
+From $\pi_\ell^{w}$ we record \code{ll\_entropy\_w\_l}, \code{ll\_conf\_w\_l},
+\code{ll\_margin\_w\_l}; the wrapper-vs-base divergence
+$\mathrm{\code{ll\_kl\_wb\_l}}=\mathrm{KL}(\pi_\ell^{w}\Vert\pi_\ell^{0})$;
+and the depth-stabilisation flag
+$\mathrm{\code{ll\_argmax\_agree\_final\_l}}=\mathbf{1}[\arg\max\pi_\ell^{w}
+=\arg\max p_w]$. We also record per-layer \emph{hidden drift}
+\begin{equation}
+\mathrm{\code{drift\_l}} =
+\frac{\lVert h_\ell^{w}-h_\ell^{0}\rVert_2}{\lVert h_\ell^{0}\rVert_2+\epsilon},
+\end{equation}
+i.e.\ how much the wrapper perturbs each layer's residual stream at the
+answer position. \textbf{Rationale (the multi-layer hypothesis):}
+different depths encode different things --- early-layer drift may flag
+format perturbation (harmful), mid-layer $\pi_\ell$ agreement-with-base
+may flag safe compression, late-layer confidence may flag correctness ---
+so the most predictive signal need not live at the final layer, and a
+\emph{per-layer} gate can read whichever layer carries the signal.
+
+\paragraph{Memory geometry.} $\mathrm{drift\_mem}=\lVert m_T-m_0\rVert_F$;
+$\mathrm{delta\_mean}=\tfrac1N\sum_t\lVert\Delta m_t\rVert$;
+$\mathrm{q\_chunk\_cos}=\cos(\overline{\mathrm{enc}}(q),\overline{\mathrm{enc}}(c))$
+(query vs.\ chunk mean-pooled encodings; max and mean over chunks).
+
+\paragraph{Ensemble signals (Phase 0 only; not purely intrinsic).}
+\code{intervene\_vs\_noctx} $=\mathbf{1}[\hat y_w\ne\hat y_0]$;
+\code{agree\_retrieval} $=\mathbf{1}[\hat y_w=\hat y_{\mathrm{retr}}]$;
+\code{n\_baselines\_agree} $=\#\{$baselines whose prediction $=\hat y_w\}$;
+\code{w\_outlen} (generated length). These need running other strategies
+and so are candidate \emph{ensemble} gate inputs.
+
+\subsection{Correlation metrics}
+\label{sec:corr}
+For each (signal, layer) we report \textbf{AUROC} against a binary label
+(rank statistic: $\mathrm{AUROC}=\Pr[s_{+}>s_{-}]$; $0.5=$ no signal,
+$|{\cdot}-0.5|$ measures discriminative power, $<0.5$ means the signal is
+\emph{inversely} predictive), and \textbf{Spearman} $\rho$ against the
+continuous target. A \emph{per-layer profile} reports, per layer-metric,
+the layer maximising $|\mathrm{AUROC}-0.5|$. A planned multivariate
+logistic probe on the full $\{$metric$\times$layer$\}$ vector estimates
+the achievable gate ceiling.
+
+% =====================================================================
+\section{Results and interpretation}
+\label{sec:results}
+
+\paragraph{Status.} The full 9-seed dataset is in flight; tables below
+are the completed \textbf{seed 42} ($n{=}150$/bench) plus the Phase-0
+free-generation study ($5{,}600$ items). Multi-seed bands (pooling
+$\sim$$1{,}350$ items/bench) will tighten and re-rank these.
+
+\subsection{Phase 0 --- base rates (free-gen scored, $5{,}600$ items)}
+\begin{center}\small
+\begin{tabular}{l rrr rrr}
+\toprule
+bench & $u_w$ & \noctx{} & \fullctx{} & help\% & hurt\% & noharm\%\\
+\midrule
+quality    & 0.193 & 0.141 & 0.079 & 13 & 8  & 92\\
+musr\_mm   & 0.492 & 0.494 & 0.551 & 11 & 12 & 89\\
+trivia\_qa & 0.168 & \textbf{0.338} & 0.565 & 3 & \textbf{20} & 80\\
+hotpot\_qa & 0.086 & 0.104 & 0.438 & 3 & 5  & 95\\
+ruler\_niah& 0.000 & 0.000 & 0.994 & 0 & 0  & 100\\
+\bottomrule
+\end{tabular}
+\end{center}
+\noindent\textbf{Read:} vs.\ \noctx{} the wrapper is mostly harmless
+(noharm $80$--$100\%$); it \emph{actively} hurts only on TriviaQA
+($20\%$). The catastrophe is vs.\ \fullctx{} (RULER $0.994\!\to\!0$,
+Hotpot $0.44\!\to\!0.09$) --- compression discards usable context. So
+the gate is a compressibility detector, not a corruption filter.
+
+\subsection{Seed-42 gate signal sheet (native-MC + per-layer)}
+\begin{center}\small
+\begin{tabular}{l l l r l}
+\toprule
+bench & native metric & best intrinsic signal & AUROC & predictive layer\\
+\midrule
+hotpot\_qa & squad\_f1        & \code{conf\_w}        & \textbf{0.753} & near-final (34--35)\\
+quality    & accuracy (LL)    & \code{ll\_kl\_wb@30}  & \textbf{0.680} & \textbf{mid-layer 30}\\
+trivia\_qa & squad\_f1        & \code{ll\_conf@34}    & \textbf{0.653} & layer 34\\
+musr\_mm   & accuracy (LL)    & \code{ll\_entropy@11} & 0.582          & weak (at chance)\\
+ruler\_niah& exact\_value     & ---                   & ---            & undefined ($0$ correct)\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Per-layer profile} (layer maximising $|\mathrm{AUROC}-0.5|$
+for \texttt{correct}; bold $=$ best per row):
+\begin{center}\small
+\begin{tabular}{l rrrr}
+\toprule
+signal & quality & hotpot & trivia & musr\\
+\midrule
+\code{ll\_kl\_wb\_l}            & \textbf{@30: 0.680} & @34: 0.332 & @33: 0.284 & @34: 0.555\\
+\code{ll\_conf\_w\_l}          & @30: 0.353 & \textbf{@35: 0.731} & \textbf{@34: 0.653} & @22: 0.428\\
+\code{ll\_margin\_w\_l}        & @30: 0.333 & @35: 0.696 & @34: 0.630 & @19: 0.422\\
+\code{drift\_l}                & @2: 0.374  & @33: 0.397 & @26: 0.370 & @17: 0.531\\
+\code{ll\_argmax\_agree\_final\_l} & @34: 0.461 & @34: 0.597 & @23: 0.343 & @34: 0.479\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\subsection{Interpretation}
+\begin{enumerate}
+\item \textbf{The wrapper's own confidence/margin predicts correctness}
+on the QA benchmarks (\code{conf\_w}/\code{ll\_conf} AUROC $0.65$--$0.75$).
+A confidence-thresholded gate is therefore viable: low confidence
+$\Rightarrow$ suppress the wrapper.
+\item \textbf{The predictive layer is benchmark-dependent and often not
+the final one.} QuALITY's strongest signal is logit-lens KL-vs-base at
+\emph{layer 30} (\code{ll\_kl\_wb@30}$=0.680$), whereas Hotpot/Trivia
+peak at layers 34--35. This empirically validates the multi-layer
+hypothesis: a single-layer (output-only) gate would miss the QuALITY
+signal; a per-layer gate has the right information to read.
+\item \textbf{Where there is no signal, the gate should simply close.}
+MuSR is at chance (max AUROC $0.58$) and RULER is uniformly wrong
+(AUROC undefined). These are exactly the regimes where the wrapper must
+defer to context; a do-no-harm gate that closes there is correct, not a
+failure.
+\item \textbf{Ensemble signals are stronger but costlier} (Phase 0:
+\code{n\_baselines\_agree} AUROC $0.83$--$0.90$ on extractive benches),
+trading deployability for accuracy --- a fallback if intrinsic signals
+prove insufficient under multi-seed.
+\end{enumerate}
+
+% =====================================================================
+\section{The gate target and next steps}
+\label{sec:gate-target}
+
+\paragraph{Mechanism.} Implement the placeholder \code{gated} combine as
+an input-conditioned convex mix, optionally \emph{per base layer} $\ell$:
+\begin{equation}
+e_t' = (1-g_\ell)\,e_t + g_\ell\,\tilde m_{t,\ell},
+\qquad
+g_\ell = \sigma\!\big(w_\ell^\top \phi_\ell(\text{signals}) + b_\ell\big),
+\quad b_\ell \ll 0,
+\end{equation}
+so $g_\ell\!\approx\!0$ at init (wrapper $\approx$ identity, base
+preserved; cf.\ LLaMA-Adapter zero-init gating, Flamingo $\tanh$-gating,
+DISeL input-conditioned LoRA gating). The gate reads the signals the
+correlation study selects (likely late-layer \code{conf}/\code{ll\_conf}
+for correctness $+$ mid-layer \code{ll\_kl\_wb} for compressibility).
+
+\paragraph{Training the gate.} On \code{categorical\_niah} $+$ decoy
+items (irrelevant context $\Rightarrow$ gate should close, target $=$
+base \noctx{} output) plus a do-no-harm KL regulariser
+$\mathrm{KL}(p_{\mathrm{wrap}}\Vert p_{\mathrm{base}})$ on held-out
+OOD-like text. \textbf{Eval public-only}; success $=$ Regime-A gain
+retained \emph{and} \code{OURS\_gated} $\ge$ \noctx{} on Regime-B/C.
+
+\paragraph{Pending.} (i) Multi-seed bands ($9$ seeds) to firm up
+\S\ref{sec:results}. (ii) Multivariate logistic probe for the gate
+ceiling. (iii) Multi-layer injection (only if the per-layer profile's
+payoff over output-only justifies it).
+
+% =====================================================================
+\section*{Pointers}
+\begin{itemize}\setlength\itemsep{1pt}
+\item Probe: \code{mem-embedding/scripts/probe\_v2.py} (train$+$save,
+native-MC, $37$-layer logit-lens/drift).
+\item Analysis: \code{scripts/signal\_corr.py}; Phase 0
+\code{scripts/signal\_study.py}.
+\item Live ledger: \code{mem-embedding/summary/matrix.md} (v1 archived in
+\code{matrix-archive-2026-06-03.md}).
+\item Native metrics impl: \code{llm-infra/src/llm\_infra/benchmark\_metrics.py}.
+\item Runs: \code{runs/pv2-20260604-181915UTC} (seed 42),
+\code{runs/pv2-seed*-20260604-*UTC} (multi-seed).
+\end{itemize}
+
+\end{document}

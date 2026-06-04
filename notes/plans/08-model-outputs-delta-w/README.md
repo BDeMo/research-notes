@@ -1,7 +1,7 @@
 # Plan 08 — Model Outputs ΔW as Part of Generation (Self-Modifying LLMs)
 
-> **Status**: **v1 paper submitting (characterization)** · north star (self-modifying ΔW) on hold pending v2
-> **Created**: 2026-05-26 · **Last updated**: 2026-06-03
+> **Status**: **v1 paper submitting (characterization)** · v1.5 intrinsic gating in progress · north star (self-modifying ΔW) on hold pending v2
+> **Created**: 2026-05-26 · **Last updated**: 2026-06-04
 > **Owner**: Mingjia
 > **Parent idea**: brainstorm H6 (also entangles H3, H7, I3)
 > **One-liner**: At each turn, the model produces not just an answer $y$ but also a **weight delta $\Delta W$** representing what it just learned. A verifier decides whether to apply, reject, or scale $\Delta W$. Over time, the model literally rewrites itself.
@@ -18,6 +18,8 @@
 Full fact-dump at [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md). Source repo: `~/workspace/mem-test/mem-embedding/`. Paper repo: `~/workspace/latent-mem-paper/`.
 
 **Pivot menu**: [`v1-if-wrapper-doesnt-work-2026-06-03.md`](v1-if-wrapper-doesnt-work-2026-06-03.md) — 10 directions, top-3 testable-today: hybrid wrapper+retrieval (B), infilling objective (D), unfreeze last layer (I).
+
+**v1.5 gating study**: [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex) / [`pdf`](v1.5-intrinsic-gating-study-2026-06-04.pdf) studies intrinsic "do-no-harm" signals for suppressing the wrapper when it would hurt a frozen-base model.
 
 ---
 
@@ -96,6 +98,12 @@ Kill criteria:
 
 ## Files in this plan
 - [`README.md`](README.md) — this file
+- [`v0-learned-memory-wrapper.md`](v0-learned-memory-wrapper.md) — practical v0 scope
+- [`v0-learned-memory-wrapper_zh.md`](v0-learned-memory-wrapper_zh.md) — Chinese v0 scope
+- [`v0-budget.md`](v0-budget.md) — practical v0 budget
+- [`v0-budget_zh.md`](v0-budget_zh.md) — Chinese v0 budget
+- [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md) — v1 empirical state and paper claim
+- [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex) — v1.5 intrinsic gating note
 - [`validation.md`](validation.md) — experimental protocol, baselines
 - [`channels.md`](channels.md) — benchmarks, datasets
 - [`budget.md`](budget.md) — costs by phase
