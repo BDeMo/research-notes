@@ -23,7 +23,8 @@
 | Q | Qwen3.5 env solved (torch 2.11 iso-venv) + hybrid 3:1 attention handling | ✅ | `runs/GPU_STRATEGY.md` |
 | G | **Unified grid** (12 angles/39 metrics × 12 benchmarks × 4 families = 41 cells) | ✅ | `grid-metrics-2026-06-04.md` |
 | G2 | **Headline: LC×CF coupling uniformly positive (+0.17…0.56)**, cross-family/dataset | ✅ | `figs/G1_LC_CF_coupling.png` |
-| H3 | **Causal test**: protect LC-coupled heads during SFT → CF↓ without LC↓ | ⏳ next | — |
+| H3 | **Causal test**: protect LC-coupled heads during SFT → CF↓ without LC↓ | 🟢 running | GLM-4-9B (ray) + Qwen3-8B (sam-dev), 5 variants, GSM8K SFT |
+| P | **Paper-level writeup** consolidated | ✅ | `paper-draft-2026-06-04.md` |
 | B | Behavioural LC (NIAH acc@length) + retention Δ per dataset (close angle 12) | ⏳ | — |
 | S | Scale axis 0.6→32B on the confirmed couplings | ⏳ | ladder data partly collected |
 | M | Method design (Phase-2 variant per granularity) + paper framing | ⏳ | `validation.md` §Phase-2 |
