@@ -21,7 +21,7 @@ Full fact-dump at [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md). Source
 
 **v1.5 gating study**: [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex) / [`pdf`](v1.5-intrinsic-gating-study-2026-06-04.pdf) studies intrinsic "do-no-harm" signals for suppressing the wrapper when it would hurt a frozen-base model.
 
-## Leader update — 2026-06-04
+## Weekly human update — week of 2026-06-01
 
 **High-level message.** Plan 08 now has a more positive and actionable story:
 the learned memory wrapper is not a universal replacement for long context, but
