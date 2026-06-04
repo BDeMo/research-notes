@@ -1140,6 +1140,438 @@ def cmd_facts(args):
 def F_softmax_safe(logits):
     return torch.softmax(logits, dim=-1)
 
+# ================================================================ GRID DATASETS
+# Unified loader: returns (texts_for_passA, sft_pairs_for_passCD) for each benchmark.
+# texts = raw strings for forward metrics (truncated to ctxlen by caller).
+# sft_pairs = (prompt, completion) for Fisher/drift SFT.
+# is_long flags benchmarks whose inputs exercise the long-context (inference) frontier.
+GRID_DATASETS = {
+    # name: (long-context?, domain-tag)
+    "wikitext":   (False, "generic"),
+    "mmlu":       (False, "knowledge"),
+    "math":       (False, "math"),
+    "gsm8k":      (False, "math"),
+    "triviaqa":   (False, "knowledge"),
+    "bbh":        (False, "reasoning"),
+    "squad":      (True,  "qa"),
+    "hotpotqa":   (True,  "multihop"),
+    "quality":    (True,  "longdoc"),
+    "narrativeqa":(True,  "longdoc"),
+    "musr":       (True,  "reasoning"),
+    "msmarco":    (True,  "retrieval"),
+}
+
+def _ld(*a, **k):
+    from datasets import load_dataset
+    return load_dataset(*a, **k)
+
+def load_grid_dataset(tok, name, n=12):
+    texts, pairs = [], []
+    try:
+        if name == "wikitext":
+            ds = None
+            for c in ["wikitext-103-v1", "wikitext-103-raw-v1", "wikitext-2-raw-v1"]:
+                try: ds = _ld("Salesforce/wikitext", c, split="test"); break
+                except Exception: pass
+            buf = [r["text"] for r in ds if len(r["text"]) > 200][:n * 3]
+            texts = buf[:n]; pairs = [(t[:400], " " + t[400:800]) for t in buf[:n] if len(t) > 500]
+        elif name == "mmlu":
+            ds = _ld("cais/mmlu", "all", split="test")
+            idx = list(range(len(ds))); random.Random(1).shuffle(idx)
+            for i in idx[:n * 2]:
+                r = ds[i]; ch = "\n".join(f"{c}. {o}" for c, o in zip("ABCD", r["choices"]))
+                p = f"Question: {r['question']}\n{ch}\nAnswer:"
+                texts.append(p + f" {'ABCD'[r['answer']]}"); pairs.append((p, f" {'ABCD'[r['answer']]}"))
+        elif name == "math":
+            for cfg in ["algebra", "prealgebra", "number_theory"]:
+                try:
+                    ds = _ld("EleutherAI/hendrycks_math", cfg, split="train")
+                    for r in ds:
+                        texts.append(f"Problem: {r['problem']}\nSolution: {r['solution'][:600]}")
+                        pairs.append((f"Problem: {r['problem']}\nSolution:", " " + r["solution"]))
+                        if len(pairs) >= n * 2: break
+                except Exception: pass
+                if len(pairs) >= n * 2: break
+        elif name == "gsm8k":
+            ds = _ld("openai/gsm8k", "main", split="train")
+            for r in list(ds)[:n * 2]:
+                p = f"Question: {r['question']}\nAnswer:"
+                texts.append(p + " " + r["answer"]); pairs.append((p, " " + r["answer"]))
+        elif name == "triviaqa":
+            ds = load_trivia("train")
+            for r in list(ds)[:n * 2]:
+                a = r["answer"]["value"]; p = f"Question: {r['question']}\nAnswer:"
+                texts.append(p + " " + a); pairs.append((p, " " + a))
+        elif name == "bbh":
+            got = False
+            for repo, cfg in [("lukaemon/bbh", "date_understanding"), ("SaylorTwift/bbh", "date_understanding"),
+                              ("maveriq/bigbenchhard", "date_understanding")]:
+                try:
+                    ds = _ld(repo, cfg, split="test")
+                    for r in list(ds)[:n * 2]:
+                        q = r.get("input") or r.get("question"); a = str(r.get("target") or r.get("answer"))
+                        p = f"{q}\nAnswer:"; texts.append(p + " " + a); pairs.append((p, " " + a))
+                    got = True; break
+                except Exception: pass
+        elif name == "squad":
+            ds = _ld("rajpurkar/squad_v2", split="validation")
+            for r in list(ds)[:n * 2]:
+                if not r["answers"]["text"]: continue
+                a = r["answers"]["text"][0]
+                p = f"Context: {r['context']}\nQuestion: {r['question']}\nAnswer:"
+                texts.append(p + " " + a); pairs.append((p, " " + a))
+        elif name == "hotpotqa":
+            ds = _ld("hotpotqa/hotpot_qa", "distractor", split="validation")
+            for r in list(ds)[:n * 2]:
+                ctx = " ".join(" ".join(s) for s in r["context"]["sentences"])
+                p = f"Context: {ctx[:3000]}\nQuestion: {r['question']}\nAnswer:"
+                texts.append(p + " " + r["answer"]); pairs.append((p[:2000], " " + r["answer"]))
+        elif name == "quality":
+            ds = _ld("emozilla/quality", split="validation")
+            for r in list(ds)[:n * 2]:
+                art = r.get("article") or ""; q = r.get("question") or ""
+                p = f"{art[:4000]}\nQuestion: {q}\nAnswer:"
+                texts.append(p); pairs.append((p[:2000], " " + str(r.get("options", [""])[0])[:80]))
+        elif name == "narrativeqa":
+            ds = _ld("deepmind/narrativeqa", split="validation")
+            for r in list(ds)[:n * 2]:
+                doc = r["document"]["summary"]["text"]; q = r["question"]["text"]; a = r["answers"][0]["text"]
+                p = f"{doc[:4000]}\nQuestion: {q}\nAnswer:"
+                texts.append(p + " " + a); pairs.append((p[:2000], " " + a))
+        elif name == "musr":
+            ds = _ld("TAUR-Lab/MuSR", split="murder_mysteries")
+            for r in list(ds)[:n * 2]:
+                p = f"{r['narrative'][:4000]}\nQuestion: {r['question']}\nAnswer:"
+                texts.append(p); pairs.append((p[:2000], " " + str(r.get('answer_choice', ''))[:60]))
+        elif name == "msmarco":
+            ds = _ld("microsoft/ms_marco", "v2.1", split="validation")
+            for r in list(ds)[:n * 2]:
+                psg = " ".join(r["passages"]["passage_text"][:5]); q = r["query"]
+                p = f"Passages: {psg[:3500]}\nQuery: {q}\nAnswer:"
+                texts.append(p); pairs.append((p[:2000], " " + (r["answers"][0] if r["answers"] else "")[:80]))
+    except Exception as e:
+        log(f"load_grid_dataset {name} failed", e)
+    return texts[:n], [p for p in pairs if p[1].strip()][:max(n * 2, 32)]
+
+# ================================================================ GRID (unified)
+# Frontier tags: LC = long-context/inference, CF = catastrophic-forgetting/training,
+# ST = structural substrate (covariate). Used to organize the correlation tables.
+FRONTIER = {
+    # per-head
+    "sink": "LC", "retrieval": "LC", "induction": "LC", "attn_entropy": "LC",
+    "attn_distance": "LC", "prev_token": "LC", "receptive_field": "LC",
+    "kv_norm": "LC", "v_norm": "LC", "out_norm": "ST",
+    "head_alpha": "CF", "head_wnorm": "ST", "ov_norm": "ST",
+    "fisher": "CF", "grad_mag": "CF", "grad_noise": "CF", "dW_drift": "CF", "act_drift": "CF",
+    # per-layer
+    "resid_norm": "ST", "anisotropy": "ST", "eff_rank": "ST", "intrinsic_dim": "ST",
+    "spectral_decay": "ST", "update_norm": "ST", "curvature": "ST", "cka_adjacent": "ST",
+    "token_mixing": "LC", "ll_kl_to_final": "ST", "ll_top1_depth": "ST", "ll_entropy": "ST",
+    "tuned_lens_kl": "ST", "tuned_lens_depth": "ST", "lens_gap": "ST",
+    "act_kurtosis": "ST", "act_sparsity": "ST", "gini": "ST", "dead_frac": "ST",
+    "massive_max": "ST", "massive_count": "ST",
+    "w_stable_rank": "ST", "w_eff_rank": "ST", "w_spectral_norm": "ST", "w_ht_alpha": "CF",
+    "condition_num": "ST", "weight_entropy": "ST", "down_stable_rank": "ST", "mlp_gain": "ST",
+}
+
+def _gini(x):
+    x = np.sort(np.abs(x.ravel())); n = x.size
+    if n == 0 or x.sum() == 0: return 0.0
+    return float((2 * np.arange(1, n + 1) - n - 1).dot(x) / (n * x.sum()))
+
+@torch.no_grad()
+def _grid_spectra(model, L, H, hd):
+    # Pass B: parameter spectra (weights only, dataset-independent). Cached per model.
+    cache = os.path.join(ART, "_spectra_cache.npz")  # keyed by model dir below
+    pl = {k: np.zeros(L) for k in ["w_stable_rank", "w_eff_rank", "w_spectral_norm",
+          "w_ht_alpha", "condition_num", "weight_entropy", "down_stable_rank", "mlp_gain"]}
+    ph = {k: np.zeros((L, H)) for k in ["head_alpha", "head_wnorm", "ov_norm"]}
+    lyrs = layers_of(model)
+    for l in range(L):
+        lyr = lyrs[l]
+        a = getattr(lyr, "self_attn", None) or getattr(lyr, "linear_attn", None)
+        mlp = getattr(lyr, "mlp", None) or getattr(lyr, "feed_forward", None)
+        srs, ers, sns, alphas, conds, ents = [], [], [], [], [], []
+        cand = []
+        if a is not None: cand += [(a, n) for n in ["q_proj", "k_proj", "v_proj", "o_proj"]]
+        if mlp is not None: cand += [(mlp, n) for n in ["gate_proj", "up_proj", "down_proj"]]
+        for mod, nm in cand:
+            w = getattr(mod, nm, None)
+            if w is None or not hasattr(w, "weight"): continue
+            try:
+                s = torch.linalg.svdvals(w.weight.detach().float())
+                srs.append(_stable_rank_from_svals(s)); ers.append(_eff_rank_from_svals(s))
+                sns.append(float(s.max())); alphas.append(_ht_alpha(s))
+                conds.append(float(s.max() / (s[s > 0].min() + 1e-9)))
+                p = s / (s.sum() + 1e-9); ents.append(float(-(p * (p + 1e-12).log()).sum()))
+                if nm == "down_proj": pl["down_stable_rank"][l] = _stable_rank_from_svals(s)
+            except Exception: pass
+        if srs:
+            pl["w_stable_rank"][l] = np.mean(srs); pl["w_eff_rank"][l] = np.mean(ers)
+            pl["w_spectral_norm"][l] = np.mean(sns); pl["w_ht_alpha"][l] = np.mean(alphas)
+            pl["condition_num"][l] = np.mean(conds); pl["weight_entropy"][l] = np.mean(ents)
+        if mlp is not None:
+            up = getattr(mlp, "up_proj", None); dn = getattr(mlp, "down_proj", None)
+            if up is not None and dn is not None and hasattr(up, "weight"):
+                pl["mlp_gain"][l] = float(up.weight.detach().float().norm() / (dn.weight.detach().float().norm() + 1e-6))
+        # per-head param geometry
+        if a is not None and hasattr(a, "q_proj") and hasattr(a, "o_proj"):
+            qw = a.q_proj.weight.detach().float().view(H, hd, -1)
+            ow = a.o_proj.weight.detach().float().t().contiguous().view(H, hd, -1)
+            vproj = getattr(a, "v_proj", None)
+            vw = vproj.weight.detach().float() if vproj is not None else None
+            n_kv = vw.shape[0] // hd if vw is not None else H
+            grp = max(H // n_kv, 1)
+            for h in range(H):
+                w = torch.cat([qw[h], ow[h]], dim=1)
+                try: ph["head_alpha"][l, h] = _ht_alpha(torch.linalg.svdvals(w))
+                except Exception: pass
+                ph["head_wnorm"][l, h] = float(qw[h].norm() + ow[h].norm())
+                if vw is not None:
+                    vh = vw[(h // grp) * hd:(h // grp) * hd + hd]    # [hd, in]
+                    ph["ov_norm"][l, h] = float((ow[h] @ vh).norm()) if ow[h].shape[1] == vh.shape[0] else float(ow[h].norm() * vh.norm())
+    return pl, ph
+
+def cmd_grid(args):
+    model_id = MODELS.get(args.model, args.model)
+    ds = args.dataset
+    log(f"GRID {args.model} x {ds} ctxlen={args.ctxlen}")
+    model, tok = load_model(model_id, eager=True)
+    cfg = model.config
+    L, H, hd = cfg.num_hidden_layers, cfg.num_attention_heads, head_dim_of(cfg)
+    n_kv = getattr(cfg, "num_key_value_heads", H); grp = max(H // n_kv, 1)
+    attn_idx = _attn_layer_indices(model)
+    PH = {}; PL = {}; SC = {}
+
+    # ---- Pass B: parameter spectra (cache per model; concurrency-safe) ----
+    spec_f = os.path.join(ART, args.model, "spectra.npz")
+    loaded = False
+    if os.path.exists(spec_f):
+        try:
+            z = np.load(spec_f)
+            for k in z.files:
+                if k.startswith("pl_"): PL[k[3:]] = z[k]
+                elif k.startswith("ph_"): PH[k[3:]] = z[k]
+            loaded = True
+        except Exception:
+            loaded = False
+    if not loaded:
+        pl_spec, ph_spec = _grid_spectra(model, L, H, hd)
+        PL.update(pl_spec); PH.update(ph_spec)
+        try:
+            tmp = spec_f + f".{os.getpid()}.tmp.npz"   # end in .npz so savez keeps the name
+            np.savez(tmp, **{"pl_" + k: v for k, v in pl_spec.items()},
+                     **{"ph_" + k: v for k, v in ph_spec.items()})
+            os.replace(tmp, spec_f)  # atomic
+        except Exception as e:
+            log("spectra cache write skipped", e)
+
+    # ---- dataset text + sft pairs ----
+    texts, pairs = load_grid_dataset(tok, ds, n=args.n_texts)
+    if not texts:
+        log(f"no texts for {ds}; abort"); free(model); return
+
+    # ---- Pass A: ONE forward/text (hidden + attn + labels) -> angles 1-8 + surprisal ----
+    headm = {k: np.zeros((L, H)) for k in ["sink", "attn_entropy", "attn_distance",
+             "prev_token", "receptive_field", "kv_norm", "v_norm", "out_norm"]}
+    laym = {k: np.zeros(L) for k in ["resid_norm", "anisotropy", "eff_rank", "intrinsic_dim",
+            "spectral_decay", "update_norm", "curvature", "cka_adjacent", "token_mixing",
+            "ll_kl_to_final", "ll_top1_depth", "ll_entropy", "act_kurtosis", "act_sparsity",
+            "gini", "dead_frac", "massive_max", "massive_count"]}
+    nrm = getattr(model.model, "norm", None) or getattr(getattr(model, "model", model), "norm", None)
+    lm_head = getattr(model, "lm_head", None)
+    hooks, store = _install_norm_hooks(model)
+    ns = 0; nll_sum = 0.0; nll_tok = 0
+    ridge_Hl = {l: [] for l in range(L)}; ridge_Hf = []
+    with torch.no_grad():
+        for text in texts:
+            for d in store.values(): d.clear()
+            ids = tok(text, return_tensors="pt", truncation=True, max_length=args.ctxlen).input_ids.cuda()
+            if ids.shape[1] < 8: continue
+            out = model(ids, output_attentions=True, output_hidden_states=True)
+            # surprisal (NLL) on this text
+            lg = out.logits[0].float()
+            nll = F.cross_entropy(lg[:-1], ids[0, 1:], reduction="sum")
+            nll_sum += float(nll); nll_tok += ids.shape[1] - 1
+            T = ids.shape[1]
+            for l, att in _iter_attn_maps(out.attentions, attn_idx, L):
+                att = att.float()
+                headm["sink"][l] += att[:, 4:, 0].mean(dim=1).cpu().numpy()
+                p = att.clamp_min(1e-9); ent = -(p * p.log()).sum(-1)
+                headm["attn_entropy"][l] += ent.mean(dim=1).cpu().numpy()
+                headm["receptive_field"][l] += ent.mean(dim=1).exp().cpu().numpy()
+                pos = torch.arange(T, device=att.device).float()
+                dist = (att * (pos.view(1, 1, T) - pos.view(1, T, 1)).abs()).sum(-1).mean(dim=1)
+                headm["attn_distance"][l] += dist.cpu().numpy()
+                pt = att.diagonal(offset=-1, dim1=1, dim2=2).mean(dim=1)
+                headm["prev_token"][l] += pt.cpu().numpy()
+                # token mixing = off-diagonal mass (1 - self+sink); per layer avg over heads
+                offdiag = 1.0 - att.diagonal(dim1=1, dim2=2).mean(dim=1) - att[:, :, 0].mean(dim=1)
+                laym["token_mixing"][l] += float(offdiag.mean())
+            for l in range(L):
+                if l in store.get("k", {}):
+                    headm["kv_norm"][l] += np.repeat(store["k"][l], grp)[:H]
+                    headm["v_norm"][l] += np.repeat(store["v"][l], grp)[:H]
+                    headm["out_norm"][l] += store["out"][l]
+            hs = out.hidden_states; hf = hs[-1][0].float(); ridge_Hf.append(hf.cpu())
+            final_p = torch.softmax(lg, -1)
+            for l in range(L):
+                h = hs[l + 1][0].float()
+                laym["resid_norm"][l] += float(h.norm(dim=-1).mean())
+                hn = h / (h.norm(dim=-1, keepdim=True) + 1e-6); Gm = hn @ hn.t()
+                laym["anisotropy"][l] += float((Gm.sum() - Gm.diag().sum()) / (T * (T - 1) + 1e-9))
+                try:
+                    s = torch.linalg.svdvals(h - h.mean(0, keepdim=True))
+                    laym["eff_rank"][l] += _eff_rank_from_svals(s)
+                    ls = s[s > 0].log(); xi = torch.arange(ls.numel(), device=ls.device).float()
+                    laym["spectral_decay"][l] += float(-((xi - xi.mean()) * (ls - ls.mean())).sum() / ((xi - xi.mean()) ** 2).sum().clamp_min(1e-9))
+                except Exception: pass
+                try: laym["intrinsic_dim"][l] += _twonn_id(h)
+                except Exception: pass
+                if l < L - 1:
+                    try: laym["cka_adjacent"][l] += _linear_cka(h, hs[l + 2][0].float())
+                    except Exception: pass
+                laym["update_norm"][l] += float((h - hs[l][0].float()).norm(dim=-1).mean())
+                if 0 < l < L - 1:
+                    laym["curvature"][l] += float((hs[l + 2][0].float() - 2 * h + hs[l][0].float()).norm(dim=-1).mean())
+                x = h.flatten(); mu = x.mean(); sd = x.std() + 1e-6
+                laym["act_kurtosis"][l] += float((((x - mu) / sd) ** 4).mean())
+                laym["act_sparsity"][l] += float((x.abs() < 0.1 * sd).float().mean())
+                laym["gini"][l] += _gini(h.abs().float().cpu().numpy())
+                cmax = h.abs().max(dim=0).values; med = cmax.median() + 1e-6
+                laym["dead_frac"][l] += float((cmax < 0.05 * med).float().mean())
+                laym["massive_max"][l] = max(laym["massive_max"][l], float((cmax / med).max()))
+                laym["massive_count"][l] = max(laym["massive_count"][l], float((cmax >= 6 * med).sum()))
+                ridge_Hl[l].append(h.cpu())
+                if nrm is not None and lm_head is not None:
+                    try:
+                        pl_ = torch.softmax(lm_head(nrm(h.to(hs[-1].dtype))).float(), -1)
+                        laym["ll_entropy"][l] += float((-(pl_ * (pl_ + 1e-12).log()).sum(-1)).mean())
+                        laym["ll_kl_to_final"][l] += float((pl_ * ((pl_ + 1e-12).log() - (final_p + 1e-12).log())).sum(-1).mean())
+                        laym["ll_top1_depth"][l] += float((pl_.argmax(-1) == final_p.argmax(-1)).float().mean())
+                    except Exception: pass
+            ns += 1
+    for h in hooks: h.remove()
+    for k in headm: headm[k] /= max(ns, 1)
+    for k in laym:
+        if k not in ("massive_max", "massive_count"): laym[k] /= max(ns, 1)
+    SC["surprisal"] = nll_sum / max(nll_tok, 1)
+
+    # retrieval + induction (LC site detectors)
+    headm["retrieval"] = _retrieval_scores(model, tok, L, H, attn_idx)
+    headm["induction"] = _induction_scores(model, tok, L, H, attn_idx)
+
+    # tuned-lens-lite (ridge h_l -> h_final)
+    laym["tuned_lens_kl"] = np.zeros(L); laym["tuned_lens_depth"] = np.zeros(L)
+    if nrm is not None and lm_head is not None:
+        try:
+          with torch.no_grad():
+            Hf = torch.cat(ridge_Hf, 0).cuda(); d = Hf.shape[1]; I = torch.eye(d, device=Hf.device)
+            pf = torch.softmax(lm_head(nrm(Hf.to(hs[-1].dtype))).float(), -1)
+            for l in range(L):
+                Hl = torch.cat(ridge_Hl[l], 0).cuda()
+                A = torch.linalg.solve(Hl.t() @ Hl + 1e-2 * I, Hl.t() @ Hf)
+                pl_ = torch.softmax(lm_head(nrm((Hl @ A).to(hs[-1].dtype))).float(), -1)
+                laym["tuned_lens_kl"][l] = float((pl_ * ((pl_ + 1e-12).log() - (pf + 1e-12).log())).sum(-1).mean())
+                laym["tuned_lens_depth"][l] = float((pl_.argmax(-1) == pf.argmax(-1)).float().mean())
+                del Hl, A, pl_
+        except Exception as e: log("tuned-lens failed", e)
+    laym["lens_gap"] = laym["tuned_lens_kl"] - laym["ll_kl_to_final"]
+
+    # ---- Pass C: a-priori Fisher/grad/grad-noise on this dataset (CF frontier) ----
+    big = SIZE_B.get(args.model, 0) >= 20; ml = 256 if big else 512
+    if pairs:
+        try:
+            gm, fi, gns = _grad_fisher_pairs(model, tok, pairs, L, H, hd, n_kv, grp,
+                                             n_batches=args.fisher_batches, use_ckpt=big, maxlen=ml)
+            headm["grad_mag"], headm["fisher"], headm["grad_noise"] = gm, fi, gns
+        except Exception as e: log("grad/fisher failed", e)
+
+    # ---- Pass D: short SFT on this dataset -> drift (CF frontier) ----
+    if pairs and args.sft_steps > 0:
+        try:
+            snap = snapshot_proj(model); base_out = _probe_head_acts(model, tok)
+            _quick_sft_pairs(model, tok, pairs, args.sft_steps, args.lr, use_ckpt=big, maxlen=ml)
+            model.eval()
+            headm["dW_drift"] = _head_drift_from_snap(model, snap, L, H, hd)
+            headm["act_drift"] = _act_drift(base_out, _probe_head_acts(model, tok))
+        except Exception as e: log("drift failed", e)
+
+    # ---- save unified record ----
+    out = {"model": args.model, "dataset": ds, "ctxlen": args.ctxlen, "layers": L, "heads": H,
+           "is_long": GRID_DATASETS.get(ds, (False, ""))[0], "domain": GRID_DATASETS.get(ds, (False, "?"))[1],
+           "scalars": SC, "frontier": FRONTIER}
+    np.savez(tag_path(args.model, f"grid_{ds}.npz"),
+             **{"H_" + k: v for k, v in headm.items()}, **{"L_" + k: v for k, v in laym.items()},
+             **{"P_" + k: v for k, v in PL.items()}, **{"PH_" + k: v for k, v in PH.items()})
+    json.dump(out, open(tag_path(args.model, f"grid_{ds}.json"), "w"), indent=2)
+    log(f"GRID done {args.model} x {ds}: heads={list(headm)} surprisal={SC['surprisal']:.3f}")
+    free(model)
+
+def _grad_fisher_pairs(model, tok, pairs, L, H, hd, n_kv, grp, n_batches=8, use_ckpt=False, maxlen=512):
+    feats = _pairs_to_feats(tok, pairs, maxlen)
+    return _grad_fisher_feats(model, feats, tok, L, H, hd, n_batches, use_ckpt)
+
+def _pairs_to_feats(tok, pairs, maxlen):
+    feats = []
+    for p, c in pairs:
+        pi = tok(p, add_special_tokens=False).input_ids
+        ci = tok(c, add_special_tokens=False).input_ids + [tok.eos_token_id]
+        ids = (pi + ci)[:maxlen]; labels = ([-100] * len(pi) + ci)[:maxlen]
+        if len(ids) > len(pi): feats.append((ids, labels))
+    return feats
+
+def _grad_fisher_feats(model, feats, tok, L, H, hd, n_batches, use_ckpt):
+    for p in model.parameters(): p.requires_grad_(False)
+    attn = _attn_modules(model)
+    for a in attn:
+        if a is None: continue
+        for nm in ["q_proj", "o_proj"]: getattr(a, nm).weight.requires_grad_(True)
+    if use_ckpt: model.gradient_checkpointing_enable(); model.enable_input_require_grads()
+    grad_mag = np.zeros((L, H)); fisher = np.zeros((L, H)); per_batch = []; nb = 0
+    model.train()
+    for bi in range(min(n_batches, len(feats))):
+        ids, labels = collate([feats[bi]], tok.pad_token_id)
+        out = model(ids.cuda(), labels=labels.cuda()); model.zero_grad(set_to_none=True); out.loss.backward()
+        pb = np.zeros((L, H))
+        for l, a in enumerate(attn):
+            if a is None: continue
+            for nm in ["q_proj", "o_proj"]:
+                g = getattr(a, nm).weight.grad
+                if g is None: continue
+                g = g.detach().float()
+                gh = (g.view(H, hd, -1) if nm == "q_proj" else g.view(-1, H, hd).permute(1, 0, 2)).reshape(H, -1)
+                grad_mag[l] += gh.abs().mean(dim=1).cpu().numpy(); fisher[l] += (gh * gh).sum(dim=1).cpu().numpy()
+                pb[l] += gh.norm(dim=1).cpu().numpy()
+        per_batch.append(pb); nb += 1
+    model.zero_grad(set_to_none=True); model.eval()
+    if use_ckpt: model.gradient_checkpointing_disable()
+    grad_mag /= max(nb, 1); fisher /= max(nb, 1)
+    pb = np.stack(per_batch, 0) if per_batch else np.zeros((1, L, H))
+    gns = pb.var(axis=0) / (pb.mean(axis=0) ** 2 + 1e-9)
+    for p in model.parameters(): p.requires_grad_(True)
+    return grad_mag, fisher, gns
+
+def _quick_sft_pairs(model, tok, pairs, steps, lr, use_ckpt=False, maxlen=512):
+    for p in model.parameters(): p.requires_grad_(False)
+    proj_set = ["q_proj", "o_proj"] if use_ckpt else ["q_proj", "k_proj", "v_proj", "o_proj"]
+    tp = []
+    for a in _attn_modules(model):
+        if a is None: continue
+        for nm in proj_set:
+            w = getattr(a, nm).weight; w.requires_grad_(True); tp.append(w)
+    if use_ckpt: model.gradient_checkpointing_enable(); model.enable_input_require_grads()
+    feats = _pairs_to_feats(tok, pairs, maxlen)
+    if not feats: return
+    opt = torch.optim.SGD(tp, lr=lr * 10) if use_ckpt else torch.optim.AdamW(tp, lr=lr)
+    model.train()
+    for s in range(steps):
+        b = feats[s % len(feats):s % len(feats) + 1]
+        ids, labels = collate(b, tok.pad_token_id)
+        out = model(ids.cuda(), labels=labels.cuda()); opt.zero_grad(); out.loss.backward()
+        torch.nn.utils.clip_grad_norm_(tp, 1.0); opt.step()
+    if use_ckpt: model.gradient_checkpointing_disable()
+
 # ---------------------------------------------------------------- collate/util
 def collate(batch, pad):
     m = max(len(x[0]) for x in batch)
@@ -1173,9 +1605,13 @@ def main():
     p.add_argument("--domain", default="math"); p.add_argument("--sft_steps", type=int, default=120)
     p.add_argument("--lr", type=float, default=2e-5); p.add_argument("--fisher_batches", type=int, default=8)
     p = sub.add_parser("facts"); p.add_argument("--model", required=True)
+    p = sub.add_parser("grid"); p.add_argument("--model", required=True)
+    p.add_argument("--dataset", required=True); p.add_argument("--ctxlen", type=int, default=1024)
+    p.add_argument("--n_texts", type=int, default=12); p.add_argument("--fisher_batches", type=int, default=8)
+    p.add_argument("--sft_steps", type=int, default=80); p.add_argument("--lr", type=float, default=2e-5)
     args = ap.parse_args()
     {"detect": cmd_detect, "niah": cmd_niah, "sft": cmd_sft, "capeval": cmd_capeval,
-     "intrinsic": cmd_intrinsic, "facts": cmd_facts}[args.cmd](args)
+     "intrinsic": cmd_intrinsic, "facts": cmd_facts, "grid": cmd_grid}[args.cmd](args)
 
 if __name__ == "__main__":
     main()

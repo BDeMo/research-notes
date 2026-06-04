@@ -1,0 +1,265 @@
+{
+  "models": [
+    "glm4-9b",
+    "qwen2.5-7b-instruct",
+    "qwen3-8b",
+    "qwen3.5-9b"
+  ],
+  "n_cells": 41,
+  "frontier": {
+    "_head_alpha": null,
+    "_head_wnorm": null,
+    "_ov_norm": null,
+    "act_drift": "CF",
+    "attn_distance": "LC",
+    "attn_entropy": "LC",
+    "dW_drift": "CF",
+    "fisher": "CF",
+    "grad_mag": "CF",
+    "grad_noise": "CF",
+    "induction": "LC",
+    "kv_norm": "LC",
+    "out_norm": "ST",
+    "prev_token": "LC",
+    "receptive_field": "LC",
+    "retrieval": "LC",
+    "sink": "LC",
+    "v_norm": "LC",
+    "act_kurtosis": "ST",
+    "act_sparsity": "ST",
+    "anisotropy": "ST",
+    "cka_adjacent": "ST",
+    "condition_num": "ST",
+    "curvature": "ST",
+    "dead_frac": "ST",
+    "down_stable_rank": "ST",
+    "eff_rank": "ST",
+    "gini": "ST",
+    "intrinsic_dim": "ST",
+    "lens_gap": "ST",
+    "ll_entropy": "ST",
+    "ll_kl_to_final": "ST",
+    "ll_top1_depth": "ST",
+    "massive_count": "ST",
+    "massive_max": "ST",
+    "mlp_gain": "ST",
+    "resid_norm": "ST",
+    "spectral_decay": "ST",
+    "token_mixing": "LC",
+    "tuned_lens_depth": "ST",
+    "tuned_lens_kl": "ST",
+    "update_norm": "ST",
+    "w_eff_rank": "ST",
+    "w_ht_alpha": "CF",
+    "w_spectral_norm": "ST",
+    "w_stable_rank": "ST",
+    "weight_entropy": "ST"
+  },
+  "T4_LC_CF_coupling_top": {
+    "v_norm~dW_drift": {
+      "mean": 0.552,
+      "min": -0.232,
+      "max": 0.899,
+      "n": 41,
+      "consistent": false
+    },
+    "prev_token~grad_mag": {
+      "mean": 0.475,
+      "min": 0.179,
+      "max": 0.902,
+      "n": 41,
+      "consistent": true
+    },
+    "attn_distance~act_drift": {
+      "mean": 0.423,
+      "min": 0.096,
+      "max": 0.877,
+      "n": 41,
+      "consistent": true
+    },
+    "prev_token~fisher": {
+      "mean": 0.417,
+      "min": 0.164,
+      "max": 0.894,
+      "n": 41,
+      "consistent": true
+    },
+    "sink~act_drift": {
+      "mean": 0.409,
+      "min": -0.067,
+      "max": 0.886,
+      "n": 41,
+      "consistent": false
+    },
+    "attn_entropy~grad_mag": {
+      "mean": 0.405,
+      "min": -0.017,
+      "max": 0.887,
+      "n": 41,
+      "consistent": false
+    },
+    "receptive_field~grad_mag": {
+      "mean": 0.4,
+      "min": -0.02,
+      "max": 0.887,
+      "n": 41,
+      "consistent": false
+    },
+    "retrieval~dW_drift": {
+      "mean": 0.382,
+      "min": -0.327,
+      "max": 0.917,
+      "n": 41,
+      "consistent": false
+    },
+    "retrieval~act_drift": {
+      "mean": 0.372,
+      "min": 0.074,
+      "max": 0.874,
+      "n": 41,
+      "consistent": true
+    },
+    "kv_norm~dW_drift": {
+      "mean": 0.367,
+      "min": -0.456,
+      "max": 0.909,
+      "n": 41,
+      "consistent": false
+    },
+    "v_norm~act_drift": {
+      "mean": 0.365,
+      "min": -0.402,
+      "max": 0.869,
+      "n": 41,
+      "consistent": false
+    },
+    "attn_entropy~fisher": {
+      "mean": 0.361,
+      "min": -0.039,
+      "max": 0.888,
+      "n": 41,
+      "consistent": false
+    },
+    "receptive_field~fisher": {
+      "mean": 0.357,
+      "min": -0.041,
+      "max": 0.889,
+      "n": 41,
+      "consistent": false
+    },
+    "attn_distance~dW_drift": {
+      "mean": 0.32,
+      "min": -0.303,
+      "max": 0.828,
+      "n": 41,
+      "consistent": false
+    },
+    "kv_norm~act_drift": {
+      "mean": 0.307,
+      "min": -0.283,
+      "max": 0.854,
+      "n": 41,
+      "consistent": false
+    },
+    "sink~dW_drift": {
+      "mean": 0.302,
+      "min": -0.283,
+      "max": 0.825,
+      "n": 41,
+      "consistent": false
+    },
+    "attn_distance~grad_noise": {
+      "mean": 0.301,
+      "min": -0.269,
+      "max": 0.903,
+      "n": 41,
+      "consistent": false
+    },
+    "sink~grad_noise": {
+      "mean": 0.286,
+      "min": -0.305,
+      "max": 0.953,
+      "n": 41,
+      "consistent": false
+    },
+    "kv_norm~fisher": {
+      "mean": 0.284,
+      "min": -0.213,
+      "max": 0.774,
+      "n": 41,
+      "consistent": false
+    },
+    "retrieval~grad_noise": {
+      "mean": 0.253,
+      "min": -0.208,
+      "max": 0.937,
+      "n": 41,
+      "consistent": false
+    },
+    "induction~act_drift": {
+      "mean": 0.242,
+      "min": -0.075,
+      "max": 0.855,
+      "n": 41,
+      "consistent": false
+    },
+    "kv_norm~grad_mag": {
+      "mean": 0.237,
+      "min": -0.364,
+      "max": 0.765,
+      "n": 41,
+      "consistent": false
+    },
+    "induction~grad_noise": {
+      "mean": 0.227,
+      "min": -0.144,
+      "max": 0.891,
+      "n": 41,
+      "consistent": false
+    },
+    "induction~grad_mag": {
+      "mean": 0.212,
+      "min": -0.256,
+      "max": 0.935,
+      "n": 41,
+      "consistent": false
+    },
+    "induction~fisher": {
+      "mean": 0.207,
+      "min": -0.249,
+      "max": 0.921,
+      "n": 41,
+      "consistent": false
+    }
+  },
+  "T4_consistent_couplings": {
+    "prev_token~grad_mag": {
+      "mean": 0.475,
+      "min": 0.179,
+      "max": 0.902,
+      "n": 41,
+      "consistent": true
+    },
+    "attn_distance~act_drift": {
+      "mean": 0.423,
+      "min": 0.096,
+      "max": 0.877,
+      "n": 41,
+      "consistent": true
+    },
+    "prev_token~fisher": {
+      "mean": 0.417,
+      "min": 0.164,
+      "max": 0.894,
+      "n": 41,
+      "consistent": true
+    },
+    "retrieval~act_drift": {
+      "mean": 0.372,
+      "min": 0.074,
+      "max": 0.874,
+      "n": 41,
+      "consistent": true
+    }
+  }
+}
