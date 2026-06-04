@@ -1,0 +1,17 @@
+{
+  "model": "qwen3-8b",
+  "protect": "lc",
+  "k": 40,
+  "domain": "gsm8k",
+  "steps": 600,
+  "before_mmlu": 0.4917,
+  "before_niah": 0.05,
+  "before_dom": 0.125,
+  "n_protected": 40,
+  "after_mmlu": 0.4917,
+  "after_niah": 0.2333,
+  "after_dom": 0.75,
+  "d_mmlu": 0.0,
+  "d_niah": 0.1833,
+  "d_dom": 0.625
+}

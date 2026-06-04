@@ -1,0 +1,17 @@
+{
+  "model": "glm4-9b",
+  "protect": "random",
+  "k": 40,
+  "domain": "gsm8k",
+  "steps": 600,
+  "before_mmlu": 0.475,
+  "before_niah": 1.0,
+  "before_dom": 0.2833,
+  "n_protected": 40,
+  "after_mmlu": 0.3833,
+  "after_niah": 1.0,
+  "after_dom": 0.5167,
+  "d_mmlu": -0.0917,
+  "d_niah": 0.0,
+  "d_dom": 0.2334
+}

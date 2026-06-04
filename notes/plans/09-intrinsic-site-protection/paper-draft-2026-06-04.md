@@ -102,8 +102,8 @@ Per-head Spearman ρ, pooled over 41 cells (`figs/G1_LC_CF_coupling.png`). **Eve
 
 **Sign-consistent across all 41 cells:** `prev_token~grad_mag +0.48`, `attn_distance~act_drift +0.42`, `prev_token~fisher +0.42`, `retrieval~act_drift +0.37`. The coupling is strongest with **drift** (what SFT actually does), not just a-priori Fisher. → the heads doing long-context work are exactly the heads SFT perturbs most. [`grid-metrics-2026-06-04.md`](grid-metrics-2026-06-04.md).
 
-### 5.5 Causal protection test (H3) — RUNNING
-Cross-family (GLM-4-9B + Qwen3-8B), heavy narrow SFT (GSM8K, 600 steps, attention-proj only) with 5 protection variants: **none / lc (top-k long-context-coupled heads, grad-masked) / retrieval / random / deltaw (post-hoc ΔW oracle, the `[mech-forget]` baseline)**. Metrics: NIAH (LC retention), MMLU (general retention), GSM8K (new-domain plasticity), before vs after. *Gate: lc-protection cuts forgetting ≥30%, no long-context regression, beats random and matches/beats the post-hoc deltaw oracle while being a-priori.* Results pending (this is the method validation; see `matrix.md` for live status).
+### 5.5 Causal protection test (H3) — COMPLETE, inconclusive (setup-limited)
+Cross-family (GLM-4-9B + Qwen3-8B), SFT GSM8K (600 steps, attention-proj) × 5 variants {none / lc / retrieval / random / deltaw}, NIAH+MMLU+GSM8K before/after. **The setup did not induce long-context forgetting**, so the headline causal claim could not be tested: GLM-4-9B NIAH stayed 1.0→1.0 (nothing to forget); Qwen3-8B NIAH *improved* 0.02→0.18–0.62 (the SFT taught the answer format, so protection was counterproductive). MMLU showed only slight movement (GLM-4: retrieval-protect best retention −0.05 vs random/deltaw −0.09 — a weak positive that retrieval-head protection helps *when* there is forgetting). **Conclusion:** GSM8K-SFT is not long-context-degrading on these models (same gap as Phase-1); H3 must be re-run with a forgetting-inducing setup (strong-NIAH base + narrow non-retrieval heavy SFT + longer NIAH). Until then this remains a **measurement** paper with a strong unifying observation (§5.4), not yet a causal one.
 
 ---
 

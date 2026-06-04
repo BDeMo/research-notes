@@ -2,7 +2,7 @@
 
 > **Living ledger.** Top = one-screen status. Then the **DONE** ledger (what we've
 > shipped, with results) and the **TODO** queue (what's next, prioritized).
-> Keep both sides in sync after every work block. Last updated **2026-06-04 ~19:35 UTC**.
+> Keep both sides in sync after every work block. Last updated **2026-06-04 ~22:55 UTC** (H3 complete, inconclusive).
 >
 > **Thesis (Janus):** the transformer-intrinsic sites that carry **long-context
 > behaviour at inference (LC)** are the *same* sites that **fine-tuning perturbs
@@ -23,7 +23,7 @@
 | Q | Qwen3.5 env solved (torch 2.11 iso-venv) + hybrid 3:1 attention handling | ✅ | `runs/GPU_STRATEGY.md` |
 | G | **Unified grid** (12 angles/39 metrics × 12 benchmarks × 4 families = 41 cells) | ✅ | `grid-metrics-2026-06-04.md` |
 | G2 | **Headline: LC×CF coupling uniformly positive (+0.17…0.56)**, cross-family/dataset | ✅ | `figs/G1_LC_CF_coupling.png` |
-| H3 | **Causal test**: protect LC-coupled heads during SFT → CF↓ without LC↓ | 🟢 running | GLM-4-9B (ray) + Qwen3-8B (sam-dev), 5 variants, GSM8K SFT |
+| H3 | **Causal test**: protect LC-coupled heads during SFT → CF↓ without LC↓ | ◐ done, **inconclusive** | 10/10 cells. GSM8K-SFT induced **no long-ctx forgetting** (GLM-4 NIAH 1.0→1.0; Qwen3-8B NIAH 0.02→↑ *improved*). Weak +: GLM-4 retrieval-protect best MMLU retention (−0.05 vs random −0.09). → need a long-ctx-DEGRADING SFT setup before H3 can decide. |
 | P | **Paper-level writeup** consolidated | ✅ | `paper-draft-2026-06-04.md` |
 | C | **Metric codebook** (derivation/range/interp) + full ranking | ✅ | `metrics-reference.md` |
 | I | **Idea list** (62 methods, motivation+insight) | ✅ | `ideas-brainstorm-2026-06-04.md` |
@@ -81,7 +81,7 @@ step on **ray only**.
 
 ## 2 · TODO queue (prioritized)
 
-1. **H3 causal test (the method).** On ray: take top-k LC-coupled heads (by `attn_distance`/`retrieval`/`prev_token`), protect during SFT (freeze / grad-mask / orthogonal) vs {none, random, ΔW-set `[mech-forget]`}. Measure Δforgetting (retention) **and** Δlong-ctx (NIAH). *Gate: ≥30% less forgetting, no LC regression, beat baselines.*
+1. **H3 v2 — a forgetting-INDUCING setup (gates the method).** H3 v1 (GSM8K SFT, 2026-06-04) was inconclusive: it did not degrade long-context (GLM-4 NIAH unchanged at 1.0; Qwen3-8B NIAH *improved*). Fix the setup: (a) start from a base with strong NIAH (instruct/GLM-4) and SFT on a **narrow non-retrieval domain heavily** (e.g. style/format/single-task overfit) that is known to erode retrieval; (b) measure NIAH at longer lengths (16k+) where degradation shows; (c) add capability retention (code/math) cross-domain. Then re-run the {none/lc/retrieval/random/deltaw} protection matrix. *Gate: ≥30% less forgetting, no LC regression, beat random + deltaw.*
 2. **Close angle 12 (behavioural).** NIAH acc@length×depth + capability retention Δ (before/after SFT) per dataset → ties the structural couplings to actual LC/CF *outcomes*.
 3. **Scale axis (0.6→32B).** Re-run the grid (or just the LC×CF couplings) on the ladder; check the coupling is scale-invariant (esp. does it strengthen/weaken with size?).
 4. **MoE instantiation (P0b headline).** Port detect+protect to a super-expert MoE (Qwen3-30B-A3B) — the least-crowded novelty.
