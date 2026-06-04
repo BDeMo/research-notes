@@ -1,0 +1,145 @@
+% Week naming rule:
+% 2026-06-w01 means the Monday of this report week is in June 2026,
+% and it is the 1st Monday in that month.
+% Date range: Mon 2026-06-01 to Sun 2026-06-07.
+
+\begin{frame}
+  \titlepage
+  \vspace{-1.0em}
+  \begin{center}
+    \small Reporting period: June 2026, Week 1 \\
+    \scriptsize Date range: Mon 2026-06-01 to Sun 2026-06-07 \\
+    \scriptsize Goal: concise progress record; detailed facts live in linked GitHub notes.
+  \end{center}
+\end{frame}
+
+\begin{frame}{This Week: Main Message}
+  \begin{block}{High-level direction}
+    Controlled model adaptation: improve RCA / long-context capability while
+    preserving the frozen base model's general ability.
+  \end{block}
+  \begin{itemize}
+    \item \textbf{Plan 08 v1}: learned soft-prompt memory is now framed as a
+      lossy-compression characterization, not a universal-memory claim.
+    \item \textbf{Plan 08 v1.5}: next step is a do-no-harm gate that opens the
+      wrapper only when compression is likely safe.
+    \item \textbf{Plan 08 v2}: next version is cross-session latent memory with
+      read/write tokens under a frozen base.
+    \item \textbf{Related direction}: Janus tests whether long-context sites
+      and forgetting-sensitive sites are coupled.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Problem Statement: Why This Matters}
+  \begin{itemize}
+    \item RCA and debugging inputs are long: logs, traces, topology, prior
+      observations, and code context often exceed cheap prompting.
+    \item Direct SFT can teach RCA behavior, but risks weakening general
+      instruction-following, reasoning, or retrieval behavior.
+    \item The safer target is a \textbf{frozen-base adaptation module}: learn
+      context compression / memory without overwriting the base model.
+    \item This week sharpened the decision rule: use memory when it helps;
+      close it when it would hurt.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Plan 08 v1: Main Result Cell}
+  \small
+  \begin{table}
+    \centering
+    \begin{tabular}{lccc}
+      \toprule
+      Benchmark & Wrapper & Gist & Best reference \\
+      \midrule
+      QuALITY & 0.193 $\pm$ 0.032 & 0.180 $\pm$ 0.044 & no-context 0.141 \\
+      MuSR-mm & 0.493 $\pm$ 0.008 & 0.501 $\pm$ 0.013 & full-context 0.551 \\
+      RULER-NIAH & 0.000 $\pm$ 0.000 & 0.000 $\pm$ 0.000 & full-context 0.995 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \vspace{-0.3em}
+  \begin{itemize}
+    \item \textbf{Conclusion}: wrapper works as a narrow lossy compressor.
+    \item Helps when gist-level information is sufficient; fails when exact
+      detail preservation is required.
+    \item Full facts:
+      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md}{v1 results summary}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Plan 08 v1.5: Signal Grid Cell}
+  \small
+  \begin{table}
+    \centering
+    \begin{tabular}{llcc}
+      \toprule
+      Signal family & Interpretation & Direction & Use in gate \\
+      \midrule
+      Confidence / seq logprob & wrapper likely correct & positive & open \\
+      Wrapper-to-base KL / JS / TV & wrapper fights base & inverse & close \\
+      Mid/late-layer drift & late reasoning distorted & inverse & close \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \begin{itemize}
+    \item \textbf{Design move}: gate on ``is compression safe?'' rather than
+      forcing memory onto every input.
+    \item Main signal-grid deliverables:
+      \href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04}{grid folder},
+      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04/rank_help.png}{help ranking},
+      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04/rank_interesting.png}{non-obvious ranking}.
+    \item Compiled note:
+      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.pdf}{v1.5 PDF}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Plan 08 v2: Next-Version Setting}
+  \begin{itemize}
+    \item \textbf{Question}: can latent memory be written during generation and
+      reused across sessions?
+    \item \textbf{Base}: still frozen; adaptation remains wrapper-only.
+    \item \textbf{New API}: add `update\_from\_generation`, `serialize`, and
+      `load` to the v1 wrapper protocol.
+    \item \textbf{Differentiation}: cross-session persistence + frozen base +
+      v1 bit-capacity diagnostic.
+    \item Links:
+      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-plan.md}{v2 plan},
+      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-related-work.md}{v2 related work}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Deliverables: Where To Read More}
+  \small
+  \begin{tabular}{p{0.30\textwidth}p{0.62\textwidth}}
+    \toprule
+    Item & Link \\
+    \midrule
+    Plan 08 hub &
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/README.md}{README / deliverables hub} \\
+    v1 facts &
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md}{main results summary} \\
+    v1.5 report &
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.pdf}{compiled PDF} \\
+    v1.5 signal grid &
+    \href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04}{CSV + figures} \\
+    v2 setting &
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-plan.md}{v2 plan} \\
+    Idea tables &
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/ideas/README.md}{ideas index} /
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/README.md}{plans index} \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{Next Steps}
+  \begin{enumerate}
+    \item Implement the first do-no-harm gated wrapper using confidence and
+      divergence features.
+    \item Evaluate whether gating preserves gains on compressible inputs while
+      closing on unsafe exact-retrieval / reasoning-transfer cases.
+    \item Keep v1 as the characterization paper line; keep v2 as the
+      cross-session latent-memory next version.
+    \item Continue Janus causal testing in parallel: protect long-context-coupled
+      sites during SFT and measure forgetting / long-context retention.
+  \end{enumerate}
+\end{frame}
