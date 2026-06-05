@@ -37,14 +37,15 @@ Root cause: attention-proj-only training can't learn GSM8K reasoning + lr 1e-4 w
 attention. → fix the trainer (LoRA on all modules / full-FT, moderate lr; protection
 masks protected-head deltas), re-run. (3rd time the *setup*, not the method, is the blocker.)
 
-> ⚠️ **MECHANISM RECKONING (2026-06-04 eve).** Partial-correlation + within-layer
-> controls show the v1 "uniformly positive head-level coupling" is **largely
-> confounded** (pooling + activation magnitude + depth; qwen3.5 = hybrid artifact).
-> Per-model, head-level couplings are weak/≈0/negative; the survivor `attn_distance
-> ~dW_drift` is a **layer/depth** effect. → revised claim = *long-context-heavy
-> **layers** are the forgetting hotspots*, not "same heads." See
-> [`paper-preexp-plan-2026-06-04.md`](paper-preexp-plan-2026-06-04.md). Pre-exps now
-> target the *real* claim. 🟢 mechanism ladder running on 4×H100.
+> ⛔ **THESIS FALSIFIED at head-level (2026-06-04 eve).** Rigorous a-priori coupling
+> across the 0.6→14B full-attn ladder, with partial(|out_norm)+within-layer+CI controls
+> ([`mechanism-results-2026-06-04.md`](mechanism-results-2026-06-04.md)): **no robust
+> head-level long-context↔forgetting coupling.** Within-layer, `attn_distance`/`sink`
+> are **robustly NEGATIVE** (−0.45…−0.60, all sizes) → structural long-ctx heads are
+> *gradient-AVOIDED*, not vulnerable. v1's "+coupling" = pooling + activation + depth +
+> qwen3.5 hybrid artifacts. **The "same heads, two frontiers" claim does not hold.**
+> Surviving fact: long-context heads are intrinsically *shielded* from SFT gradients.
+> → paper pivot needed (options below). The v1 measurement infra/metrics are still sound.
 
 **Decisive question (revised):** at the granularity that survives controls (**layer-level**, `attn_distance`), is there a clean coupling that scales — and can protecting those *layers* reduce forgetting beyond an activation-magnitude / depth baseline?
 

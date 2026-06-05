@@ -1,0 +1,79 @@
+{
+  "model": "qwen3-14b",
+  "layers": 40,
+  "heads": 40,
+  "couplings": {
+    "retrieval~grad_mag": {
+      "raw": 0.134,
+      "partial_outnorm": 0.011,
+      "within_layer": 0.076,
+      "ci95": [
+        0.087,
+        0.181
+      ]
+    },
+    "v_norm~grad_mag": {
+      "raw": 0.299,
+      "partial_outnorm": -0.32,
+      "within_layer": 0.105,
+      "ci95": [
+        0.25,
+        0.348
+      ]
+    },
+    "attn_distance~grad_mag": {
+      "raw": -0.222,
+      "partial_outnorm": -0.294,
+      "within_layer": -0.548,
+      "ci95": [
+        -0.275,
+        -0.167
+      ]
+    },
+    "sink~grad_mag": {
+      "raw": -0.117,
+      "partial_outnorm": -0.232,
+      "within_layer": -0.516,
+      "ci95": [
+        -0.176,
+        -0.061
+      ]
+    },
+    "retrieval~fisher": {
+      "raw": 0.123,
+      "partial_outnorm": 0.003,
+      "within_layer": 0.084,
+      "ci95": [
+        0.075,
+        0.167
+      ]
+    },
+    "v_norm~fisher": {
+      "raw": 0.318,
+      "partial_outnorm": -0.242,
+      "within_layer": 0.142,
+      "ci95": [
+        0.269,
+        0.367
+      ]
+    },
+    "attn_distance~fisher": {
+      "raw": -0.142,
+      "partial_outnorm": -0.195,
+      "within_layer": -0.449,
+      "ci95": [
+        -0.197,
+        -0.088
+      ]
+    },
+    "sink~fisher": {
+      "raw": -0.043,
+      "partial_outnorm": -0.137,
+      "within_layer": -0.422,
+      "ci95": [
+        -0.101,
+        0.015
+      ]
+    }
+  }
+}
