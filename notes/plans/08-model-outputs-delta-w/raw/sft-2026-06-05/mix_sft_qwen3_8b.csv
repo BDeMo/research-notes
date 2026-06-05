@@ -1,0 +1,9 @@
+bench,sft_noctx,sft_fullctx,base_noctx,base_fullctx
+hotpot_qa,0.226,0.342,0.228,0.623
+ms_marco,0.198,0.334,0.214,0.282
+musr_mm,0.493,0.560,0.490,0.495
+narrativeqa,0.118,0.116,0.139,0.150
+quality,0.233,0.233,0.240,0.200
+ruler_niah,0.000,1.000,0.000,0.995
+squad_v2,0.149,0.386,0.170,0.656
+trivia_qa,0.250,0.301,0.475,0.635
