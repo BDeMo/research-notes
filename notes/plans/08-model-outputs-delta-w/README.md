@@ -19,7 +19,7 @@ Full fact-dump at [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md). Source
 
 **Pivot menu**: [`v1-if-wrapper-doesnt-work-2026-06-03.md`](v1-if-wrapper-doesnt-work-2026-06-03.md) — 10 directions, top-3 testable-today: hybrid wrapper+retrieval (B), infilling objective (D), unfreeze last layer (I).
 
-**v1.5 gating study**: [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex) / [`pdf`](v1.5-intrinsic-gating-study-2026-06-04.pdf) studies intrinsic "do-no-harm" signals for suppressing the wrapper when it would hurt a frozen-base model.
+**v1.5 gating study**: [`v1.5-intrinsic-gating-study-2026-06-04.tex`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.tex) / [`pdf`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.pdf) studies intrinsic "do-no-harm" signals for suppressing the wrapper when it would hurt a frozen-base model.
 
 **Settings registry**: [`settings.md`](settings.md) is the source of truth for
 which model/data/hyperparameter setting produced each result cell. New result
@@ -43,30 +43,30 @@ Use this section as the main human entry point for Plan 08 deliverables.
 ### v1.5 / signal grid and gating deliverables
 
 - **Compiled technical note**:
-  [`v1.5-intrinsic-gating-study-2026-06-04.pdf`](v1.5-intrinsic-gating-study-2026-06-04.pdf)
+  [`v1.5-intrinsic-gating-study-2026-06-04.pdf`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.pdf)
   — PDF report with settings, metrics, results, and next gate target.
 - **LaTeX source**:
-  [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex)
+  [`v1.5-intrinsic-gating-study-2026-06-04.tex`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.tex)
   — source for the compiled report.
 - **Gate-signal metric candidates**:
-  [`v1.5-metric-candidates-2026-06-04.md`](v1.5-metric-candidates-2026-06-04.md)
+  [`v1.5-metric-candidates-2026-06-04.md`](summary/2026-06-04/v1.5-metric-candidates-2026-06-04.md)
   — generality × novelty × interest × soundness screen of current + new gate
   signals (plan-09-style curation) with a code-&-validate shortlist; includes the
   index of where the v1.5 facts/grids/analysis live.
-- **Signal grid folder**: [`grids-2026-06-04/`](grids-2026-06-04/)
+- **Signal grid folder**: [`summary/2026-06-04/grids-2026-06-04/`](summary/2026-06-04/grids-2026-06-04/)
   — correlation grids and ranking figures for v1.5 gating.
   Result cells use setting [`P08-S3`](settings.md#p08-s3--v15-intrinsic-signal-probe).
 - **Help ranking figure**:
-  [`grids-2026-06-04/rank_help.png`](grids-2026-06-04/rank_help.png)
+  [`summary/2026-06-04/grids-2026-06-04/rank_help.png`](summary/2026-06-04/grids-2026-06-04/rank_help.png)
   — top signals for wrapper help.
 - **Non-obvious ranking figure**:
-  [`grids-2026-06-04/rank_interesting.png`](grids-2026-06-04/rank_interesting.png)
+  [`summary/2026-06-04/grids-2026-06-04/rank_interesting.png`](summary/2026-06-04/grids-2026-06-04/rank_interesting.png)
   — confidence-filtered signals, highlighting divergence/drift.
 - **Grid CSVs**:
-  [`grid_auroc_correct.csv`](grids-2026-06-04/grid_auroc_correct.csv),
-  [`grid_auroc_noharm.csv`](grids-2026-06-04/grid_auroc_noharm.csv),
-  [`grid_spearman_cont.csv`](grids-2026-06-04/grid_spearman_cont.csv),
-  [`corr_long.csv`](grids-2026-06-04/corr_long.csv).
+  [`grid_auroc_correct.csv`](summary/2026-06-04/grids-2026-06-04/grid_auroc_correct.csv),
+  [`grid_auroc_noharm.csv`](summary/2026-06-04/grids-2026-06-04/grid_auroc_noharm.csv),
+  [`grid_spearman_cont.csv`](summary/2026-06-04/grids-2026-06-04/grid_spearman_cont.csv),
+  [`corr_long.csv`](summary/2026-06-04/grids-2026-06-04/corr_long.csv).
 
 ### v2 / next version
 
@@ -200,7 +200,7 @@ This plan is organized by artifact type and version line:
 - [`slides/`](slides/) contains Beamer decks. Its local guide is
   [`slides/README.md`](slides/README.md). Weekly progress inputs live under
   `slides/weekly/` and are appended in `slides/main.tex` chronologically.
-- [`grids-2026-06-04/`](grids-2026-06-04/) contains v1.5 signal-grid CSVs and
+- [`summary/2026-06-04/grids-2026-06-04/`](summary/2026-06-04/grids-2026-06-04/) contains v1.5 signal-grid CSVs and
   ranking figures. The setting/provenance for these cells is
   [`P08-S3`](settings.md#p08-s3--v15-intrinsic-signal-probe).
 - [`misc/`](misc/) contains supporting notes that are not primary entry points.
@@ -219,7 +219,7 @@ parent README must say what the folder is for and link the folder's own
 - [`v0-budget.md`](v0-budget.md) — practical v0 budget
 - [`v0-budget_zh.md`](v0-budget_zh.md) — Chinese v0 budget
 - [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md) — v1 empirical state and paper claim
-- [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex) — v1.5 intrinsic gating note
+- [`v1.5-intrinsic-gating-study-2026-06-04.tex`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.tex) — v1.5 intrinsic gating note
 - [`validation.md`](validation.md) — experimental protocol, baselines
 - [`channels.md`](channels.md) — benchmarks, datasets
 - [`budget.md`](budget.md) — costs by phase

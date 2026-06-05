@@ -55,6 +55,6 @@ sites can be protected during fine-tuning.
 - Plan 08 main: [`notes/plans/08-model-outputs-delta-w/README.md`](../notes/plans/08-model-outputs-delta-w/README.md)
 - Plan 08 settings registry: [`notes/plans/08-model-outputs-delta-w/settings.md`](../notes/plans/08-model-outputs-delta-w/settings.md)
 - Plan 08 v1 result: [`notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`](../notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md)
-- Plan 08 v1.5 note: [`notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.tex`](../notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.tex)
+- Plan 08 v1.5 note: [`notes/plans/08-model-outputs-delta-w/summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.tex`](../notes/plans/08-model-outputs-delta-w/summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.tex)
 - Plan 09 main: [`notes/plans/09-intrinsic-site-protection/README.md`](../notes/plans/09-intrinsic-site-protection/README.md)
 - Plan 09 matrix: [`notes/plans/09-intrinsic-site-protection/matrix.md`](../notes/plans/09-intrinsic-site-protection/matrix.md)

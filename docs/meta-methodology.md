@@ -149,6 +149,36 @@ mechanism. Cross-reference their cohort measurements; do not merge them.
 
 ---
 
+## 13. Documentation, reporting & evidence hygiene
+
+Distilled from how we present results (plan 08 v1.5). The goal: a reader or
+listener can follow **every claim to its evidence** in one or two clicks.
+
+1. **One wiki page decodes every term.** Every label on a table/slide/figure
+   (route, signal, setting ID, experiment ID, metric) is defined **once, with a
+   link**, in a glossary. If a term isn't in the glossary, it doesn't go on a slide.
+2. **A settings registry is the single source for exact recipes.** Result cells
+   cite a **stable setting ID** (e.g. `P08-S7`); hyperparameters live there and are
+   never repeated locally. New result ⇒ new/updated setting entry.
+3. **Refer details OUT of slides.** A slide is for a *human*: capture the **core
+   logic** — *why it matters → why this approach → expected effect → real result*
+   — with ≤ a few bullets and one figure/number per slide; end each with
+   "→ details: \<doc/setting\>". Never dump tables a person can't read in 10 s.
+4. **Annotate every claim with its basis.** Keep a **claim ↔ evidence** table:
+   claim → the number → the file → the setting. Same for motivations. No claim
+   ships without a pointer to the data that supports it.
+5. **Explain metrics high-level, defer the math.** State how to *read* each metric
+   (what higher/lower means, what chance is, why it supports the claim) in the
+   wiki; put formulas / ranges / derivations in the settings/codebook.
+6. **Readable assets index.** Group artifacts by **purpose** (start-here /
+   headline results / figures / docs / scripts / data / archives) with a "what it
+   gives you" per row — not a flat path dump.
+7. **Result-logging convention.** Every run ⇒ flip the status, persist CSV+figure
+   to the dated grids dir, add it to the assets index. Raw per-item data stays on
+   the pods; pulled summaries live in-repo.
+8. **Negative results are first-class.** Keep failed ablations *with the reason*;
+   they are what justify the design choices.
+
 ## Execution checklist (run at the start and end of every empirical study)
 
 - [ ] Is the metric the benchmark's **native** metric, scored its own way?
