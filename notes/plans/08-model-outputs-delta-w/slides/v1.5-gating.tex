@@ -100,20 +100,9 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Result 2 --- \emph{deploy it safely} (expected vs.\ real)}
-  \small
-  \textbf{Expected:} one gate keeps the in-dist gains, avoids the OOD harm, and works on a new base model unchanged.
-  \vspace{0.4em}
-  \begin{block}{Real (honest 5-fold CV)}
-  \begin{itemize}
-    \item \textbf{recovers most harm}: the routing gate pulls the wrapper back toward base (e.g.\ trivia Qwen3-8B $0.23\to0.45$ vs base $0.46$). Strict do-no-harm (gate $\ge$ base) holds \textbf{17/35}; an \emph{oracle} gate holds \textbf{35/35} --- the signal has real headroom.
-    \item \textbf{model-agnostic}: the gate signal (\texttt{delta\_last}) predicts usefulness on an \textbf{unseen} family at AUROC \textbf{0.71} (leave-one-model-out, 7 families).
-    \item \textbf{locking (one gate, same wrappers):} keeps the in-dist QA gain ($+0.050\!\to\!+0.049$) while cutting OOD harm ($-0.075\!\to\!-0.054$).
-    \item \textbf{which signal generalizes:} memory-write dynamics (yes) vs.\ logit-lens confidence (no --- model-specific).
-  \end{itemize}
-  \end{block}
-  \footnotesize $\rightarrow$ data \texttt{raw/grids-xmodel-2026-06-05/\{gate\_route\_main,gate\_transfer\_lomo\}.csv}, \texttt{raw/baselines-2026-06-05/\{gate\_baselines,locking\_by\_distance\}.csv}; analysis matrix \texttt{\S2b/\S7/\S7b} · settings \texttt{P08-S6/S8}; failed soft-gate $=$ \texttt{v1.5-gate-sweep-2026-06-05.md}.
-\end{frame}
+% "Result 2 --- deploy it safely" (the gate result) is held for NEXT WEEK's deck;
+% it is staged in v1.5-gate-nextweek.tex, to be finalized with the running
+% significance / honest-gate / locking batch. Not shown this week.
 
 \begin{frame}{Baselines side-by-side: floor $\to$ wrapper $\to$ gate $\to$ ceiling}
   \scriptsize Qwen3-8B; wrapper trained on \emph{mix} (all datasets). Numbers = native score (PRIMARY metric).
