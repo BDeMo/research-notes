@@ -286,7 +286,7 @@
   \emph{in-distribution gains} and \emph{recovers most of the out-of-distribution harm}
   (oracle shows full headroom), and the gate signal \textbf{transfers across 7 model families with no tuning}.
   \vspace{1.2em}\\
-  \footnotesize $\rightarrow$ every term/number on the next slides links out to a wiki page: \texttt{v1.5-glossary.md}.
+  \footnotesize $\rightarrow$ every term/number on the next slides links out to a wiki page: \texttt{summary/2026-06-05/v1.5-glossary.md}.
 \end{frame}
 
 
@@ -315,12 +315,12 @@
     \item \textbf{So the real product is not just "a better memory module"} --- it's \textbf{knowing when to use it}, automatically, on any base model.
   \end{itemize}
   \vspace{0.6em}
-  \footnotesize $\rightarrow$ v1 characterization (3-regime law): analysis \texttt{v1-results-2026-06-03.md}; per-bench data \texttt{mem-embedding/summary/v1-archive/tables/*.csv}. \emph{(Training-time forgetting itself is measured in the separate Janus track, not this paper.)}
+  \footnotesize $\rightarrow$ v1 characterization (3-regime law): analysis \texttt{v1-results-2026-06-03.md}; per-bench data \texttt{mem-test/mem-embedding/summary/v1-archive/tables/*.csv}. \emph{(Training-time forgetting itself is measured in the separate Janus track, not this paper.)}
 \end{frame}
 
 \begin{frame}{How the memory wrapper connects to the base}
   \begin{center}
-    \includegraphics[width=0.96\linewidth]{../../summary/2026-06-05/wrapper-connect.png}
+    \includegraphics[width=0.82\linewidth,height=0.46\textheight,keepaspectratio]{../summary/2026-06-05/wrapper-connect.png}
   \end{center}
   \vspace{-0.4em}
   \begin{itemize}\footnotesize
@@ -328,12 +328,12 @@
     \item Those vectors are \textbf{prepended to the query} as a soft prompt ($[\,m\,;\,q\,]$); the \textbf{base is frozen} --- only $G_\phi$ trains, so adaptation can't overwrite general ability.
   \end{itemize}
   \vspace{-0.2em}
-  \footnotesize $\rightarrow$ TikZ source \texttt{summary/2026-06-05/wrapper-connect.tex}; combine modes \texttt{src/mem\_embedding/wrapper.py}; canonical recipe \texttt{P08-S1} (Qwen3-8B, $K{=}64$, \texttt{combine=xattn}).
+  \footnotesize $\rightarrow$ TikZ source \texttt{summary/2026-06-05/wrapper-connect.tex}; combine modes \texttt{mem-test/mem-embedding/src/mem\_embedding/wrapper.py}; canonical recipe \texttt{P08-S1} (Qwen3-8B, $K{=}64$, \texttt{combine=xattn}).
 \end{frame}
 
 \begin{frame}{What we do (architecture)}
   \begin{center}
-    \includegraphics[width=0.86\linewidth]{../../summary/2026-06-05/architecture-v1.5.png}
+    \includegraphics[width=0.78\linewidth,height=0.62\textheight,keepaspectratio]{../summary/2026-06-05/architecture-v1.5.png}
   \end{center}
   \vspace{-0.6em}
   \footnotesize Recurrent memory (carried from v0) $+$ a \textbf{do-no-harm gate} $g$: $e'=e+g\,\alpha\Delta e$, with $g{\to}0\Rightarrow$ the base is \emph{untouched}.
@@ -347,13 +347,13 @@
     \item \textbf{Crucial requirement:} those signals must be \emph{the same across model families} --- otherwise we'd re-tune per model and it's not deployable.
   \end{itemize}
   \vspace{0.6em}
-  \footnotesize $\rightarrow$ data \texttt{raw/grids-xmodel-2026-06-05/xmodel\_consistency\_7models.csv}; analysis \texttt{v1.5-metric-candidates-2026-06-04.md} (codebook+verdicts) · matrix \texttt{\S2/\S2b} · setting \texttt{P08-S6}.
+  \footnotesize $\rightarrow$ data \texttt{raw/grids-xmodel-2026-06-05/xmodel\_consistency\_7models.csv}; analysis \texttt{summary/2026-06-04/v1.5-metric-candidates-2026-06-04.md} (codebook+verdicts) · matrix \texttt{\S2/\S2b} · setting \texttt{P08-S6}.
 \end{frame}
 
 \begin{frame}{Result 1 --- \emph{where} it helps (expected vs.\ real)}
   \begin{columns}
     \begin{column}{0.55\linewidth}
-      \includegraphics[width=\linewidth]{../../raw/grids-xmodel-2026-06-05/transfer_heatmap.png}
+      \includegraphics[width=\linewidth,height=0.62\textheight,keepaspectratio]{../raw/grids-xmodel-2026-06-05/transfer_heatmap.png}
     \end{column}
     \begin{column}{0.43\linewidth}
       \small
@@ -363,7 +363,7 @@
         \item \textbf{in-distribution: it helps} (QA $+2$ to $+9$ pt).
         \item competence is \textbf{distribution-bound}: gain $\to$ harm already at the same-task line.
       \end{itemize}
-      \vspace{0.3em}\footnotesize $\rightarrow$ data \texttt{raw/grids-xmodel-2026-06-05/transfer\_matrix.csv} (+\,\texttt{transfer\_long.csv}); analysis matrix \texttt{\S8} · setting \texttt{P08-S7}.
+      \vspace{0.3em}\footnotesize $\rightarrow$ data \texttt{raw/grids-xmodel-2026-06-05/transfer\_matrix.csv} (+\,\texttt{raw/grids-xmodel-2026-06-05/transfer\_long.csv}); analysis matrix \texttt{\S8} · setting \texttt{P08-S7}.
     \end{column}
   \end{columns}
 \end{frame}
@@ -409,5 +409,5 @@
     \item \textbf{Landed:} locking experiment (\texttt{\S7b}) --- one gate keeps in-dist gain \& cuts OOD harm. \textbf{Running:} significance (seeds+CIs), K \& combine-mode ablations, full-context ceiling.
   \end{itemize}
   \vspace{0.5em}
-  \footnotesize $\rightarrow$ full ledger \& asset index: \texttt{mem-embedding/summary/matrix.md}; decode any term: \texttt{v1.5-glossary.md}.
+  \footnotesize $\rightarrow$ full ledger \& asset index: \texttt{mem-test/mem-embedding/summary/matrix.md}; decode any term: \texttt{summary/2026-06-05/v1.5-glossary.md}.
 \end{frame}
