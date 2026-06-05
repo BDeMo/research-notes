@@ -37,7 +37,16 @@ Root cause: attention-proj-only training can't learn GSM8K reasoning + lr 1e-4 w
 attention. → fix the trainer (LoRA on all modules / full-FT, moderate lr; protection
 masks protected-head deltas), re-run. (3rd time the *setup*, not the method, is the blocker.)
 
-**Decisive question:** does protecting the LC-coupled heads (`lc_combined` / `retrieval` / `attn_distance` / `v_norm`) during heavy SFT **preserve general (MMLU) + long-context (NIAH) better than random**, at equal new-domain gain — and match/beat the post-hoc **ΔW oracle** while being *a-priori*?
+> ⚠️ **MECHANISM RECKONING (2026-06-04 eve).** Partial-correlation + within-layer
+> controls show the v1 "uniformly positive head-level coupling" is **largely
+> confounded** (pooling + activation magnitude + depth; qwen3.5 = hybrid artifact).
+> Per-model, head-level couplings are weak/≈0/negative; the survivor `attn_distance
+> ~dW_drift` is a **layer/depth** effect. → revised claim = *long-context-heavy
+> **layers** are the forgetting hotspots*, not "same heads." See
+> [`paper-preexp-plan-2026-06-04.md`](paper-preexp-plan-2026-06-04.md). Pre-exps now
+> target the *real* claim. 🟢 mechanism ladder running on 4×H100.
+
+**Decisive question (revised):** at the granularity that survives controls (**layer-level**, `attn_distance`), is there a clean coupling that scales — and can protecting those *layers* reduce forgetting beyond an activation-magnitude / depth baseline?
 
 **Compute:** ray 4×H100 = the sweep. sam-dev 4×H100 = v1 mem-test (not ours, leave).
 
