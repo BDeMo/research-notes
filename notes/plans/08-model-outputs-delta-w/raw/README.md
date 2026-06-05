@@ -74,5 +74,8 @@ noted below; full recipes (`P08-S0…S8`) in [`../settings/settings.md`](../sett
 ### [`mix-2026-06-05/`](mix-2026-06-05/) — multi-task (mix) training (Qwen3-8B, 3 seeds)
 - `mix_results.csv` — `bench, seed, native_w, native_0, delta, n`: one wrapper trained on ALL datasets mixed (`train-dataset=mix`), `native_w`/`native_0` = wrapper vs no-context PRIMARY score, `delta` = their difference, per seed (42/7/11). (`§8`; shows mix does **not** broaden competence.)
 
+### [`seed_std-2026-06-05.csv`](seed_std-2026-06-05.csv) — per-benchmark seed variance (the noise floor)
+`setting, bench, n_seeds, no_ctx_mean, no_ctx_std, wrapper_mean, wrapper_std`: mean±std of the PRIMARY score across seeds (Qwen3-8B; `qwen3_8b_catniah` = 4 seeds, `qwen3_8b_mix` = 3 seeds). **Use as the reference error bar:** no-context is stable (std ≈0.01–0.03) but the **wrapper is seed-unstable on QA** (trivia/hotpot wrapper std ≈0.08–0.18), so a wrapper delta smaller than ~1 std on those benches is not meaningful. (v1 Phase-Y 4-seed std is in `v1-results-2026-06-03.md §5` / matrix §1; single-seed transfer-grid cells get CIs from the running 5-seed significance batch.)
+
 > Landing next (will be added here with the same protocol): full-context ceiling
 > (`native_full`) and mix+SFT (`native_sft*`) per bench × model.

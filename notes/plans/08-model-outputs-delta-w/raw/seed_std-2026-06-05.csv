@@ -1,0 +1,14 @@
+setting,bench,n_seeds,no_ctx_mean,no_ctx_std,wrapper_mean,wrapper_std
+qwen3_8b_catniah,quality,4,0.2300,0.0153,0.2167,0.0256
+qwen3_8b_catniah,musr_mm,4,0.5133,0.0183,0.5350,0.0288
+qwen3_8b_catniah,ruler_niah,4,0.0000,0.0000,0.0000,0.0000
+qwen3_8b_catniah,hotpot_qa,4,0.1894,0.0323,0.1295,0.0933
+qwen3_8b_catniah,trivia_qa,4,0.4616,0.0199,0.2302,0.1767
+qwen3_8b_mix,quality,3,0.2333,0.0205,0.2267,0.0249
+qwen3_8b_mix,musr_mm,3,0.5200,0.0245,0.5100,0.0432
+qwen3_8b_mix,ruler_niah,3,0.0000,0.0000,0.0000,0.0000
+qwen3_8b_mix,hotpot_qa,3,0.2341,0.0093,0.2019,0.0788
+qwen3_8b_mix,trivia_qa,3,0.4742,0.0115,0.3239,0.0997
+qwen3_8b_mix,squad_v2,3,0.1706,0.0299,0.1565,0.0333
+qwen3_8b_mix,narrativeqa,3,0.1489,0.0150,0.1185,0.0322
+qwen3_8b_mix,ms_marco,3,0.2195,0.0063,0.2008,0.0465
