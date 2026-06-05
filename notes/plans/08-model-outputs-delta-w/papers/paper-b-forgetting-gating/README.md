@@ -1,5 +1,9 @@
 # Paper B — Do-No-Harm Adaptation (Forgetting & Gating)
 
+> 📨 **Writing agent: start at [`summary-matrix.md`](summary-matrix.md)** — the single-source handoff
+> brief (thesis · claims↔evidence with exact numbers + sources · main table · baselines · novelty
+> defense · ⛔do-not-overclaim list · section plan · asset index · status).
+
 **Status:** 🟢 **ACTIVE — the paper we write first** (started 2026-06-05).
 **Working title:** *Do No Harm: a portable, model-agnostic memory module that knows when not to fire.*
 **Scope source:** [two-paper litreview §Paper B](../../summary/2026-06-05/two-paper-litreview-2026-06-05.md). **Reasoned spine + locked decisions:** [`logic.md`](logic.md). **Framing:** [`framing.md`](framing.md).
