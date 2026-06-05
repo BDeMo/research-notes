@@ -34,16 +34,25 @@ relies on* (write protection). The signal needs **no labels and no per-model tun
 
 Negative/ablation results that sharpen the story: **soft residual gate fails** (H4), **multi-depth injection fails** (matrix §7c) → both motivate *hard routing over soft/deep residual injection*.
 
-## Honest novelty (do not over-claim)
-read gate ≈ adaptive retrieval (**TARG**, Self-RAG, "When do LLMs need RA?"); write protection ≈
-**MoFO/MIGU/ESFT** + Mechanistic-Forgetting head-freezing; multi-depth ≈ **LLaMA-Adapter**.
-**Novelty = unifying read+write do-no-harm under ONE cross-model-general intrinsic signal**, not any
-single mechanism. **Reviewer-mandatory baselines:** read — TARG logit-margin gate, LLaMA-Adapter;
-write — EWC, MoFO/MIGU, ESFT, Mechanistic-Forgetting head-freezing.
+## Framing (popular / agent-oriented) → see [`framing.md`](framing.md)
+We **do not** lead with narrow "catastrophic forgetting." Headline = **do-no-harm augmentation for
+agents**: *a pluggable, inference-time memory module that knows when not to fire* (gate→base
+fallback, do-no-harm by construction).
+**⚠️ Honest constraint (read-baseline run §7d):** on 3 families a trivial **TARG** base-uncertainty
+gate ≥ our `delta_last` signal (LOMO 0.60 vs 0.56). So the defensible contribution is the
+**framing + do-no-harm-by-construction for a *learned* module + cross-model robustness of intrinsic
+gating** — *not* "our signal beats all." The 7-family head-to-head (ours vs TARG vs ours⊕TARG) is the
+decisive next run.
 
-## Where things stand → see [`outline.md`](outline.md)
-Read-side (08) is **mostly evidenced**; write-side (09) is the **main gap**; reviewer baselines + an
-**online** gate are the rest. Open scope/venue decisions are flagged at the top of `outline.md`.
+## Honest novelty (do not over-claim)
+read gate ≈ adaptive retrieval (**TARG**, Self-RAG, "When do LLMs need RA?"); multi-depth ≈
+**LLaMA-Adapter**. **Reviewer-mandatory baselines:** TARG base-uncertainty gate (✅ done, competitive),
+output-confidence gate (✅ done), LLaMA-Adapter (≈ multi-depth, done/negative).
+
+## Where things stand → see [`outline.md`](outline.md) + [`framing.md`](framing.md)
+Read-side (08) is **mostly evidenced**, but the read baselines show **TARG is competitive** → the
+decisive gap is the **7-family head-to-head** + a **relevance/agent eval** to earn the framing.
+Write-side (Plan 09) is **parked** (read-only scope).
 
 ## Links
 - **outline + claim→evidence map:** [`outline.md`](outline.md)

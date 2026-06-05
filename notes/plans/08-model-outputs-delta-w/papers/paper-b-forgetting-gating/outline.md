@@ -35,17 +35,20 @@
 | A1 | soft residual gate **fails** (motivates hard routing) | ✅ have | gate-sweep doc | §7/H4 |
 | A2 | multi-depth injection **fails** (motivates input-level routing) | ✅ have | `raw/deep-2026-06-05/multidepth_trivia.csv` | §7c |
 | S1 | significance: per-bench 5-seed means ± CIs | 🔄 running | `abl` batch (23/38) | §0 |
-| **C4** | **write-time site protection beats EWC/MoFO (same signal)** | ❌ **gap** | Plan 09 experiments | — |
-| B1 | read baseline: **TARG** logit-margin gate | ❌ gap | buildable from existing signal jsonls | — |
-| B2 | read baseline: Self-RAG / confidence gate | ❌ gap | — | — |
+| **C4** | **write-time site protection beats EWC/MoFO (same signal)** | ⏸ out of scope (read-only paper) | Plan 09 | — |
+| B1 | read baseline: **TARG** (base-uncertainty) gate | ⚠️ **done (3-family) — TARG ≥ ours** | `raw/baselines-2026-06-05/gate_read_baselines.csv` | §7d |
+| B2 | read baseline: output-confidence (Self-RAG-ish) | ✅ done (3-family) | same CSV | §7d |
+| **B0** | **7-family head-to-head** ours vs TARG vs out-conf vs ours⊕TARG | ❌ **decisive gap** | pull Phi/Mistral/Q2.5/Q3-14B jsonls | — |
 | B3 | write baselines: EWC, MoFO/MIGU, ESFT, head-freezing | ❌ gap | Plan 09 | — |
 | O1 | **online** gate (current routing is offline/simulated) | ❌ gap | new run | — |
 
 ## Experiment queue (priority)
 - **P0 — in hand:** C1a/b/c, C2, C3a–d, A1, A2 (above). Fold significance (S1) when `abl` lands.
-- **P1 — read-side baselines (cheap, reuse signal jsonls):** TARG logit-margin gate (B1), confidence gate (B2) → compare AUROC/harm-recovery vs `delta_last` gate. *No new GPU for the offline versions.*
-- **P2 — online gate (O1):** wire the routing decision into generation (apply memory vs skip per-input) and re-measure do-no-harm live, not via post-hoc routing.
-- **P3 — write-side (C4, Plan 09):** build long-ctx-importance site map → freeze during SFT on the mix; compare to no-protect SFT (the §7c forgetting baseline), EWC, MoFO/MIGU, ESFT, head-freezing. *Decides whether Paper B = read⊕write or read-only.*
+- **P1 — read baselines (DONE, 3-family):** TARG (B1) + output-confidence (B2) vs ours → **honest finding: TARG ≥ ours on 3 families** (§7d). *This reshapes the thesis — see [`framing.md`](framing.md).*
+- **P1.5 — DECISIVE: 7-family head-to-head (B0):** pull Phi/Mistral/Qwen2.5-7B/Qwen3-14B signal jsonls from ray/test pods → ours vs TARG vs out-conf vs **ours⊕TARG**. Settles whether our signal beats/complements TARG (ours was strongest on Phi/Mistral). *Cheap, offline, no GPU.*
+- **P2 — relevance/agent eval:** a "augmentation-sometimes-irrelevant" benchmark (mixed relevant/decoy context) to **earn the do-no-harm-for-agents framing**; without it F1/F2 are unbacked.
+- **P3 — online gate (O1):** wire apply-or-skip into generation (live, not post-hoc routing).
+- **(parked) write-side (C4, Plan 09):** out of scope for this read-only paper; follow-up.
 
 ## Target venue / timeline
 **OPEN** (decision #2 above). Candidate framings: CF/continual-learning track (problem-first) or

@@ -1,0 +1,4 @@
+family,feats,lead,lead_auroc_help_pooled,pooled_cv_score,dnh_cells,total_cells,lomo_auroc_mean,floor,ungated,oracle
+ours,delta_last+delta_mean+delta_trend+slot_norm_max+slot_norm_mean+drift_mem,delta_last,0.5835,0.2304,8,15,0.5574,0.2956,0.2304,0.3417
+targ,entropy_0+margin_0+conf_0,margin_0,0.6240,0.2622,8,15,0.6045,0.2956,0.2304,0.3417
+outconf,conf_w+margin_w+entropy_w+top5_mass_w,conf_w,0.5871,0.2404,8,15,0.5860,0.2956,0.2304,0.3417
