@@ -13,14 +13,50 @@
   \end{center}
 \end{frame}
 
-\begin{frame}{Weekly Recall: Why Are We Doing This?}
-  \begin{block}{Problem}
-    RCA/debugging needs long evidence: logs, traces, topology, prior cases, and
-    code context. Directly fine-tuning the base model can teach RCA behavior, but
-    may weaken general reasoning or retrieval ability.
+\begin{frame}{Recall: The Two Core Problems}
+  \small
+  \begin{block}{Problem 1: long-context inference}
+    At test time, the model may need to answer from very long evidence: logs,
+    traces, documents, retrieved cases, or code. The question is how to use that
+    evidence without always paying full-context cost.
+  \end{block}
+  \begin{block}{Problem 2: catastrophic forgetting during training}
+    When we train or adapt a model for a specialized setting, it may improve on
+    that setting but lose general abilities such as reasoning, retrieval, or
+    instruction following.
   \end{block}
   \begin{itemize}
-    \item We want domain adaptation without overwriting the frozen base model.
+    \item Root-cause-analysis (RCA) benchmarks matter here because they naturally
+      combine both problems: long evidence at inference time and specialized
+      adaptation pressure at training time.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Preliminaries: Vocabulary For This Talk}
+  \scriptsize
+  \begin{tabular}{p{0.28\textwidth}p{0.64\textwidth}}
+    \toprule
+    Term & Meaning in this project \\
+    \midrule
+    Frozen base model & The original LLM is not updated; this protects its general ability. \\
+    Adaptation module & A small extra component trained for the task while the base stays frozen. \\
+    Learned memory module / wrapper & The adaptation module tested here; it compresses long evidence into soft memory tokens. \\
+    Soft memory / soft prompt & Continuous vectors inserted into the model, not human-readable text. \\
+    Gate & A decision rule that chooses whether to use the learned memory or fall back to the base/full-context path. \\
+    Do-no-harm & The gate should keep gains when memory helps and avoid losing points when memory is unsafe. \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
+\begin{frame}{Background: Why Study These Two Problems?}
+  \begin{block}{Problem}
+    RCA-style tasks are a motivating benchmark family because they expose both
+    long-context inference and training-time forgetting. They require long
+    evidence at test time, and task-specific training can still damage general
+    model behavior.
+  \end{block}
+  \begin{itemize}
+    \item We want task adaptation without overwriting the frozen base model.
     \item The useful module should compress long context, be reusable, and be
       safe to turn off when it is not appropriate.
     \item This connects May Week 4 to June Week 1: first build a wrapper, then
@@ -32,7 +68,7 @@
   \begin{columns}[T]
     \begin{column}{0.49\textwidth}
       \begin{block}{Practical use}
-        A memory wrapper could make long-context RCA cheaper and more modular:
+        A learned memory module could make long-context inference cheaper and more modular:
         keep the base model frozen, attach a small learned memory path, and reuse
         compressed evidence.
       \end{block}
@@ -57,7 +93,7 @@
 \begin{frame}{What Are We Doing?}
   \small
   \begin{enumerate}
-    \item \textbf{Train a wrapper} around a frozen base model: long evidence
+    \item \textbf{Train a learned memory module} around a frozen base model: long evidence
       context $c_{1:n}$ is compressed into soft memory $m$.
     \item \textbf{Evaluate the wrapper} against no-context, full-context,
       retrieval, and Gist-style baselines.
@@ -75,7 +111,7 @@
 
 \begin{frame}{Goal For This Line Of Work}
   \begin{block}{Main goal}
-    A frozen-base memory system that improves long-context/RCA cases where
+    A frozen-base memory system that improves long-context cases where
     compression is useful, while preserving the base model when memory is unsafe.
   \end{block}
   \begin{itemize}
@@ -192,7 +228,7 @@
       \begin{block}{Done}
         \begin{itemize}
           \item v1 reframed as bit-capacity characterization.
-          \item Main result cells and settings are linked.
+          \item Main result cells, settings, and terminology are linked.
           \item Gate direction is now concrete, not vague.
         \end{itemize}
       \end{block}

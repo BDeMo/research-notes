@@ -5,9 +5,9 @@
 %  Wiki/details: ../summary/2026-06-05/v1.5-glossary.md, ../settings/settings.md, ../summary/2026-06-04/v1.5-metric-candidates-2026-06-04.md,
 %                ../v1.5-gate-sweep-2026-06-05.md.
 % =============================================================
-\section{v1.5 --- Safe, model-agnostic memory gate (2026-06-05)}
+\section{Detailed Evidence --- Safe Memory Gate (2026-06-05)}
 
-\begin{frame}{v1.5: can a learned memory module be deployed \emph{safely}?}
+\begin{frame}{Detailed Question: Can Learned Memory Be Deployed \emph{Safely}?}
   \large
   \begin{itemize}
     \item A frozen base + a small learned \textbf{memory wrapper}.
@@ -21,11 +21,29 @@
   \footnotesize $\rightarrow$ every term/number on the next slides links out to a wiki page: \texttt{v1.5-glossary.md}.
 \end{frame}
 
+
+\begin{frame}{Preliminaries For The Gate Evidence}
+  \scriptsize
+  \begin{tabular}{p{0.28\textwidth}p{0.64\textwidth}}
+    \toprule
+    Term & Meaning in the detailed gate slides \\
+    \midrule
+    In-distribution (ID) & Test inputs similar to what the memory module was trained on. \\
+    Out-of-distribution (OOD) & Test inputs that differ from training; this is where memory can become unsafe. \\
+    Intrinsic signal & A number read from the model's own forward pass, without needing the true answer. \\
+    Memory-write dynamics & How strongly the module changes or writes memory; used as a clue for competence. \\
+    Model-agnostic & The same gate rule should transfer across model families without retuning. \\
+    AUROC & A threshold-free score for whether a signal separates useful vs unsafe memory cases. \\
+    Leave-one-model-out & Train/choose the signal on some model families, then test on a held-out family. \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
+
 \begin{frame}{Why it matters}
   \begin{itemize}
     \item \textbf{Frozen base = a promise: don't regress.} A memory/adaptation module is only deployable if it can't quietly \emph{hurt} the model on inputs it wasn't built for.
-    \item \textbf{Our v1 finding:} the memory wrapper is a \emph{narrow lossy compressor} --- it helps on some inputs and \textbf{actively hurts} on others (e.g.\ exact-answer QA). Negative transfer is the blocker.
-    \item \textbf{So the real product isn't "a better wrapper"} --- it's \textbf{knowing when to use it}, automatically, on any base model.
+    \item \textbf{Our v1 finding:} the learned memory module is a \emph{narrow lossy compressor} --- it helps on some inputs and \textbf{actively hurts} on others (e.g.\ exact-answer QA). Negative transfer is the blocker.
+    \item \textbf{So the real product is not just "a better memory module"} --- it's \textbf{knowing when to use it}, automatically, on any base model.
   \end{itemize}
   \vspace{0.8em}
   \footnotesize $\rightarrow$ v1 characterization (3-regime law): \texttt{v1-results-2026-06-03.md}.
