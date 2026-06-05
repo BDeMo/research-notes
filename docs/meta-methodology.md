@@ -15,8 +15,8 @@
 ```
 measure (broad, intrinsic, native)
    → find the load-bearing / trustworthy subset
-      → intervene only there (gate / protect)
-         → verify do-no-harm across seeds AND model families
+      → act only on that subset
+         → verify it holds vs baselines, across seeds AND model families
             → report the whole grid, not the cherry-pick
 ```
 
@@ -40,7 +40,7 @@ Every principle below is a way of not cheating at one of these five steps.
 - Run the **observation study before designing the method**, and **gate the
   method on what the observation finds.** Plan 09 is structured this way (H1/H2
   measured before any protection mechanism); plan 08 v1.5 ran the intrinsic
-  **signal study before** building the do-no-harm gate.
+  **signal study before** building the gate.
 - This is cheap insurance: if the coupling/signal is weak, you learn it in the
   cheap phase instead of after building a method on a false premise.
 
@@ -99,14 +99,19 @@ Every principle below is a way of not cheating at one of these five steps.
   fractional-depth layer-curve features travel; raw absolute-layer-index
   features do not (depths differ, e.g. 36 / 40 / 32 layers).
 
-## 9. Do-no-harm / frozen-base philosophy
+## 9. Anchor every result to baselines, controls, and a ceiling
 
-- When adding capability to a pretrained model, the **default action is "don't
-  degrade what already works."** Intervene only where you have positive evidence
-  it helps; otherwise fall back to the base.
-- Make the intervention **input-conditioned**: a trustworthiness signal decides
-  per-input (gate the wrapper) or per-site (protect the weights). Negative
-  transfer on out-of-distribution inputs is the failure this prevents.
+- A number means nothing alone. Always report against the **trivial baselines**
+  (no-op / unmodified / random / no-context) and, where definable, an **oracle
+  ceiling** — the contribution is the *measured gap* you close between them, never
+  an assumed one.
+- **Ablate each added component** against a no-op control so its effect is
+  isolated, and keep the control in the reported grid.
+
+> *Project note (not a meta principle):* "do-no-harm / frozen-base gating" is a
+> plan-08/09 **research thesis** (a response to catastrophic forgetting), not a
+> general methodology rule. It lives in §12 (worked instances) and the plan docs,
+> not here.
 
 ## 10. Compute discipline
 
@@ -188,6 +193,6 @@ listener can follow **every claim to its evidence** in one or two clicks.
 - [ ] Did I **filter trivial** correlates and surface the **non-obvious** ones?
 - [ ] Is every reported metric in a **codebook** (setting + definition + why)?
 - [ ] Does each finding survive **multi-seed** and **cross-model** reproduction?
-- [ ] Is the intervention **input/site-conditioned** with a **do-no-harm** default?
+- [ ] Did I report against **trivial baselines** (+ an **oracle ceiling** where definable) and **ablate** each added component?
 - [ ] Did I export the **full grid** (CSV + ranked chart), not a cherry-pick?
 - [ ] Did I log the session in the **matrix** and archive superseded versions with dates?

@@ -3,7 +3,7 @@
 ## Activities
 - Distilled the recurring **execution principles** (honesty/fairness, measure-first,
   native metrics, multi-granularity×angle, filter-to-non-obvious, rank/visualize,
-  metric codebook, multi-seed×cross-model robustness, do-no-harm, compute discipline,
+  metric codebook, multi-seed×cross-model robustness, baselines/controls, compute discipline,
   living ledger) into [`../meta-methodology.md`](../meta-methodology.md) — 12 principles,
   a worked-instances table (08 v1.5 vs 09), and an execution checklist.
 - Reproduced the plan-08 **v1.5 intrinsic gating signals on two new base families** to test
