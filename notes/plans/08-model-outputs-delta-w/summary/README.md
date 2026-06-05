@@ -27,4 +27,4 @@ study) — narrative/analysis only, one subfolder per work-block (by generation 
 - **Result data (CSVs + figures):** [`../raw/`](../raw/) (`grids-2026-06-04/`, `grids-xmodel-2026-06-05/`).
 - **Live results ledger:** `mem-test/mem-embedding/summary/matrix.md`.
 - **Code:** `mem-test/mem-embedding/scripts/` (`probe_v3.py`, `gate_train.py`, `gate_route.py`, `grid_transfer.py`, `signal_corr.py`, `xmodel_consistency.py`).
-- **Slides (for reporting):** [`../slides/v1.5-gating.tex`](../slides/v1.5-gating.tex).
+- **Slides (for reporting):** [`../slides/weekly/v1.5-gating.tex`](../slides/weekly/v1.5-gating.tex).

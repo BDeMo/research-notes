@@ -1,9 +1,10 @@
 % =============================================================
 %  Plan 08 v1.5 — intrinsic-signal do-no-harm gate (appended 2026-06-05)
 %  HUMAN-FACING report deck: why -> how -> expected -> real. Details referred out.
-%  \input{v1.5-gating.tex} from main.tex. Figures: ../figs, ../raw/grids-xmodel-2026-06-05.
-%  Wiki/details: ../summary/2026-06-05/v1.5-glossary.md, ../settings/settings.md, ../summary/2026-06-04/v1.5-metric-candidates-2026-06-04.md,
-%                ../v1.5-gate-sweep-2026-06-05.md.
+%  Included by main.tex as weekly/v1.5-gating.tex (this file lives in slides/weekly/).
+%  Figures (relative to here): ../../summary/2026-06-05/, ../../raw/grids-xmodel-2026-06-05/.
+%  Wiki/details: ../../summary/2026-06-05/v1.5-glossary.md, ../../settings/settings.md,
+%                ../../summary/2026-06-04/v1.5-metric-candidates-2026-06-04.md.
 % =============================================================
 \section{Detailed Evidence --- Safe Memory Gate (2026-06-05)}
 
@@ -52,7 +53,7 @@
 
 \begin{frame}{How the memory wrapper connects to the base}
   \begin{center}
-    \includegraphics[width=0.96\linewidth]{../summary/2026-06-05/wrapper-connect.png}
+    \includegraphics[width=0.96\linewidth]{../../summary/2026-06-05/wrapper-connect.png}
   \end{center}
   \vspace{-0.4em}
   \begin{itemize}\footnotesize
@@ -65,7 +66,7 @@
 
 \begin{frame}{What we do (architecture)}
   \begin{center}
-    \includegraphics[width=0.86\linewidth]{../summary/2026-06-05/architecture-v1.5.png}
+    \includegraphics[width=0.86\linewidth]{../../summary/2026-06-05/architecture-v1.5.png}
   \end{center}
   \vspace{-0.6em}
   \footnotesize Recurrent memory (carried from v0) $+$ a \textbf{do-no-harm gate} $g$: $e'=e+g\,\alpha\Delta e$, with $g{\to}0\Rightarrow$ the base is \emph{untouched}.
@@ -85,7 +86,7 @@
 \begin{frame}{Result 1 --- \emph{where} it helps (expected vs.\ real)}
   \begin{columns}
     \begin{column}{0.55\linewidth}
-      \includegraphics[width=\linewidth]{../raw/grids-xmodel-2026-06-05/transfer_heatmap.png}
+      \includegraphics[width=\linewidth]{../../raw/grids-xmodel-2026-06-05/transfer_heatmap.png}
     \end{column}
     \begin{column}{0.43\linewidth}
       \small
