@@ -1,0 +1,143 @@
+% Week naming rule (see 2026-06-w01.tex):
+% 2026-06-wNN = the NN-th Monday-week of June 2026.
+% This input is a cross-repo UPDATE compiled 2026-06-04, appended after the
+% June Week 1 report. Earlier inputs (w04, w01) are left unchanged (archived).
+
+\section{June 2026 Week 2 --- Cross-Repo Update}
+
+\begin{frame}{Reporting Period: June 2026 Week 2 (compiled 2026-06-04)}
+  \begin{center}
+    \small Cross-repo progress update; earlier weekly inputs are unchanged (archived). \\
+    \scriptsize Concise record; detailed facts live in linked \texttt{BDeMo/research-notes} notes.
+  \end{center}
+\end{frame}
+
+\begin{frame}{This Update: Main Message}
+  \begin{block}{One line}
+    Same goal --- adapt to RCA / long context while preserving the frozen base ---
+    pursued across four parallel lines; this week's headline is an \emph{honest pivot}
+    on the long-context $\leftrightarrow$ forgetting hypothesis.
+  \end{block}
+  \begin{itemize}
+    \item \textbf{Janus (Plan 09)}: the ``same heads drive long-context and forgetting''
+      claim was \textbf{falsified under controls}; what survives is that long-context
+      heads are \emph{gradient-shielded} during instruction fine-tuning.
+    \item \textbf{Plan 08 paper}: reframed as a \emph{bit-capacity wall} of soft-prompt
+      memory; target ICLR 2027.
+    \item \textbf{dLLM Best-of-N}: a verifier-readout result for diffusion LLMs (submitted to EMNLP 2026).
+    \item \textbf{RCA application}: curriculum LoRA adapters trained on four RCA datasets.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Janus (Plan 09): Measurement, Falsification, Surviving Finding}
+  \small
+  \begin{block}{Question}
+    Are the transformer-intrinsic sites that carry long-context behavior the same
+    sites that fine-tuning perturbs most?
+  \end{block}
+  \begin{enumerate}
+    \item \textbf{Instrument}: 39 intrinsic metrics / 12 angles; 41-cell grid
+      (4 model families $\times$ 12 benchmarks), native bf16.
+    \item \textbf{First read}: a uniformly positive per-head coupling (looked promising).
+    \item \textbf{Reckoning}: under controls (partial-out activation magnitude,
+      within-layer, per-model, CIs) the \textbf{head-level coupling dissolves} ---
+      the ``two frontiers, one site'' thesis does \emph{not} hold at the head level.
+    \item \textbf{Surviving finding}: long-context heads are \textbf{gradient-shielded}
+      --- SFT gradients \emph{avoid} long-reach / sink heads (within-layer
+      $\rho \approx -0.5\ldots-0.6$).
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Janus: Boundaries of the Shielding Effect}
+  \small
+  \begin{table}
+    \centering
+    \begin{tabular}{lll}
+      \toprule
+      Axis & Finding & Reading \\
+      \midrule
+      Scale & strong at 0.6--14B; $\approx 0$ by 30B/32B & a small/mid-model effect, no reversal \\
+      Objective & holds for tasks; vanishes for plain LM & it is an instruction (Q$\to$A) effect \\
+      Consequence & NIAH robust under instruction-SFT & long context is not where forgetting lands \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \begin{itemize}
+    \item \textbf{Status}: a \emph{measurement} result with an honest negative; the
+      causal protection test (H3) was inconclusive because GSM8K-SFT did not induce
+      long-context forgetting (nothing to protect).
+    \item \textbf{Pivot}: ``long-context heads are intrinsically shielded from
+      instruction fine-tuning'' --- which explains why NIAH survives SFT.
+    \item Facts:
+      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/09-intrinsic-site-protection/facts-2026-06-04.md}{Janus facts (2026-06-04)}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Plan 08: Bit-Capacity Wall of Soft-Prompt Memory}
+  \small
+  \begin{block}{Paper (target ICLR 2027)}
+    \emph{Bit-Capacity Limits of Soft-Prompt Memory} --- what a learned, fixed-size
+    memory wrapper around a frozen LLM can and cannot encode about long context.
+  \end{block}
+  \begin{itemize}
+    \item \textbf{(i) A sharp wall}: exact recall $\approx 1.0$ at $\le 2$-bit answer
+      entropy, collapsing to $0$ above $\sim 10$ bits; the wrapper and a matched-$K$
+      Gist baseline hit the wall \emph{at the same place}.
+    \item \textbf{Reading}: the wall is a property of the soft-prompt \emph{read}
+      interface, not the write architecture.
+    \item \textbf{(ii) Below the wall} the wrapper works but not robustly (seed-sensitive;
+      improves with more synthetic data).
+    \item This generalizes the earlier ``three-regime'' characterization. Repo:
+      \texttt{latent-mem-paper}; facts:
+      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md}{v1 results}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{dLLM Best-of-N: Where Should a Verifier Read?}
+  \small
+  \begin{block}{Paper (submitted to EMNLP 2026)}
+    Best-of-$N$ selection verifiers for diffusion language models.
+  \end{block}
+  \begin{itemize}
+    \item AR decoder-only verifiers read the \emph{final} token because of
+      \textbf{confluence}: under causal masking, that position has seen the whole
+      prompt and answer.
+    \item Diffusion LLMs are bidirectional and fill a masked canvas, so the inherited
+      final position may be padding / an end marker --- \textbf{confluence is broken}.
+    \item \textbf{Fix}: read the \emph{output-span} (answer-bearing region), not the
+      inherited tail. On LLaDA-8B / GSM8K this lifts a linear verifier
+      $75.4 \to 83.7$; on the LLaDA2.0-mini MoE the boundary flips.
+    \item No universal rule --- match readout to generation geometry, check linear
+      separability, separate verifier error from candidate-set limits. Connects to
+      Plan 03 (W-space Best-of-$N$) and the AR$\to$dLLM design rule.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{RCA Application + Cohort}
+  \small
+  \begin{itemize}
+    \item \textbf{RCA model line} (\texttt{rca-demo-qwen}): curriculum LoRA adapters on
+      Qwen2.5 and Qwen3 over a four-dataset RCA curriculum
+      (Nezha $\to$ OpenRCA-500 $\to$ RCAEval $\to$ LincYaw), plus mixed adapters ---
+      the application end of the long-context + forgetting work.
+    \item \textbf{Intern cohort} (\texttt{intern-project}): MoE compiler + phenomena
+      study, agent-skill retrieval/injection, telecom time-series foundation models,
+      and RCA deliverables.
+  \end{itemize}
+  \begin{block}{Why grouped here}
+    These are the \emph{application} and \emph{cohort} ends of the same controlled-adaptation
+    program; the methods above feed them.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Next Steps}
+  \begin{enumerate}
+    \item \textbf{Janus}: build a forgetting-inducing SFT recipe (learn-then-forget),
+      then run the protection sweep; add expert-level metrics for the MoE
+      super-expert probe.
+    \item \textbf{Plan 08}: polish the bit-capacity paper for ICLR 2027; implement the
+      do-no-harm gate (v1.5); design cross-session latent memory (v2).
+    \item \textbf{dLLM Best-of-N}: finalize the EMNLP draft.
+    \item \textbf{RCA}: consolidate curriculum-adapter results into the demo line.
+  \end{enumerate}
+\end{frame}

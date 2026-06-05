@@ -60,9 +60,21 @@
 - **Thesis (shared substrate)**: the intrinsic load-bearing sites — attention sinks / massive activations (dense), super experts (MoE) — carry long context *and* are the forgetting-vulnerable sites; a data-agnostic protection rule fixes both. Source + audit: [`notes/ideas/rca-transformer-intrinsic-2026-06-03.md`](../notes/ideas/rca-transformer-intrinsic-2026-06-03.md).
 - **Design rules DR1–DR15** in §0 of that file are the durable constraints (data-agnostic · transformers-intrinsic · lightweight/model-agnostic · non-task-specific training · audit-first · general-first cross-X eval · 4-seed · AR→dLLM). Any new idea/plan in this line must comply.
 - **Audit verdict**: every single mechanism (R1–R12 dense, M1–M9 MoE) is preempted; the contribution is the *unifying observation + intrinsic site-selection criterion*, not a new mechanism.
-- **Plan 09** ([`notes/plans/09-intrinsic-site-protection/`](../notes/plans/09-intrinsic-site-protection/)) — measure-first: Phase-1 observation study of the long-ctx↔forgetting coupling (gate H2: Spearman ρ ≥ 0.4) → Phase-2 protection method → Phase-3 cross-domain/task/model eval. ~$9.4K; de-risk Phase-0+1 ≈ $1.3K.
+- **Plan 09 = "Janus"** ([`notes/plans/09-intrinsic-site-protection/`](../notes/plans/09-intrinsic-site-protection/)) — **executed 2026-06-03→04** (codename Janus; impl repos `~/workspace/janus`, `~/workspace/janus-methods`). Built a 39-metric / 12-angle intrinsic instrument; ran a 41-cell grid (4 families × 12 benchmarks).
+  - **v1 measurement**: per-head long-ctx × forgetting coupling looked uniformly positive (ρ 0.17–0.56). ([`paper-draft-2026-06-04.md`](../notes/plans/09-intrinsic-site-protection/paper-draft-2026-06-04.md))
+  - ⛔ **Falsified under controls** (partial-out activation magnitude + within-layer + per-model + CIs): **no robust head-level coupling**. The "same heads, two frontiers" thesis does **not** hold at head level. ([`mechanism-results-2026-06-04.md`](../notes/plans/09-intrinsic-site-protection/mechanism-results-2026-06-04.md))
+  - ✅ **Surviving finding (F-shield)**: long-context structural heads are gradient-**shielded** during SFT (within-layer ρ(grad, attn_distance) ≈ −0.5…−0.6) → SFT gradients *avoid* them. **F-scale**: strong at 0.6–14B, neutralizes to ≈0 by 30B/32B (no reversal). **F-domain**: it's an *instruction/Q→A objective* effect (holds for hotpot/narrativeqa, vanishes for wikitext LM). **F-consequence**: explains why NIAH stays robust under instruction-SFT. ([`facts-2026-06-04.md`](../notes/plans/09-intrinsic-site-protection/facts-2026-06-04.md))
+  - **H3 causal test inconclusive** (GSM8K-SFT didn't induce long-ctx forgetting). Method line (`janus-methods`: criterion×operator lib) blocked on a valid forgetting-inducing SFT recipe.
+  - **Paper pivot**: from "same heads, two frontiers" → "long-context heads are intrinsically shielded from instruction-SFT gradients (why NIAH survives), a small/mid-model effect that neutralizes by 30B." Measurement infra/metrics still sound.
 - New `known/` categories from this line: [`catastrophic-forgetting/`](../known/catastrophic-forgetting/) + [`transformer-internals/`](../known/transformer-internals/).
-- Next concrete step: Plan 09 Phase-0 tooling (site detectors + drift meters) on Qwen3-8B + Qwen3-30B-A3B, then the coupling scatter (H2 gate).
+- Next concrete step: fix the Janus method-line SFT recipe (LoRA-all-modules/full-FT that *learns then forgets*); re-run the protection sweep; MoE super-expert probe needs expert-level metrics (current mechanism.py is attention-head only).
+
+### Other active repos (detail in matrix active-threads + 2026-06-04 harvest)
+- **`latent-mem-paper`** — Plan 08 paper "Bit-Capacity Limits of Soft-Prompt Memory", target **ICLR 2027**.
+- **`test_env/EMNLP-dllm-BoN`** — dLLM Best-of-N verifier-readout paper ("confluence"), **EMNLP** draft.
+- **`rca-demo-qwen`** — Nokia RCA application; curriculum LoRA adapters (Nezha→OpenRCA-500→RCAEval→LincYaw) on Qwen2.5/Qwen3.
+- **`intern-project`** — Nokia intern cohort (MoECompiler, agent skills, telecom time-series FM, RCA deliverables).
+- Cross-repo roll-up: [`docs/matrix/2026-06-04-cross-repo-harvest.md`](../docs/matrix/2026-06-04-cross-repo-harvest.md).
 
 ## Archived threads
 
