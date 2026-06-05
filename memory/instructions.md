@@ -82,6 +82,18 @@
 - Parent README files must describe child folders, link child `README.md` files, and explain the organization/update method for the next layer.
 - Child folders with nontrivial structure should carry their own `README.md`.
 
+### 2026-06-05 · Weekly slides must recall context and define terms
+**Source**: user instruction in 2026-06-05 session.
+**Verbatim**: "每个词都要有解释，不要就wrapper上来，一周一次，大家都忙，没有上下文的，你要注意这一点。同样slides也是，你检查一下，这次汇报要用到的概念，不管前面出没出现过，都要分别有recall和preliminary。"
+**Rule**: weekly presentation slides are for busy collaborators who may have no active context. Do not assume they remember prior discussions or project jargon. Every deck/update must first recall the background and define the concepts needed for that meeting before showing results.
+**How to apply**:
+- Start each weekly update with a short `Recall` / `Background` section: what problem is being studied, why it matters, and how the motivating benchmark/scenario connects to the paper question.
+- Add a `Preliminaries` / vocabulary slide before using project-specific terms, even if those terms appeared in previous weeks.
+- Define all key terms in plain language on first use: e.g. long-context inference, catastrophic forgetting, frozen base model, adaptation module, learned memory module/wrapper, soft memory/soft prompt, gate, do-no-harm, in-distribution, out-of-distribution, intrinsic signal, model-agnostic, AUROC.
+- For weekly meetings, organize the story as: why are we doing this; what is it useful for; what are we doing; what is the goal; how is it going; what is good news; what is bad news/risk; what is next.
+- Avoid starting directly from implementation names such as `wrapper`, `gate`, or setting IDs. Introduce the concept first, then give the local implementation name.
+- If a detailed/appendix section uses extra technical terms, add a second preliminary slide local to that section.
+
 ---
 
 *If an instruction is later replaced, do NOT delete it. Add a `~~strikethrough~~ (superseded YYYY-MM-DD by …)` marker and the new entry below.*

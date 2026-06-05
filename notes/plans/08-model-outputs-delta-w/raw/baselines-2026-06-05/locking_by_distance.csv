@@ -1,0 +1,5 @@
+distance,n,delta_ungated,delta_gated,help_ungated,help_gated
+same-dataset,800,+0.0165,+0.0163,0.180,0.179
+same-task,1100,-0.0132,-0.0139,0.159,0.151
+same-domain,500,-0.0345,-0.0325,0.062,0.040
+cross,4800,-0.0747,-0.0541,0.118,0.103

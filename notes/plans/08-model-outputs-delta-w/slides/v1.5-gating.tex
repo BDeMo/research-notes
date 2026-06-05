@@ -14,9 +14,9 @@
     \item \textbf{The question:} can we get its gains \emph{where it works} and \emph{never lose points} where it doesn't?
   \end{itemize}
   \vspace{1em}
-  \normalsize One-line answer: \textbf{yes} --- an intrinsic-signal gate makes the wrapper
-  \emph{help in-distribution} and \emph{do no harm out-of-distribution}, and it
-  \textbf{transfers across 7 model families with no tuning}.
+  \normalsize One-line answer: \textbf{mostly} --- an intrinsic-signal gate keeps the wrapper's
+  \emph{in-distribution gains} and \emph{recovers most of the out-of-distribution harm}
+  (oracle shows full headroom), and the gate signal \textbf{transfers across 7 model families with no tuning}.
   \vspace{1.2em}\\
   \footnotesize $\rightarrow$ every term/number on the next slides links out to a wiki page: \texttt{v1.5-glossary.md}.
 \end{frame}
@@ -41,12 +41,26 @@
 
 \begin{frame}{Why it matters}
   \begin{itemize}
+    \item \textbf{The broader risk:} adapting a model to a task (e.g.\ SFT) can \emph{overwrite} general ability --- reasoning, retrieval, instruction-following (catastrophic forgetting). A \textbf{frozen base} sidesteps this: adaptation lives only in a removable memory module.
     \item \textbf{Frozen base = a promise: don't regress.} A memory/adaptation module is only deployable if it can't quietly \emph{hurt} the model on inputs it wasn't built for.
     \item \textbf{Our v1 finding:} the learned memory module is a \emph{narrow lossy compressor} --- it helps on some inputs and \textbf{actively hurts} on others (e.g.\ exact-answer QA). Negative transfer is the blocker.
     \item \textbf{So the real product is not just "a better memory module"} --- it's \textbf{knowing when to use it}, automatically, on any base model.
   \end{itemize}
-  \vspace{0.8em}
-  \footnotesize $\rightarrow$ v1 characterization (3-regime law): \texttt{v1-results-2026-06-03.md}.
+  \vspace{0.6em}
+  \footnotesize $\rightarrow$ v1 characterization (3-regime law): analysis \texttt{v1-results-2026-06-03.md}; per-bench data \texttt{mem-embedding/summary/v1-archive/tables/*.csv}. \emph{(Training-time forgetting itself is measured in the separate Janus track, not this paper.)}
+\end{frame}
+
+\begin{frame}{How the memory wrapper connects to the base}
+  \begin{center}
+    \includegraphics[width=0.96\linewidth]{../summary/2026-06-05/wrapper-connect.png}
+  \end{center}
+  \vspace{-0.4em}
+  \begin{itemize}\footnotesize
+    \item $G_\phi$ is a \textbf{small (1-layer, $K{=}64$) recurrent module} that compresses the chunks into $K$ \emph{soft memory vectors} (not text).
+    \item Those vectors are \textbf{prepended to the query} as a soft prompt ($[\,m\,;\,q\,]$); the \textbf{base is frozen} --- only $G_\phi$ trains, so adaptation can't overwrite general ability.
+  \end{itemize}
+  \vspace{-0.2em}
+  \footnotesize $\rightarrow$ TikZ source \texttt{summary/2026-06-05/wrapper-connect.tex}; combine modes \texttt{src/mem\_embedding/wrapper.py}; canonical recipe \texttt{P08-S1} (Qwen3-8B, $K{=}64$, \texttt{combine=xattn}).
 \end{frame}
 
 \begin{frame}{What we do (architecture)}
@@ -65,7 +79,7 @@
     \item \textbf{Crucial requirement:} those signals must be \emph{the same across model families} --- otherwise we'd re-tune per model and it's not deployable.
   \end{itemize}
   \vspace{0.6em}
-  \footnotesize $\rightarrow$ candidate signals \& screen: \texttt{v1.5-metric-candidates-2026-06-04.md}; setting \texttt{P08-S6}.
+  \footnotesize $\rightarrow$ data \texttt{raw/grids-xmodel-2026-06-05/xmodel\_consistency\_7models.csv}; analysis \texttt{v1.5-metric-candidates-2026-06-04.md} (codebook+verdicts) · matrix \texttt{\S2/\S2b} · setting \texttt{P08-S6}.
 \end{frame}
 
 \begin{frame}{Result 1 --- \emph{where} it helps (expected vs.\ real)}
@@ -81,7 +95,7 @@
         \item \textbf{in-distribution: it helps} (QA $+2$ to $+9$ pt).
         \item competence is \textbf{distribution-bound}: gain $\to$ harm already at the same-task line.
       \end{itemize}
-      \vspace{0.3em}\footnotesize $\rightarrow$ \texttt{P08-S7}, matrix \texttt{\S8}.
+      \vspace{0.3em}\footnotesize $\rightarrow$ data \texttt{raw/grids-xmodel-2026-06-05/transfer\_matrix.csv} (+\,\texttt{transfer\_long.csv}); analysis matrix \texttt{\S8} · setting \texttt{P08-S7}.
     \end{column}
   \end{columns}
 \end{frame}
@@ -90,22 +104,23 @@
   \small
   \textbf{Expected:} one gate keeps the in-dist gains, avoids the OOD harm, and works on a new base model unchanged.
   \vspace{0.4em}
-  \begin{block}{Real}
+  \begin{block}{Real (honest 5-fold CV)}
   \begin{itemize}
-    \item \textbf{do-no-harm holds}: gated $\ge$ base on \textbf{32/35} cases.
+    \item \textbf{recovers most harm}: the routing gate pulls the wrapper back toward base (e.g.\ trivia Qwen3-8B $0.23\to0.45$ vs base $0.46$). Strict do-no-harm (gate $\ge$ base) holds \textbf{17/35}; an \emph{oracle} gate holds \textbf{35/35} --- the signal has real headroom.
     \item \textbf{model-agnostic}: the gate signal (\texttt{delta\_last}) predicts usefulness on an \textbf{unseen} family at AUROC \textbf{0.71} (leave-one-model-out, 7 families).
+    \item \textbf{locking (one gate, same wrappers):} keeps the in-dist QA gain ($+0.050\!\to\!+0.049$) while cutting OOD harm ($-0.075\!\to\!-0.054$).
     \item \textbf{which signal generalizes:} memory-write dynamics (yes) vs.\ logit-lens confidence (no --- model-specific).
   \end{itemize}
   \end{block}
-  \footnotesize $\rightarrow$ \texttt{P08-S6}/\texttt{P08-S8}, matrix \texttt{\S2b}/\texttt{\S7}; soft-gate that \emph{failed} (and why) $=$ \texttt{v1.5-gate-sweep-2026-06-05.md}.
+  \footnotesize $\rightarrow$ data \texttt{raw/grids-xmodel-2026-06-05/\{gate\_route\_main,gate\_transfer\_lomo\}.csv}, \texttt{raw/baselines-2026-06-05/\{gate\_baselines,locking\_by\_distance\}.csv}; analysis matrix \texttt{\S2b/\S7/\S7b} · settings \texttt{P08-S6/S8}; failed soft-gate $=$ \texttt{v1.5-gate-sweep-2026-06-05.md}.
 \end{frame}
 
 \begin{frame}{So what + honest scope + next}
   \textbf{Takeaway:} a frozen-base memory module becomes \textbf{safely deployable} --- it captures gains where it's competent and is provably harmless elsewhere, using one \emph{model-general} intrinsic signal.
   \vspace{0.6em}
   \begin{itemize}\small
-    \item \textbf{Honest scope:} in-dist gains are \emph{modest \& dataset-dependent} (QA yes, multiple-choice no); the headline value is \textbf{safe, modular memory}, not SOTA.
-    \item \textbf{Next:} (1) \emph{locking experiment} --- one gate that opens in-dist \& closes OOD on the same wrappers; (2) significance (more seeds + CIs); (3) \emph{mix-train} (all datasets) --- does multi-task training widen the boundary?
+    \item \textbf{Honest scope:} in-dist gains are \emph{modest \& dataset-dependent} (QA yes, multiple-choice no); the gate \emph{recovers most} OOD harm but doesn't fully guarantee do-no-harm under honest CV (17/35; oracle 35/35). The headline value is \textbf{safe, modular memory}, not SOTA.
+    \item \textbf{Landed:} locking experiment (\texttt{\S7b}) --- one gate keeps in-dist gain \& cuts OOD harm. \textbf{Running:} significance (seeds+CIs), K \& combine-mode ablations, full-context ceiling.
   \end{itemize}
   \vspace{0.5em}
   \footnotesize $\rightarrow$ full ledger \& asset index: \texttt{mem-embedding/summary/matrix.md}; decode any term: \texttt{v1.5-glossary.md}.
