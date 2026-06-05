@@ -8,64 +8,86 @@
 \begin{frame}{Reporting Period: June 2026 Week 1}
   \begin{center}
     \small Date range: Mon 2026-06-01 to Sun 2026-06-07 \\
-    \scriptsize Goal: concise progress record; detailed facts live in linked GitHub notes.
+    \scriptsize Weekly meeting logic: why this matters $\rightarrow$ what we are doing $\rightarrow$ goal $\rightarrow$ progress. \\
+    \scriptsize Updates compiled on 2026-06-04/05 belong to this same Week 1 report.
   \end{center}
 \end{frame}
 
-\begin{frame}{This Week: Main Message}
-  \begin{block}{High-level direction}
-    Controlled model adaptation: improve RCA / long-context capability while
-    preserving the frozen base model's general ability.
+\begin{frame}{Weekly Recall: Why Are We Doing This?}
+  \begin{block}{Problem}
+    RCA/debugging needs long evidence: logs, traces, topology, prior cases, and
+    code context. Directly fine-tuning the base model can teach RCA behavior, but
+    may weaken general reasoning or retrieval ability.
   \end{block}
   \begin{itemize}
-    \item \textbf{Plan 08 v1}: learned soft-prompt memory is now framed as a
-      lossy-compression characterization, not a universal-memory claim.
-    \item \textbf{Plan 08 v1.5}: next step is a do-no-harm gate that opens the
-      wrapper only when compression is likely safe.
-    \item \textbf{Plan 08 v2}: next version is cross-session latent memory with
-      read/write tokens under a frozen base.
+    \item We want domain adaptation without overwriting the frozen base model.
+    \item The useful module should compress long context, be reusable, and be
+      safe to turn off when it is not appropriate.
+    \item This connects May Week 4 to June Week 1: first build a wrapper, then
+      measure when it is safe to use.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Problem Statement: Why This Matters}
-  \begin{itemize}
-    \item RCA and debugging inputs are long: logs, traces, topology, prior
-      observations, and code context often exceed cheap prompting.
-    \item Direct SFT can teach RCA behavior, but risks weakening general
-      instruction-following, reasoning, or retrieval behavior.
-    \item The safer target is a \textbf{frozen-base adaptation module}: learn
-      context compression / memory without overwriting the base model.
-    \item This week sharpened the decision rule: use memory when it helps;
-      close it when it would hurt.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Goal and Significance}
+\begin{frame}{What Is The Use?}
   \begin{columns}[T]
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Goal}
-        Train a small wrapper around a frozen base model so long context can be
-        compressed into a reusable memory signal without updating base weights.
+    \begin{column}{0.49\textwidth}
+      \begin{block}{Practical use}
+        A memory wrapper could make long-context RCA cheaper and more modular:
+        keep the base model frozen, attach a small learned memory path, and reuse
+        compressed evidence.
       \end{block}
       \begin{itemize}
-        \item Input: long evidence context + query.
-        \item Output: answer from the frozen base, optionally helped by wrapper memory.
+        \item Avoid full-context cost when gist-level memory is enough.
+        \item Preserve a fallback path to the original base model.
       \end{itemize}
     \end{column}
-    \begin{column}{0.48\textwidth}
-      \begin{block}{Why it matters}
-        RCA needs adaptation to domain evidence, but direct SFT can damage
-        general ability. The wrapper is a controlled adaptation module.
+    \begin{column}{0.47\textwidth}
+      \begin{block}{Research use}
+        It gives a clean testbed for frozen-base adaptation: what can a fixed-size
+        soft memory encode, and when does it fail?
       \end{block}
       \begin{itemize}
-        \item Learn useful compression when it is safe.
-        \item Fall back when compression would lose details.
+        \item Positive result: wrapper can learn.
+        \item Boundary result: fixed memory has a capacity wall.
       \end{itemize}
     \end{column}
   \end{columns}
 \end{frame}
 
-\begin{frame}{High-Level Architecture: Inputs, Outputs, and Gate}
+\begin{frame}{What Are We Doing?}
+  \small
+  \begin{enumerate}
+    \item \textbf{Train a wrapper} around a frozen base model: long evidence
+      context $c_{1:n}$ is compressed into soft memory $m$.
+    \item \textbf{Evaluate the wrapper} against no-context, full-context,
+      retrieval, and Gist-style baselines.
+    \item \textbf{Characterize the boundary}: where memory helps, where it is
+      neutral, and where it collapses.
+    \item \textbf{Add a gate}: only let memory participate when intrinsic signals
+      suggest compression is safe.
+  \end{enumerate}
+  \vspace{0.5em}
+  \begin{block}{Short version}
+    We are not claiming ``memory replaces context.'' We are building controlled
+    frozen-base adaptation: learn memory, measure its limits, then gate it.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Goal For This Line Of Work}
+  \begin{block}{Main goal}
+    A frozen-base memory system that improves long-context/RCA cases where
+    compression is useful, while preserving the base model when memory is unsafe.
+  \end{block}
+  \begin{itemize}
+    \item \textbf{v1}: characterize the learned soft-prompt wrapper; write the
+      result as a bit-capacity-wall paper.
+    \item \textbf{v1.5}: build a do-no-harm gate between wrapper and base.
+    \item \textbf{v2}: extend from one-shot compressed memory to cross-session
+      latent memory with read/write behavior.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Architecture: Input, Memory, Gate, Output}
   \centering
   \small
   \begin{tikzpicture}[
@@ -88,66 +110,21 @@
     \node[box, below right=0.55cm and 0.82cm of gate] (base0) {Frozen base\\$F_\theta(q)$ or\\full context};
     \node[box, right=0.82cm of $(basew)!0.5!(base0)$] (out) {Answer $y$\\+ decision trace};
 
-    \draw[arr] (ctx) -- node[above]{train / encode} (wrapper);
+    \draw[arr] (ctx) -- node[above]{encode} (wrapper);
     \draw[arr] (wrapper) -- (mem);
     \draw[arr] (mem) -- (gate);
     \draw[arr] (query.east) -| (gate.south);
-    \draw[arr] (gate) -- node[above, sloped]{safe compression} (basew);
-    \draw[arr] (gate) -- node[below, sloped]{unsafe / unseen} (base0);
+    \draw[arr] (gate) -- node[above, sloped]{safe} (basew);
+    \draw[arr] (gate) -- node[below, sloped]{unsafe} (base0);
     \draw[arr] (basew) -- (out);
     \draw[arr] (base0) -- (out);
 
-    \node[warn, below=1.0cm of mem] (risk) {Risk: forcing wrapper\\on unseen/exact tasks\\can hurt inference};
+    \node[warn, below=1.0cm of mem] (risk) {Risk: forced memory\\can hurt exact/unseen tasks};
     \draw[dashedarr, red!70!black] (risk) -- (gate);
   \end{tikzpicture}
-
-  \vspace{0.5em}
-  \begin{block}{Core idea}
-    The wrapper is useful only when compression is safe. The gate decides whether
-    memory should participate in inference.
-  \end{block}
 \end{frame}
 
-\begin{frame}{Comparison: What We Are Really Testing}
-  \small
-  \begin{tabular}{p{0.24\textwidth}p{0.31\textwidth}p{0.34\textwidth}}
-    \toprule
-    Approach & Benefit & Limitation \\
-    \midrule
-    Full context & Preserves exact details & Expensive; not persistent \\
-    Direct SFT & Learns task behavior & Can regress base capabilities \\
-    Retrieval only & Good for verbatim facts & Does not learn compression / synthesis \\
-    Always-on wrapper & Learns compressed memory & Can hurt unseen or exact-retrieval cases \\
-    \textbf{Gated wrapper} & Uses memory only when safe & Needs reliable gate signals \\
-    \bottomrule
-  \end{tabular}
-
-  \vspace{0.7em}
-  \begin{block}{Positioning}
-    We are not claiming ``wrapper replaces context.'' We are testing controlled
-    adaptation: train a wrapper, measure where it helps, and gate it off when it
-    would damage the frozen base path.
-  \end{block}
-\end{frame}
-
-\begin{frame}{Core Evidence Chain}
-  \begin{enumerate}
-    \item \textbf{Wrapper can train and learn something.}
-      It improves compressible / gist-style cases relative to no-context
-      baselines.
-    \item \textbf{But learned memory changes inference.}
-      The wrapper is not neutral: on some tasks it shifts the base away from
-      useful behavior.
-    \item \textbf{Unseen or exact-detail tasks are unsafe for forced memory.}
-      If the task needs verbatim evidence or reasoning transfer the wrapper did
-      not learn, always-on memory can lose the answer.
-    \item \textbf{Solution: gate between wrapper and base.}
-      Open the wrapper when confidence is high; close it when divergence/drift
-      says the wrapper is fighting the base.
-  \end{enumerate}
-\end{frame}
-
-\begin{frame}{Plan 08 v1: Main Result Cell}
+\begin{frame}{How Is It Going? v1 Result}
   \small
   \begin{table}
     \centering
@@ -161,64 +138,84 @@
       \bottomrule
     \end{tabular}
   \end{table}
-  \vspace{-0.3em}
   \begin{itemize}
-    \item \textbf{Conclusion}: wrapper works as a narrow lossy compressor.
-    \item \textbf{Setting}: P08-S2
-      (\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings/settings.md\#p08-s2--v1-phase-y-three-regime-benchmark-cells}{model/data/hyperparameters}).
-    \item Helps when gist-level information is sufficient; fails when exact
-      detail preservation is required.
-    \item Full facts:
+    \item \textbf{Good news}: the wrapper can train and helps on compressible
+      gist-style inputs.
+    \item \textbf{Lesson}: it is not a universal replacement for long context;
+      exact-retrieval cases expose a capacity wall.
+    \item \textbf{Setting}: P08-S2; full facts in
       \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md}{v1 results summary}.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Plan 08 v1.5: Signal Grid Cell}
+\begin{frame}{How Is It Going? Interpretation}
+  \begin{enumerate}
+    \item \textbf{Wrapper can learn}: memory is useful when the answer can be
+      represented as compressed/gist information.
+    \item \textbf{Wrapper changes inference}: it is not neutral; the learned
+      memory path can pull the base away from safer behavior.
+    \item \textbf{Always-on memory is risky}: if the task needs exact details or
+      unseen reasoning transfer, forced memory can lose information.
+    \item \textbf{Next design}: put a gate between wrapper and base, and open it
+      only when intrinsic signals say compression is safe.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{How Is It Going? v1.5 Gate}
   \small
   \begin{table}
     \centering
     \begin{tabular}{llcc}
       \toprule
-      Signal family & Interpretation & Direction & Use in gate \\
+      Signal family & Interpretation & Direction & Use \\
       \midrule
       Confidence / seq logprob & wrapper likely correct & positive & open \\
       Wrapper-to-base KL / JS / TV & wrapper fights base & inverse & close \\
+      Memory/write dynamics & wrapper competence signal & positive & open/close \\
       Mid/late-layer drift & late reasoning distorted & inverse & close \\
       \bottomrule
     \end{tabular}
   \end{table}
   \begin{itemize}
-    \item \textbf{Design move}: gate on ``is compression safe?'' rather than
-      forcing memory onto every input.
-    \item \textbf{Setting}: P08-S3
-      (\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings/settings.md\#p08-s3--v15-intrinsic-signal-probe}{probe + signal-grid setting}).
-    \item Main signal-grid deliverables:
-      \href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/raw/grids-2026-06-04}{grid folder},
-      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/raw/grids-2026-06-04/rank_help.png}{help ranking},
-      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/raw/grids-2026-06-04/rank_interesting.png}{non-obvious ranking}.
-    \item Compiled note:
-      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.pdf}{v1.5 PDF}.
+    \item \textbf{Goal}: keep in-distribution gains while avoiding OOD harm.
+    \item \textbf{Setting}: P08-S3/P08-S6 for signal probes; detailed v1.5
+      results continue in the appended gate section.
+    \item Main deliverables:
+      \href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04}{signal grids} and
+      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.pdf}{v1.5 PDF}.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Plan 08 v2: Next-Version Setting}
-  \begin{itemize}
-    \item \textbf{Question}: can latent memory be written during generation and
-      reused across sessions?
-    \item \textbf{Base}: still frozen; adaptation remains wrapper-only.
-    \item \textbf{New API}: add `update\_from\_generation`, `serialize`, and
-      `load` to the v1 wrapper protocol.
-    \item \textbf{Differentiation}: cross-session persistence + frozen base +
-      v1 bit-capacity diagnostic.
-    \item \textbf{Setting}: P08-S4
-      (\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings/settings.md\#p08-s4--v2-design-setting}{design setting; no verified v2 result yet}).
-    \item Links:
-      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-plan.md}{v2 plan},
-      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-related-work.md}{v2 related work}.
-  \end{itemize}
+\begin{frame}{This Week's Status Summary}
+  \begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Done}
+        \begin{itemize}
+          \item v1 reframed as bit-capacity characterization.
+          \item Main result cells and settings are linked.
+          \item Gate direction is now concrete, not vague.
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Next}
+        \begin{itemize}
+          \item Polish v1 paper story.
+          \item Run/validate do-no-harm gate.
+          \item Test if multi-task training widens the safe region.
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{0.6em}
+  \begin{block}{Meeting takeaway}
+    The project is moving from ``can memory learn?'' to ``can memory be used
+    safely?'' The current answer is positive but bounded: useful compression
+    exists, and the gate is the mechanism that can make it deployable.
+  \end{block}
 \end{frame}
 
-\begin{frame}{Deliverables: Where To Read More}
+\begin{frame}{Where To Read More}
   \small
   \begin{tabular}{p{0.30\textwidth}p{0.62\textwidth}}
     \toprule
@@ -229,25 +226,11 @@
     v1 facts &
     \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md}{main results summary} (setting P08-S2) \\
     v1.5 report &
-    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.pdf}{compiled PDF} (setting P08-S3) \\
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.pdf}{compiled PDF} (setting P08-S3) \\
     v1.5 signal grid &
-    \href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/raw/grids-2026-06-04}{CSV + figures} (setting P08-S3) \\
+    \href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/grids-2026-06-04}{CSV + figures} (setting P08-S3) \\
     v2 setting &
     \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-plan.md}{v2 plan} (setting P08-S4) \\
-    Idea tables &
-    \href{https://github.com/BDeMo/research-notes/blob/main/notes/ideas/README.md}{ideas index} /
-    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/README.md}{plans index} \\
     \bottomrule
   \end{tabular}
-\end{frame}
-
-\begin{frame}{Next Steps}
-  \begin{enumerate}
-    \item Implement the first do-no-harm gated wrapper using confidence and
-      divergence features.
-    \item Evaluate whether gating preserves gains on compressible inputs while
-      closing on unsafe exact-retrieval / reasoning-transfer cases.
-    \item Keep v1 as the characterization paper line; keep v2 as the
-      cross-session latent-memory next version.
-  \end{enumerate}
 \end{frame}
