@@ -1,0 +1,9 @@
+bench,task,no_ctx(floor),SFT-LoRA,Cartridge-lite,Gist-lite,OURS(in-dist),Δ_ours,full_ctx(ceiling)
+trivia_qa,exQA,0.475,0.250,—,—,0.571,+0.086,0.635
+squad_v2,exQA,0.170,0.149,—,—,0.231,+0.056,0.656
+hotpot_qa,exQA,0.228,0.226,—,—,0.247,+0.003,0.623
+narrativeqa,absQA,0.139,0.118,—,—,0.194,+0.035,0.150
+ms_marco,absQA,0.214,0.198,—,—,0.236,+0.023,0.282
+quality,MC,0.240,0.233,—,—,0.200,-0.060,0.200
+musr_mm,MC,0.490,0.493,—,—,0.480,-0.010,0.495
+ruler_niah,needle,0.000,0.000,—,—,0.000,+0.000,0.995

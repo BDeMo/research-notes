@@ -42,6 +42,10 @@
 | B3 | write baselines: EWC, MoFO/MIGU, ESFT, head-freezing | ❌ gap | Plan 09 | — |
 | O1 | **online** gate (current routing is offline/simulated) | ❌ gap | new run | — |
 
+## Main table (built 2026-06-05) → `mem-embedding/summary/matrix.md` §★★ + `raw/main-table-2026-06-05/main_table.csv`
+Qwen3-8B, module trained **in-distribution**: per bench — no-ctx (floor) · SFT-LoRA · Cartridge-lite/Gist-lite (pending) · **OURS** · full-ctx (ceiling).
+**One-row thesis:** OURS *adds* QA competence in-dist (trivia +8.6, squad +5.6, narrativeqa +3.5) while **SFT-LoRA forgets** (every QA below no-ctx); compression even **beats full-ctx on narrativeqa** (0.194>0.150); capacity wall on extractive/needle (→ Paper A); MC/needle don't help (honest). do-no-harm gate under shift = §7b. *(SFT = mix/multi-task; per-bench-SFT control = TODO. Memory-module baselines fill from `membase_q`.)*
+
 ## Experiment queue (priority)
 - **P0 — in hand:** C1a/b/c, C2, C3a–d, A1, A2 (above). Fold significance (S1) when `abl` lands.
 - **P1 — read baselines (DONE, 3-family):** TARG (B1) + output-confidence (B2) vs ours → **honest finding: TARG ≥ ours on 3 families** (§7d). *This reshapes the thesis — see [`framing.md`](framing.md).*
