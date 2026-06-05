@@ -25,9 +25,17 @@
 |---|---|---|
 | Lib | `janus-methods` built + deployed (sam-dev + ray), caches symlinked, end-to-end smoke ✅ | ✅ |
 | Setup | forgetting-inducing dose: GLM-4-9B, heavy narrow SFT (gsm8k, 800 steps, lr 1e-4), NIAH @2k/8k + MMLU + gsm8k | 🟢 |
-| Sweep | protection matrix (12 configs) on ray 4×H100 | 🟢 running |
-| Decide | which (criterion × operator) best preserves MMLU/NIAH at matched gsm8k gain; vs random + ΔW oracle | ⏳ |
-| Next | if a winner: scale (4-seed, +Qwen3-8B/Qwen3.5-9B), add code/long-ctx retention; else iterate setup | ⏳ |
+| Sweep v1 | protection matrix (12 configs) on ray 4×H100 | ◐ done, **null (broken recipe)** |
+| Decide | — | blocked on a valid recipe |
+| **Fix** | attn-proj-only SFT @lr1e-4/800steps **destroys** the model (Δgsm8k<0 even for `none`); switch trainer to **LoRA-all-modules / full-FT** that *learns* (Δgsm8k>0) then forgets | ⏳ next |
+
+**Sweep v1 verdict (2026-06-04 17:30).** Heavier dose finally moved MMLU (−0.11) but
+the SFT **degraded GSM8K itself in every variant** (incl. `none`, Δ −0.108) → it's
+global destabilization, not learn-while-forget. No protection variant beats `none`;
+NIAH unchanged (GLM-4 robust). **Precondition failed: the SFT must learn the new task.**
+Root cause: attention-proj-only training can't learn GSM8K reasoning + lr 1e-4 wrecks
+attention. → fix the trainer (LoRA on all modules / full-FT, moderate lr; protection
+masks protected-head deltas), re-run. (3rd time the *setup*, not the method, is the blocker.)
 
 **Decisive question:** does protecting the LC-coupled heads (`lc_combined` / `retrieval` / `attn_distance` / `v_norm`) during heavy SFT **preserve general (MMLU) + long-context (NIAH) better than random**, at equal new-domain gain — and match/beat the post-hoc **ΔW oracle** while being *a-priori*?
 

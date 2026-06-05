@@ -1,0 +1,24 @@
+{
+  "mode": "protect",
+  "model": "glm4-9b",
+  "dataset": "gsm8k",
+  "criterion": "retrieval",
+  "operator": "freeze",
+  "k": 40,
+  "steps": 800,
+  "n_protected": 40,
+  "before": {
+    "niah": 1.0,
+    "mmlu": 0.475,
+    "gsm8k": 0.3083
+  },
+  "after": {
+    "niah": 0.9833,
+    "mmlu": 0.3667,
+    "gsm8k": 0.1667
+  },
+  "d_niah": -0.0167,
+  "d_mmlu": -0.1083,
+  "d_gsm8k": -0.1416,
+  "final_loss": 0.7689682841300964
+}
