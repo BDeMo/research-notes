@@ -46,10 +46,14 @@ gate ≥ our `delta_last` signal (LOMO 0.60 vs 0.56). So the defensible contribu
 gating** — *not* "our signal beats all." The 7-family head-to-head (ours vs TARG vs ours⊕TARG) is the
 decisive next run.
 
-## Honest novelty (do not over-claim)
-read gate ≈ adaptive retrieval (**TARG**, Self-RAG, "When do LLMs need RA?"); multi-depth ≈
-**LLaMA-Adapter**. **Reviewer-mandatory baselines:** TARG base-uncertainty gate (✅ done, competitive),
-output-confidence gate (✅ done), LLaMA-Adapter (≈ multi-depth, done/negative).
+## Honest novelty (do not over-claim) → full review in [`baselines-and-novelty.md`](baselines-and-novelty.md)
+**Two ICLR'26 neighbors bracket the pitch:** the *memory module* ≈ **Cartridges** (offline KV-cache on
+a frozen base, composable, ICL-matching — [2506.06266](https://arxiv.org/abs/2506.06266)); the *gate* ≈
+**TARG** (training-free prefix-logit margin gate — [2511.09803](https://arxiv.org/abs/2511.09803), and
+§7d shows it ≥ ours). multi-depth ≈ **LLaMA-Adapter**. ⇒ **White space = the systematic *do-no-harm*
+treatment of a pluggable memory** (capability boundary §8 + do-no-harm-by-construction + cross-model
+gate), **complementary to Cartridges, extending TARG to learned modules** — *not* a new module or signal.
+**Reviewer-mandatory baselines:** Cartridges/Gist (memory module) · TARG + output-conf + oracle (gate, ✅ §7b/§7d) · LLaMA-Adapter (≈ multi-depth ablation) · SFT/LoRA (forgetting, ✅ §7c).
 
 ## Where things stand → see [`outline.md`](outline.md) + [`framing.md`](framing.md)
 Read-side (08) is **mostly evidenced**, but the read baselines show **TARG is competitive** → the
