@@ -143,13 +143,16 @@ Full table + IDs: [`baselines-and-novelty.md`](baselines-and-novelty.md) §1.
 
 ---
 
-## 10. Status (2026-06-05)
+## 10. Status (2026-06-05) — all 4 GPUs saturated; next-week focus = draft this paper
+Running pipeline (sam-dev, 4×GPU, sequential queues): `abl` significance → `deep_ablq` (18-config ablation) → `week_q` (21 runs).
 | item | state |
 |---|---|
 | Main table (core columns) | ✅ done & persisted |
-| Cartridge-lite / Gist-lite columns | 🔄 `membase_q` queued behind ablation |
-| Multi-layer ablation (18 configs) → §7e | 🔄 running (wave-1 + queue) |
-| 5-seed significance CIs | 🔄 `abl` 31–34/38 |
-| per-bench SFT matched control | ⬜ TODO (optional) |
-| 7-family read head-to-head | ⛔ blocked (pods deleted); 3-family done |
+| Cartridge-lite / Gist-lite columns (all 8 benches) | 🔄 `week_q` (prefix+gist × 8, in-dist) → fills main table |
+| per-bench SFT matched control + off-diagonal forgetting panel | 🔄 `week_q` (SFT × 5 QA, eval all 8) |
+| Multi-layer ablation (18 configs) → §7e | 🔄 `deep_ablq` (count×placement×gate×depth) |
+| 5-seed significance CIs | 🔄 `abl` 34/38 |
+| 7-family read head-to-head | ⛔ blocked (ray/test pods deleted); 3-family done. (+Qwen3-14B = cheap follow-up) |
 | online gate · relevance/agent eval | ⬜ T2/T3 future |
+
+**Re-fold on completion:** `main_table_build.py --membase /…/paper_week` (fills Cartridge/Gist) · add SFT-grid forgetting panel · ablation depth-profile → matrix §7e · significance CIs. This doc's §3/§4 update with the new numbers.
