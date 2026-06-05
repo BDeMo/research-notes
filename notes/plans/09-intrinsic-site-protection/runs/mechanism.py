@@ -37,14 +37,15 @@ def boot_ci(x, y, n=1000):
 
 def main():
     name = sys.argv[1]
+    domain = sys.argv[2] if len(sys.argv) > 2 else "gsm8k"   # a-priori gradient source
     model, tok = core.load_model(core.MODELS.get(name, name), eager=True); model._janus_name = name
     cfg = model.config; L, H, hd = cfg.num_hidden_layers, cfg.num_attention_heads, core.head_dim_of(cfg)
     M = criteria.compute_head_metrics(model, tok, n_texts=6)
-    pairs = core.load_grid_dataset(tok, "gsm8k", n=24)[1]
+    pairs = core.load_grid_dataset(tok, domain, n=24)[1]
     feats = core._pairs_to_feats(tok, pairs, 512)
     gm, fi, _ = core._grad_fisher_feats(model, feats, tok, L, H, hd, 12, False)
     M["grad_mag"], M["fisher"] = gm, fi
-    res = {"model": name, "layers": L, "heads": H, "couplings": {}}
+    res = {"model": name, "domain": domain, "layers": L, "heads": H, "couplings": {}}
     for cf in CF:
         for lc in LC:
             res["couplings"][f"{lc}~{cf}"] = {
@@ -63,10 +64,11 @@ def main():
     for lc in LC:
         for cf in CF:
             res["layer_level"][f"{lc}~{cf}"] = round(sp(M[lc].mean(1), M[cf].mean(1)), 3)
-    out = os.path.join(os.environ.get("JANUS_OUT", "."), f"mechanism_{name}.json")
+    od = os.environ.get("JANUS_OUT", ".")
+    tag = f"{name}" if domain == "gsm8k" else f"{name}__{domain}"
+    out = os.path.join(od, f"mechanism_{tag}.json")
     json.dump(res, open(out, "w"), indent=2)
-    np.savez(os.path.join(os.environ.get("JANUS_OUT", "."), f"mechanism_{name}.npz"),
-             **{k: M[k] for k in M})   # raw [L,H] arrays for offline layer-level/mediation
+    np.savez(os.path.join(od, f"mechanism_{tag}.npz"), **{k: M[k] for k in M})
     print(f"[mech] {name} done -> {out}")
     print("  shielding(within-layer grad vs):", res["shielding_within_layer"])
     for k, v in res["couplings"].items():
