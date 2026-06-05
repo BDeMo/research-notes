@@ -52,9 +52,23 @@ def main():
                 "partial_outnorm": round(partial(M[lc], M[cf], M["out_norm"]), 3),
                 "within_layer": round(within_layer(M[lc], M[cf]), 3),
                 "ci95": boot_ci(M[lc], M[cf])}
+    # ---- shielding mechanism: WHY are sink/long-reach heads gradient-avoided? ----
+    # within-layer corr of a-priori grad with candidate explainers.
+    expl = ["attn_entropy", "sink", "attn_distance", "head_alpha", "out_norm", "retrieval"]
+    res["shielding_within_layer"] = {e: round(within_layer(M.get(e, np.zeros_like(M["grad_mag"])), M["grad_mag"]), 3)
+                                     for e in expl if e in M}
+    res["shielding_raw"] = {e: round(sp(M[e], M["grad_mag"]), 3) for e in expl if e in M}
+    # ---- layer-level coupling (aggregate heads -> layer means) ----
+    res["layer_level"] = {}
+    for lc in LC:
+        for cf in CF:
+            res["layer_level"][f"{lc}~{cf}"] = round(sp(M[lc].mean(1), M[cf].mean(1)), 3)
     out = os.path.join(os.environ.get("JANUS_OUT", "."), f"mechanism_{name}.json")
     json.dump(res, open(out, "w"), indent=2)
+    np.savez(os.path.join(os.environ.get("JANUS_OUT", "."), f"mechanism_{name}.npz"),
+             **{k: M[k] for k in M})   # raw [L,H] arrays for offline layer-level/mediation
     print(f"[mech] {name} done -> {out}")
+    print("  shielding(within-layer grad vs):", res["shielding_within_layer"])
     for k, v in res["couplings"].items():
         print(f"  {k:22s} raw={v['raw']:+.3f} partial={v['partial_outnorm']:+.3f} within={v['within_layer']:+.3f} ci={v['ci95']}")
 

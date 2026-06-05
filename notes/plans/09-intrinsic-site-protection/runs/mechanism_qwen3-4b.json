@@ -75,5 +75,31 @@
         -0.125
       ]
     }
+  },
+  "shielding_within_layer": {
+    "attn_entropy": 0.331,
+    "sink": -0.57,
+    "attn_distance": -0.604,
+    "head_alpha": 0.149,
+    "out_norm": 0.626,
+    "retrieval": -0.028
+  },
+  "shielding_raw": {
+    "attn_entropy": 0.334,
+    "sink": -0.33,
+    "attn_distance": -0.462,
+    "head_alpha": -0.047,
+    "out_norm": 0.282,
+    "retrieval": -0.037
+  },
+  "layer_level": {
+    "retrieval~grad_mag": -0.208,
+    "retrieval~fisher": -0.004,
+    "v_norm~grad_mag": -0.145,
+    "v_norm~fisher": 0.166,
+    "attn_distance~grad_mag": -0.326,
+    "attn_distance~fisher": -0.088,
+    "sink~grad_mag": -0.294,
+    "sink~fisher": -0.047
   }
 }
