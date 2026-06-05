@@ -22,9 +22,9 @@ Use for high-level deliverables and non-numeric summaries.
 | Primary implementation | `~/workspace/mem-test/mem-embedding/` |
 | Shared infra | `~/workspace/mem-test/llm-infra/`, `~/workspace/mem-test/encoder-infra/` |
 | Paper repo | `~/workspace/latent-mem-paper/` |
-| Research notes hub | [`README.md`](README.md) |
-| Idea source | [`../../ideas/inference-time-training.md`](../../ideas/inference-time-training.md), idea H6 |
-| Plan / idea tables | [`../README.md`](../README.md), [`../../ideas/README.md`](../../ideas/README.md) |
+| Research notes hub | [`README.md`](../README.md) |
+| Idea source | [`../../ideas/inference-time-training.md`](../../../ideas/inference-time-training.md), idea H6 |
+| Plan / idea tables | [`../README.md`](../../README.md), [`../../ideas/README.md`](../../../ideas/README.md) |
 | Compute context | `sam-dev`, `sam-dev-ray`, `sam-dev-test` Kubernetes pods |
 | Caveat | Local source paths are provenance pointers; public-facing links should point to committed markdown/PDF/CSV artifacts in this repo. |
 
@@ -52,7 +52,7 @@ by the final v1 `mem-X` wrapper recipe.
 | Key hyperparameters | `lambda_div = 0.1`, `lambda_ah ≈ 0.5`, `K = 32`, heads `h = 4`, layers `L = 1` |
 | Seeds used for headline v1 bands | `{42, 7, 11, 13}` |
 | Baselines | `no_context`, `full_context`, `retrieval`, `summary`, matched Gist Tokens |
-| Main facts doc | [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md) |
+| Main facts doc | [`v1-results-2026-06-03.md`](../v1-results-2026-06-03.md) |
 | Caveats | Single-task synthetic SFT; not a universal memory claim; exact-retrieval tasks expose the bit-capacity / lossy-compression limit. |
 
 ## P08-S2 — v1 Phase Y three-regime benchmark cells
@@ -72,7 +72,7 @@ MuSR-mm, or RULER-NIAH headline cells.
 | Seeds | `{42, 7, 11, 13}` |
 | Reported statistic | mean ± std over seeds |
 | Baseline comparison | matched Gist + no-training baselines; `full_context` used as reference where available |
-| Main result doc | [`v1-results-2026-06-03.md#5-the-3-regime-law--headline-result-phase-y-4-seeds`](v1-results-2026-06-03.md#5-the-3-regime-law--headline-result-phase-y-4-seeds) |
+| Main result doc | [`v1-results-2026-06-03.md#5-the-3-regime-law--headline-result-phase-y-4-seeds`](../v1-results-2026-06-03.md#5-the-3-regime-law--headline-result-phase-y-4-seeds) |
 | Caveats | `full_context` is an upper/reference condition, not always available under equal context budget; result is a characterization of regimes, not universal superiority. |
 
 ## P08-S3 — v1.5 intrinsic signal probe
@@ -95,10 +95,10 @@ figures.
 | Candidate signals | confidence / entropy / margin, sequence logprob, wrapper-to-base KL/JS/TV, per-layer logit-lens divergence, memory influence, residual drift, slot geometry |
 | Targets | native correctness, `help`, `noharm`, continuous lift |
 | Correlation metrics | AUROC for binary targets, Spearman for continuous targets |
-| Artifact folder | [`summary/2026-06-04/grids-2026-06-04/`](summary/2026-06-04/grids-2026-06-04/) |
-| Grid CSVs | [`grid_auroc_correct.csv`](summary/2026-06-04/grids-2026-06-04/grid_auroc_correct.csv), [`grid_auroc_noharm.csv`](summary/2026-06-04/grids-2026-06-04/grid_auroc_noharm.csv), [`grid_spearman_cont.csv`](summary/2026-06-04/grids-2026-06-04/grid_spearman_cont.csv), [`corr_long.csv`](summary/2026-06-04/grids-2026-06-04/corr_long.csv) |
-| Figures | [`rank_help.png`](summary/2026-06-04/grids-2026-06-04/rank_help.png), [`rank_interesting.png`](summary/2026-06-04/grids-2026-06-04/rank_interesting.png) |
-| PDF note | [`v1.5-intrinsic-gating-study-2026-06-04.pdf`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.pdf) |
+| Artifact folder | [`summary/2026-06-04/grids-2026-06-04/`](../raw/grids-2026-06-04/) |
+| Grid CSVs | [`grid_auroc_correct.csv`](../raw/grids-2026-06-04/grid_auroc_correct.csv), [`grid_auroc_noharm.csv`](../raw/grids-2026-06-04/grid_auroc_noharm.csv), [`grid_spearman_cont.csv`](../raw/grids-2026-06-04/grid_spearman_cont.csv), [`corr_long.csv`](../raw/grids-2026-06-04/corr_long.csv) |
+| Figures | [`rank_help.png`](../raw/grids-2026-06-04/rank_help.png), [`rank_interesting.png`](../raw/grids-2026-06-04/rank_interesting.png) |
+| PDF note | [`v1.5-intrinsic-gating-study-2026-06-04.pdf`](../summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.pdf) |
 | Caveats | Confidence signals are useful but partly obvious; non-obvious design signal is late-layer divergence/drift used inversely. Some single-seed layer signals did not survive multi-seed checks. |
 
 ## P08-S4 — v2 design setting
@@ -116,8 +116,8 @@ Use for v2 design claims, not for verified result cells.
 | Persistence | serialize latent memory state and reload across sessions |
 | Target datasets | LongMemEval, LOCOMO; synthetic multi-session smoke first |
 | Main baseline | TokMem; related latent reasoning / memory-token methods in related-work doc |
-| Design doc | [`v2-plan.md`](v2-plan.md) |
-| Related work | [`v2-related-work.md`](v2-related-work.md) |
+| Design doc | [`v2-plan.md`](../v2-plan.md) |
+| Related work | [`v2-related-work.md`](../v2-related-work.md) |
 | Caveats | No v2 benchmark result should be reported as verified until this setting is implemented and evaluated. |
 
 ## P08-S5 — RCA / project motivation setting
@@ -133,7 +133,7 @@ motivation rather than Plan 08 benchmark results.
 | Datasets | Nezha, OpenRCA-500, RCAEval, lincyaw/rca; private Liang DTS only as internal qualitative probe |
 | Role in Plan 08 | motivation: direct SFT can teach RCA behavior but can also regress general capabilities / format / evidence grounding |
 | Public/private boundary | Do not expose raw Nokia DTS prompts or private local paths in public slides |
-| Relevant Plan 08 doc | [`v0-learned-memory-wrapper.md`](v0-learned-memory-wrapper.md), [`v0-how-we-got-here.md`](v0-how-we-got-here.md) |
+| Relevant Plan 08 doc | [`v0-learned-memory-wrapper.md`](../v0-learned-memory-wrapper.md), [`v0-how-we-got-here.md`](../v0-how-we-got-here.md) |
 | Caveats | RCA-demo numbers are not Plan 08 wrapper results unless explicitly labeled as RCA motivation. |
 
 ## P08-S6 — v1.5 cross-model 7-family signal probe (2026-06-05)
@@ -153,7 +153,7 @@ Use for the 7-model signal-consistency result and the gate ceiling / transfer ce
 | Sample size | 13.2k core items across 7 models |
 | Targets / metrics | `help`, `no-harm`, `useful=lift>0`; AUROC + Spearman; gate transfer = leave-one-model-out AUROC |
 | Comparability | only scalar + fractional-depth layer-curve signals compared (raw `@idx` dropped) |
-| Artifacts | [`summary/2026-06-05/grids-xmodel-2026-06-05/xmodel_consistency_7models.csv`](summary/2026-06-05/grids-xmodel-2026-06-05/xmodel_consistency_7models.csv) (+`.png`), [`gate_ceiling_cv.csv`](summary/2026-06-05/grids-xmodel-2026-06-05/gate_ceiling_cv.csv), [`gate_transfer_lomo.csv`](summary/2026-06-05/grids-xmodel-2026-06-05/gate_transfer_lomo.csv); verdicts [`v1.5-metric-candidates-2026-06-04.md#7`](summary/2026-06-04/v1.5-metric-candidates-2026-06-04.md) §7 |
+| Artifacts | [`summary/2026-06-05/grids-xmodel-2026-06-05/xmodel_consistency_7models.csv`](../raw/grids-xmodel-2026-06-05/xmodel_consistency_7models.csv) (+`.png`), [`gate_ceiling_cv.csv`](../raw/grids-xmodel-2026-06-05/gate_ceiling_cv.csv), [`gate_transfer_lomo.csv`](../raw/grids-xmodel-2026-06-05/gate_transfer_lomo.csv); verdicts [`v1.5-metric-candidates-2026-06-04.md#7`](../summary/2026-06-04/v1.5-metric-candidates-2026-06-04.md) §7 |
 | Headline | `delta_last` general (AUROC 0.59–0.80 in all 7); gate LOMO AUROC 0.71; logit-lens model-specific |
 | Caveats | wrappers here are cat_niah-trained ⇒ benches are OOD; per-model seed counts differ (4 vs 2). |
 
@@ -171,7 +171,7 @@ Use for the wrapper transfer/boundary heatmap and "in-distribution 提点" cells
 | Test benches (8, grid cols) | quality, musr_mm, ruler_niah, hotpot_qa, trivia_qa, squad_v2, narrativeqa, ms_marco (eval seed 43, held-out items) |
 | Metric | Δ = mean(native_w) − mean(native_0); native = MC accuracy or SQuAD-F1 / ROUGE-L per bench |
 | Distance taxonomy | same-dataset / same-task {retrieval, MC, exQA, absQA} / same-domain {synthetic, wiki, literary, web} / cross |
-| Artifacts | [`summary/2026-06-05/grids-xmodel-2026-06-05/transfer_matrix.csv`](summary/2026-06-05/grids-xmodel-2026-06-05/transfer_matrix.csv), [`transfer_long.csv`](summary/2026-06-05/grids-xmodel-2026-06-05/transfer_long.csv), [`transfer_heatmap.png`](summary/2026-06-05/grids-xmodel-2026-06-05/transfer_heatmap.png) |
+| Artifacts | [`summary/2026-06-05/grids-xmodel-2026-06-05/transfer_matrix.csv`](../raw/grids-xmodel-2026-06-05/transfer_matrix.csv), [`transfer_long.csv`](../raw/grids-xmodel-2026-06-05/transfer_long.csv), [`transfer_heatmap.png`](../raw/grids-xmodel-2026-06-05/transfer_heatmap.png) |
 | Headline | in-dist Δ +0.017 (QA +2..+9 pt); same-task −.013, same-domain −.034, cross −.075 (distribution-bound) |
 | Caveats | answer-head disabled for non-categorical train datasets; K=64 mild capacity bump vs P08-S1's K=32; 1 seed/cell (significance pending). |
 
@@ -187,7 +187,7 @@ Use for gate result cells (main-table gated column, do-no-harm, gate transfer).
 | Routing gate (headline) | `scripts/gate_route.py` — logistic on general signals (`delta_last`, geometry, `mem_influence_span`) → P(useful); route base↔wrapper at τ; 5-fold CV + leave-one-model-out |
 | Soft-gate sweep (ablation) | `scripts/gate_train.py` (foreign-decoy + do-no-harm KL + gate BCE), tmux `gs_c1..c9` — **fails** (gate ~0.5, residual corrupts gen) |
 | Result | gated ≥ base on 32/35 cells; LOMO transfer AUROC 0.71 |
-| Artifacts | [`summary/2026-06-05/grids-xmodel-2026-06-05/gate_route_main.csv`](summary/2026-06-05/grids-xmodel-2026-06-05/gate_route_main.csv) |
+| Artifacts | [`summary/2026-06-05/grids-xmodel-2026-06-05/gate_route_main.csv`](../raw/grids-xmodel-2026-06-05/gate_route_main.csv) |
 | Caveats | routing table evaluated on cat_niah-trained (OOD) grid; **locking experiment** (gate over the P08-S7 in-distribution wrappers) is the open item before the in-dist-gain + OOD-preserve claim is end-to-end. |
 
 ## Maintenance rule

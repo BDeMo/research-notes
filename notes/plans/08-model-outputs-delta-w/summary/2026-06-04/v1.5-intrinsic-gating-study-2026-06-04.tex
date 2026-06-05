@@ -66,7 +66,7 @@ summaries around Plan 08.
 \subsection{v1 wrapper facts and main result}
 \begin{itemize}
 \item \textbf{Settings registry:}
-\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md}{settings.md}.
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings/settings.md}{settings.md}.
 Every result cell in this report should trace to a setting ID; v1
 headline cells use \textbf{P08-S2}, and v1.5 signal-grid cells use
 \textbf{P08-S3}.
@@ -177,11 +177,11 @@ $\sim$50 GPU-min per seed for five benchmarks at $n{=}150$.
 
 Unless a table states otherwise, numeric signal/correlation results in
 this report use setting
-\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md#p08-s3--v15-intrinsic-signal-probe}{P08-S3}.
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s3--v15-intrinsic-signal-probe}{P08-S3}.
 The underlying wrapper recipe is
-\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md#p08-s1--v1-canonical-wrapper-recipe}{P08-S1};
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s1--v1-canonical-wrapper-recipe}{P08-S1};
 v1 three-regime background comparisons use
-\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells}{P08-S2}.
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells}{P08-S2}.
 
 \subsection{Frozen base and the wrapper}
 The base $f_\theta$ is \textbf{Qwen3-8B} (hidden size $d=4096$, $36$
@@ -434,9 +434,9 @@ the achievable gate ceiling.
 \label{sec:results}
 
 Setting for all result cells in this section:
-\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md#p08-s3--v15-intrinsic-signal-probe}{P08-S3},
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s3--v15-intrinsic-signal-probe}{P08-S3},
 unless explicitly labeled as v1 three-regime background
-(\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells}{P08-S2}).
+(\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells}{P08-S2}).
 
 \paragraph{Status.} The \textbf{9-seed multi-seed study
 ($n{=}1350$/bench) is complete} and is the robust result
@@ -572,7 +572,7 @@ probe.
 computed in the per-item probe protocol of \S\ref{sec:experiments}, on a
 \emph{frozen} Qwen3-8B with the wrapper trained zero-shot on
 \code{categorical\_niah} (\S\ref{sec:settings}; setting
-\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md#p08-s3--v15-intrinsic-signal-probe}{P08-S3}).
+\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s3--v15-intrinsic-signal-probe}{P08-S3}).
 The rankings of
 \S\ref{sec:interesting} are pooled over \textbf{9{,}750 items across 9
 benchmarks} (main five at 9 seeds, new four at 5 seeds); targets
@@ -650,7 +650,7 @@ conflict $\Rightarrow$ suppress. A naive confidence threshold would miss
 exactly this, which is what makes it interesting for the gate.
 
 \begin{figure}[h]\centering
-\includegraphics[width=0.9\linewidth]{grids-2026-06-04/rank_interesting.png}
+\includegraphics[width=0.9\linewidth]{../../raw/grids-2026-06-04/rank_interesting.png}
 \caption{Non-obvious correlates of wrapper \code{help} (confidence angle
 removed), pooled $9{,}750$ items over $9$ benchmarks, high$\to$low by
 $|\mathrm{AUROC}{-}0.5|$ ($\downarrow$ = inverse predictor). The

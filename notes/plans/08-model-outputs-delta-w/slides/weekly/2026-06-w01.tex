@@ -24,8 +24,6 @@
       wrapper only when compression is likely safe.
     \item \textbf{Plan 08 v2}: next version is cross-session latent memory with
       read/write tokens under a frozen base.
-    \item \textbf{Related direction}: Janus tests whether long-context sites
-      and forgetting-sensitive sites are coupled.
   \end{itemize}
 \end{frame}
 
@@ -167,7 +165,7 @@
   \begin{itemize}
     \item \textbf{Conclusion}: wrapper works as a narrow lossy compressor.
     \item \textbf{Setting}: P08-S2
-      (\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md\#p08-s2--v1-phase-y-three-regime-benchmark-cells}{model/data/hyperparameters}).
+      (\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings/settings.md\#p08-s2--v1-phase-y-three-regime-benchmark-cells}{model/data/hyperparameters}).
     \item Helps when gist-level information is sufficient; fails when exact
       detail preservation is required.
     \item Full facts:
@@ -193,11 +191,11 @@
     \item \textbf{Design move}: gate on ``is compression safe?'' rather than
       forcing memory onto every input.
     \item \textbf{Setting}: P08-S3
-      (\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md\#p08-s3--v15-intrinsic-signal-probe}{probe + signal-grid setting}).
+      (\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings/settings.md\#p08-s3--v15-intrinsic-signal-probe}{probe + signal-grid setting}).
     \item Main signal-grid deliverables:
-      \href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/summary/2026-06-04/grids-2026-06-04}{grid folder},
-      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/summary/2026-06-04/grids-2026-06-04/rank_help.png}{help ranking},
-      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/summary/2026-06-04/grids-2026-06-04/rank_interesting.png}{non-obvious ranking}.
+      \href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/raw/grids-2026-06-04}{grid folder},
+      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/raw/grids-2026-06-04/rank_help.png}{help ranking},
+      \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/raw/grids-2026-06-04/rank_interesting.png}{non-obvious ranking}.
     \item Compiled note:
       \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.pdf}{v1.5 PDF}.
   \end{itemize}
@@ -213,7 +211,7 @@
     \item \textbf{Differentiation}: cross-session persistence + frozen base +
       v1 bit-capacity diagnostic.
     \item \textbf{Setting}: P08-S4
-      (\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings.md\#p08-s4--v2-design-setting}{design setting; no verified v2 result yet}).
+      (\href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/settings/settings.md\#p08-s4--v2-design-setting}{design setting; no verified v2 result yet}).
     \item Links:
       \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-plan.md}{v2 plan},
       \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-related-work.md}{v2 related work}.
@@ -233,7 +231,7 @@
     v1.5 report &
     \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.pdf}{compiled PDF} (setting P08-S3) \\
     v1.5 signal grid &
-    \href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/summary/2026-06-04/grids-2026-06-04}{CSV + figures} (setting P08-S3) \\
+    \href{https://github.com/BDeMo/research-notes/tree/main/notes/plans/08-model-outputs-delta-w/raw/grids-2026-06-04}{CSV + figures} (setting P08-S3) \\
     v2 setting &
     \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/v2-plan.md}{v2 plan} (setting P08-S4) \\
     Idea tables &
@@ -251,7 +249,5 @@
       closing on unsafe exact-retrieval / reasoning-transfer cases.
     \item Keep v1 as the characterization paper line; keep v2 as the
       cross-session latent-memory next version.
-    \item Continue Janus causal testing in parallel: protect long-context-coupled
-      sites during SFT and measure forgetting / long-context retention.
   \end{enumerate}
 \end{frame}

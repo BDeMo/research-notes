@@ -16,7 +16,7 @@
 ## Output artifacts
 
 - `memory/instructions.md`
-- `notes/plans/08-model-outputs-delta-w/settings.md`
+- `notes/plans/08-model-outputs-delta-w/settings/settings.md`
 - `notes/plans/08-model-outputs-delta-w/README.md`
 - `notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`
 - `notes/plans/08-model-outputs-delta-w/summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.tex`
