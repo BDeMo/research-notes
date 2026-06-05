@@ -1,0 +1,106 @@
+{
+  "model": "qwen3-8b",
+  "domain": "hotpotqa",
+  "layers": 36,
+  "heads": 32,
+  "couplings": {
+    "retrieval~grad_mag": {
+      "raw": -0.11,
+      "partial_outnorm": -0.117,
+      "within_layer": -0.043,
+      "ci95": [
+        -0.165,
+        -0.055
+      ]
+    },
+    "v_norm~grad_mag": {
+      "raw": -0.307,
+      "partial_outnorm": -0.62,
+      "within_layer": 0.123,
+      "ci95": [
+        -0.363,
+        -0.25
+      ]
+    },
+    "attn_distance~grad_mag": {
+      "raw": -0.586,
+      "partial_outnorm": -0.595,
+      "within_layer": -0.571,
+      "ci95": [
+        -0.626,
+        -0.546
+      ]
+    },
+    "sink~grad_mag": {
+      "raw": -0.499,
+      "partial_outnorm": -0.525,
+      "within_layer": -0.503,
+      "ci95": [
+        -0.544,
+        -0.452
+      ]
+    },
+    "retrieval~fisher": {
+      "raw": -0.047,
+      "partial_outnorm": -0.072,
+      "within_layer": -0.012,
+      "ci95": [
+        -0.105,
+        0.01
+      ]
+    },
+    "v_norm~fisher": {
+      "raw": -0.14,
+      "partial_outnorm": -0.489,
+      "within_layer": 0.132,
+      "ci95": [
+        -0.204,
+        -0.073
+      ]
+    },
+    "attn_distance~fisher": {
+      "raw": -0.417,
+      "partial_outnorm": -0.443,
+      "within_layer": -0.442,
+      "ci95": [
+        -0.467,
+        -0.364
+      ]
+    },
+    "sink~fisher": {
+      "raw": -0.328,
+      "partial_outnorm": -0.381,
+      "within_layer": -0.377,
+      "ci95": [
+        -0.385,
+        -0.272
+      ]
+    }
+  },
+  "shielding_within_layer": {
+    "attn_entropy": 0.308,
+    "sink": -0.503,
+    "attn_distance": -0.571,
+    "head_alpha": 0.083,
+    "out_norm": 0.625,
+    "retrieval": -0.043
+  },
+  "shielding_raw": {
+    "attn_entropy": 0.453,
+    "sink": -0.499,
+    "attn_distance": -0.586,
+    "head_alpha": -0.039,
+    "out_norm": 0.038,
+    "retrieval": -0.11
+  },
+  "layer_level": {
+    "retrieval~grad_mag": -0.368,
+    "retrieval~fisher": 0.035,
+    "v_norm~grad_mag": -0.405,
+    "v_norm~fisher": -0.038,
+    "attn_distance~grad_mag": -0.555,
+    "attn_distance~fisher": -0.27,
+    "sink~grad_mag": -0.553,
+    "sink~fisher": -0.276
+  }
+}
