@@ -75,6 +75,14 @@ the criterion ablation (lc/retrieval/attn_distance/v_norm vs random vs fisher vs
 
 ---
 
+## 1.5 · PAPER A locked (2026-06-05): "Long-context heads are gradient-shielded during fine-tuning"
+Plan: [`paperA-plan-2026-06-05.md`](paperA-plan-2026-06-05.md). Claim: long-ctx heads receive
+*smaller* SFT gradients (shielded), task-objective-specific, activation-mediated, scale-fading;
+explains instruction-SFT preserving long-context. Main tables (scale/family + objective) ✅ have
+data. Pre-exps in flight: A1 carrier disentangle (offline), A2 a-priori→actual drift (LoRA),
+M2 method payoff under LM-continued-pretraining (where the shield is absent). Methodological
+cautionary (phantom couplings) folded in as rigor backbone.
+
 ## 2 · TODO queue
 1. **Run the sweep** (🟢) → fill the Pareto + ablation tables.
 2. **If a protection winner emerges:** 4-seed band + add Qwen3-8B & Qwen3.5-9B (cross-family) + code/long-ctx retention probes.
