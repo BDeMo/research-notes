@@ -1,8 +1,10 @@
 # Paper B — Do-No-Harm Adaptation (Forgetting & Gating)
 
 **Status:** 🟢 **ACTIVE — the paper we write first** (started 2026-06-05).
-**Working title:** *Do-No-Harm Adaptation: One Intrinsic, Cross-Model Signal to Gate (read) and Protect (write) a Pretrained LLM against Catastrophic Forgetting.*
-**Scope source:** [two-paper litreview §Paper B](../../summary/2026-06-05/two-paper-litreview-2026-06-05.md).
+**Working title:** *Do No Harm: a portable, model-agnostic memory module that knows when not to fire.*
+**Scope source:** [two-paper litreview §Paper B](../../summary/2026-06-05/two-paper-litreview-2026-06-05.md). **Reasoned spine + locked decisions:** [`logic.md`](logic.md). **Framing:** [`framing.md`](framing.md).
+
+**Decisions locked (2026-06-05):** read-only scope (write-side/Plan-09 parked); **memory = task/distribution adapter** (crux C — cede fact-storage to Paper A's capacity wall); **SP1 = original single-layer wrapper + multi-layer extension first, weight-fusion/parametric = v2**. De-risked **tiered** plan (T1 safe core ✅ evidenced / T2 strengthen 🔄 / T3 fancy ⏸) — see [`logic.md` §6](logic.md).
 
 ---
 

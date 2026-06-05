@@ -45,10 +45,12 @@
 ## Experiment queue (priority)
 - **P0 — in hand:** C1a/b/c, C2, C3a–d, A1, A2 (above). Fold significance (S1) when `abl` lands.
 - **P1 — read baselines (DONE, 3-family):** TARG (B1) + output-confidence (B2) vs ours → **honest finding: TARG ≥ ours on 3 families** (§7d). *This reshapes the thesis — see [`framing.md`](framing.md).*
-- **P1.5 — DECISIVE: 7-family head-to-head (B0):** pull Phi/Mistral/Qwen2.5-7B/Qwen3-14B signal jsonls from ray/test pods → ours vs TARG vs out-conf vs **ours⊕TARG**. Settles whether our signal beats/complements TARG (ours was strongest on Phi/Mistral). *Cheap, offline, no GPU.*
-- **P2 — relevance/agent eval:** a "augmentation-sometimes-irrelevant" benchmark (mixed relevant/decoy context) to **earn the do-no-harm-for-agents framing**; without it F1/F2 are unbacked.
-- **P3 — online gate (O1):** wire apply-or-skip into generation (live, not post-hoc routing).
-- **(parked) write-side (C4, Plan 09):** out of scope for this read-only paper; follow-up.
+- **P1.5 — head-to-head extend (B0):** ⚠️ **ray/test pods deleted** → full 7-family per-item data is gone. Cheap path: **re-run probe on Qwen3-14B** (model on sam-dev) → 4-family head-to-head ours vs TARG vs out-conf vs **ours⊕TARG**. (Phi/Mistral/Qwen2.5 would need re-download.) *Signal question is an ablation now (§7d), not the headline.*
+- **P1.6 — multi-layer extension v2 (T2):** the §7c multi-depth collapse → retry with **true zero-init, slow-opening per-layer gate (LLaMA-Adapter style)**, top-layers-only. Either it lifts (positive T2 deliverable) or a rigorous negative (sharpens "input-level + detachable + gated"). *Needs GPU — queue after `abl`.*
+- **P2 — relevance eval (T2):** a "context-sometimes-irrelevant" benchmark (mixed relevant/decoy context) to **earn the do-no-harm framing**; without it the agent framing is unbacked.
+- **P2.5 — few-step adaptation curve (T2):** train-steps vs in-domain lift → back the "fast/lightweight ingestion" (SP2-as-C) claim.
+- **P3 — online gate (O1, T2/T3):** wire apply-or-skip into generation (live, not post-hoc routing).
+- **(parked, T3) fancy:** weight-fusion (LoRA-merge), parametric cartridge (crux B), agentic multi-tool routing.
 
 ## Target venue / timeline
 **OPEN** (decision #2 above). Candidate framings: CF/continual-learning track (problem-first) or
