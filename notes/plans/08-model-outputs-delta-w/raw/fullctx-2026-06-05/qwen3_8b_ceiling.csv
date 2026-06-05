@@ -1,0 +1,9 @@
+bench,no_ctx,full_ctx,n
+quality,0.240,0.200,200
+musr_mm,0.490,0.495,200
+ruler_niah,0.000,0.995,200
+hotpot_qa,0.228,0.623,200
+trivia_qa,0.475,0.635,200
+squad_v2,0.170,0.656,200
+narrativeqa,0.139,0.150,200
+ms_marco,0.214,0.282,200

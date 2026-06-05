@@ -77,5 +77,7 @@ noted below; full recipes (`P08-S0…S8`) in [`../settings/settings.md`](../sett
 ### [`seed_std-2026-06-05.csv`](seed_std-2026-06-05.csv) — per-benchmark seed variance (the noise floor)
 `setting, bench, n_seeds, no_ctx_mean, no_ctx_std, wrapper_mean, wrapper_std`: mean±std of the PRIMARY score across seeds (Qwen3-8B; `qwen3_8b_catniah` = 4 seeds, `qwen3_8b_mix` = 3 seeds). **Use as the reference error bar:** no-context is stable (std ≈0.01–0.03) but the **wrapper is seed-unstable on QA** (trivia/hotpot wrapper std ≈0.08–0.18), so a wrapper delta smaller than ~1 std on those benches is not meaningful. (v1 Phase-Y 4-seed std is in `v1-results-2026-06-03.md §5` / matrix §1; single-seed transfer-grid cells get CIs from the running 5-seed significance batch.)
 
-> Landing next (will be added here with the same protocol): full-context ceiling
-> (`native_full`) and mix+SFT (`native_sft*`) per bench × model.
+### [`fullctx-2026-06-05/`](fullctx-2026-06-05/) — full-context ceiling (no training, `fullctx_eval.py`)
+- `qwen3_8b_ceiling.csv` — `bench, no_ctx, full_ctx, n`: base scored with the raw chunks+query (`full_ctx`, ceiling) vs query-only (`no_ctx`, floor), Qwen3-8B, n=200. Ceiling is large on exact/extractive QA + the needle, ≈no help on MC gist. (raw per-item jsonls on the pod `/home/devuser/fullctx/`.)
+
+> Landing next (same protocol): mix+SFT (`native_sft*`, ordinary LoRA on the base) per bench — `mix_sft.py`, currently running (GPU-contended).

@@ -115,6 +115,35 @@
   \footnotesize $\rightarrow$ data \texttt{raw/grids-xmodel-2026-06-05/\{gate\_route\_main,gate\_transfer\_lomo\}.csv}, \texttt{raw/baselines-2026-06-05/\{gate\_baselines,locking\_by\_distance\}.csv}; analysis matrix \texttt{\S2b/\S7/\S7b} · settings \texttt{P08-S6/S8}; failed soft-gate $=$ \texttt{v1.5-gate-sweep-2026-06-05.md}.
 \end{frame}
 
+\begin{frame}{Baselines side-by-side: floor $\to$ wrapper $\to$ gate $\to$ ceiling}
+  \scriptsize Qwen3-8B; wrapper trained on \emph{mix} (all datasets). Numbers = native score (PRIMARY metric).
+  \vspace{0.2em}
+  \begin{center}
+  \begin{tabular}{llccccc}
+    \toprule
+    bench & reg & no-ctx & ungated & gated & oracle & \textbf{full-ctx} \\
+          &     & (floor) & wrapper & (route) & (gate ceil.) & \textbf{(ceiling)} \\
+    \midrule
+    quality      & A & .233 & .227 & .227 & .293 & .200 \\
+    musr\_mm     & A & .520 & .510 & .510 & .600 & .495 \\
+    ruler\_niah  & C & .000 & .000 & .000 & .000 & \textbf{.995} \\
+    hotpot\_qa   & B & .234 & .202 & .212 & .320 & \textbf{.623} \\
+    trivia\_qa   & B & .474 & .324 & .440 & .538 & \textbf{.635} \\
+    squad\_v2    & B & .171 & .157 & .157 & .220 & \textbf{.656} \\
+    narrativeqa  & B & .149 & .119 & .158 & .182 & .150 \\
+    ms\_marco    & B & .220 & .201 & .222 & .261 & .282 \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+  \vspace{0.2em}
+  \begin{itemize}\scriptsize
+    \item \textbf{Ceiling (full context)} is huge on exact/extractive QA + the needle (ruler $0{\to}.995$, squad/hotpot/trivia ${\sim}.62{-}.66$) but $\approx$ no help on multiple-choice gist (even hurts quality).
+    \item \textbf{Mix wrapper (ungated)} mostly \emph{hurts}; the \textbf{gate} pulls it back toward the floor; \textbf{oracle} shows headroom. Compressed memory $\ll$ raw context where exact detail matters --- the capacity wall.
+    \item \emph{Ordinary SFT (LoRA on the base) row: running} --- the adapt-by-fine-tuning comparison.
+  \end{itemize}
+  \footnotesize $\rightarrow$ data \texttt{raw/fullctx-2026-06-05/}, \texttt{raw/baselines-2026-06-05/gate\_baselines.csv}; how to read every number \texttt{raw/README.md}.
+\end{frame}
+
 \begin{frame}{So what + honest scope + next}
   \textbf{Takeaway:} a frozen-base memory module becomes \textbf{safely deployable} --- it captures gains where it's competent and is provably harmless elsewhere, using one \emph{model-general} intrinsic signal.
   \vspace{0.6em}
