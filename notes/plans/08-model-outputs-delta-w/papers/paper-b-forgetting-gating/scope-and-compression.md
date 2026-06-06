@@ -30,13 +30,22 @@ The 2026 "agentic memory" surveys (2512.13564; 2602.06052; ICLR'26 **MemAgents**
 - **Community / venue:** **agentic memory** (ICLR'26 MemAgents workshop is an ideal fit) — *not* a generic "prompt-compression tool" (crowded engineering space: TAAC/ContextPilot). The *agent* framing + *cross-model do-no-harm* + *frozen-base detachable* is the differentiator.
 - This **refines** (doesn't replace) the do-no-harm framing: do-no-harm is the *safety property*; adaptive compression+fallback is the *efficiency mechanism*; agentic memory is the *application*.
 
-## 3. The selling-point experiment (to make it real) — **3-way adaptive gate**
-Implement + run a gate that routes **per input** among:
-`compressed latent memory (fast)` ↔ `full context (accurate, slow)` ↔ `no context (base)`.
-- **Metric:** accuracy vs **token/compute cost** frontier (the inference-acceleration story) + do-no-harm (≥ base).
-- **Baselines:** always-memory (Cartridges-style) · always-full-context (ICL ceiling) · TAAC-style text gate · oracle 3-way.
-- **Claim if it works:** "recover most of full-context accuracy at a fraction of the tokens, *and* never underperform the base" — the efficiency+safety pitch, honestly bracketed.
-- Status: **needs code** (`gate3_eval.py`); queued after the running baselines. *(This is the experiment that earns the compression/fallback selling point.)*
+## 3. The selling-point experiment — **two-track gate** (one signal, two fallbacks)
+Decided design (2026-06-06): the compressed-memory wrapper is gated by ONE intrinsic signal but with
+**two fallback tracks**, giving two "ours" columns:
+
+- **Track A — `ours×no-ctx` (do-no-harm / forgetting):** gate routes **memory ↔ no-context base**.
+  If the gate says memory isn't useful → fall back to the bare base. *Target* `useful:=(nw>n0)`.
+  *Metric:* do-no-harm (gated ≥ base) + accuracy. (= the §7/§7b routing story.)
+- **Track B — `ours×full-ctx` (compression / inference-accel):** gate routes **memory ↔ full context**.
+  If the gate says "don't trust compression" → **re-read the full context**. *Target* `suffices:=(nw≥nfull−ε)`.
+  *Metric:* **accuracy vs token cost** — "recover X% of full-context accuracy at Y% of the tokens."
+
+**Implementation (built 2026-06-06):** `probe_v3_gate.py` logs per item `native_0 / native_w /
+native_full` + the gate signal (`delta_last`, `margin_0`, `conf_0`) + token costs (`mem_tokens`,
+`full_tokens`); `gate3_route.py` does both tracks offline with honest 5-fold CV (floor/ceiling per
+track: A = no-ctx→oracle; B = memory→full). **Baselines:** always-memory (Cartridges-style) ·
+always-full (ICL ceiling) · TAAC/TARG-style gate · oracle. *Status: smoking → queue.*
 
 ## 4. Honest novelty defense (compression angle)
 | reviewer objection | response |
