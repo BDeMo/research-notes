@@ -87,7 +87,7 @@ limits: a capacity wall on exact recall, and that a trivial base-uncertainty gat
 - **Gate:** **TARG** ([2511.09803], ✅ §7d) · Self-RAG · FLARE · Adaptive-RAG · confidence-threshold · **oracle** (✅ §7b).
 - **Multi-layer (ablation):** **LLaMA-Adapter** ([2303.16199], = our scalar-gate) · prefix/P-tuning-v2 · input-only (ours, §8).
 - **Forgetting (motivation):** Luo CF (2308.08747) · PECFT survey (2504.13822) + JANUS-LoRA/PLATE (PEFT-still-forgets) · EWC/LwF.
-Full table + IDs: [`baselines-and-novelty.md`](baselines-and-novelty.md) §1.
+Full table + IDs: [`baselines-and-novelty.md`](baselines-and-novelty.md) §1. **Consolidated paper-ready Related Work (6 families + our delta): [`related-work.md`](related-work.md)** — adds KV-cache compression (SnapKV/PyramidKV), **selective-prediction/abstention** (the do-no-harm framing + risk–coverage/AURC metric), and memory-augmented/agentic-memory (RMT/MemGPT/AgeMem/RecMem).
 
 ---
 
