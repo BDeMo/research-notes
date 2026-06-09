@@ -65,6 +65,11 @@ decisive gap is the **7-family head-to-head** + a **relevance/agent eval** to ea
 Write-side (Plan 09) is **parked** (read-only scope).
 
 ## Links
+- **v1.5 method (architecture + all combine-mode math + gate + two-track):** [`method.md`](method.md)
+- **2026-06-08 decision log (scope/framing/experiment decisions):** [`decisions-2026-06-08.md`](decisions-2026-06-08.md)
+- **lit-review + claim check (novelty, must-cite, gaps):** [`litreview-claimcheck-2026-06-08.md`](litreview-claimcheck-2026-06-08.md)
+- **gate-generality experiment design:** [`exp-gate-generality.md`](exp-gate-generality.md)
+- **ICLR 2027 story spine:** [`iclr2027-story.md`](iclr2027-story.md)
 - **outline + claim→evidence map:** [`outline.md`](outline.md)
 - evidence ledger: `mem-test/mem-embedding/summary/matrix.md` (§2 signals · §7/§7b gate · §7c forgetting+multi-depth · §8 boundary)
 - settings: [`../../settings/settings.md`](../../settings/settings.md) (P08-S6 probe · P08-S8 gate)

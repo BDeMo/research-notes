@@ -3,7 +3,7 @@
 > **Purpose:** single-source brief for the **writing agent**. Everything needed to draft Paper B —
 > thesis, claims↔evidence (with exact numbers + source files), the main table, baselines, novelty
 > defense, the do-not-overclaim list, section plan, asset index, status. **Read this first**; deep-dive
-> via the links. Companion docs: [`README.md`](README.md) · [`logic.md`](logic.md) ·
+> via the links. Companion docs: [`README.md`](README.md) · [`method.md`](method.md) (v1.5 architecture + math) · [`logic.md`](logic.md) ·
 > [`framing.md`](framing.md) · [`baselines-and-novelty.md`](baselines-and-novelty.md) · [`outline.md`](outline.md).
 >
 > **Two repos:** evidence ledger = `mem-embedding` repo `summary/matrix.md` (sections cited as §N);
