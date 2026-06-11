@@ -45,3 +45,39 @@ Closest prior, grouped by role. Full entries (with arXiv IDs + our take) live in
 
 ## To add to knowledge-sources.md when Phase 1 starts
 Retrieval-heads (Wu 2024) · EWC · L2-SP · LwF · wise-ft · TRACE · HELMET · ∞Bench · LongBench-v2 · LogHub.
+
+---
+
+# Paper B — parametric agentic memory + reliability gate (2026-06-05 audit)
+Full review + novelty defense: [`gate-scope-litreview-2026-06-05.md`](gate-scope-litreview-2026-06-05.md).
+
+## Taxonomy / surveys
+- `[mem-survey-human]` From Human Memory to AI Memory (2504.15965) — 3D-8Q taxonomy (object × form[parametric/non-parametric] × time).
+- `[mem-survey-agent]` Memory for Autonomous LLM Agents (2603.07670) — write–manage–read loop; substrate × scope × policy; 5 mechanism families incl. context-resident compression + policy-learned management. **Cite for scope.**
+
+## Parametric / latent-space memory (OUR substrate — nearest in-scope)
+- `[memoryllm]` MemoryLLM (Wang 2024) — 1B latent memory-token pool, self-update, **exponential forgetting**, ≤~20k.
+- `[m+]` M+ (ICML'25, 2502.00592) — CPU long-term latent store + co-trained retriever; 20k→160k. **Closest prior work.**
+- `[memory3]` Memory³ (2407.01178) — explicit sparse-KV memory; 3rd form after weights/working.
+- `[memlayers]` Memory Layers (Meta 2024) — trainable KV memory layers.
+- Compressors usable as the wrapper: `[gist]` 2304.08467 · `[icae]` 2307.06945 · `[beacon]` Activation-Beacon 2401.03462 · `[ultragist]` 2405.16635 · CCM.
+
+## Non-parametric agentic memory (popular practice — contrast)
+- `[memgpt]` 2310.08560 · `[mem0]` 2504.19413 (LoCoMo baseline) · Letta · Zep · A-Mem · MemoryBank · Cognee.
+
+## Gated / adaptive memory control (CONTESTED — must differentiate, all non-parametric)
+- `[dmem]` D-Mem (2603.18631) — LLM-judge Quality-Gating + Full-Deliberation fallback; LoCoMo. **THE comparison.**
+- `[oblivion]` Oblivion (2604.00131) — uncertainty-gated read path (when-to-retrieve).
+- `[rfmem]` RF-Mem (2603.09250) — familiarity (list entropy) → recollection escalation.
+- `[hymem]` HyMem (2602.13933) — query-complexity picks summary vs raw tier.
+- `[adacomp]` 2409.01579 (rate) · `[entropygate]` 2606.03739 (below-fidelity→full prompt) · `[slt]` 2605.25745 (CoT confidence gate).
+- `[uncert-gate]` Han 2024 + selective-prediction line — generic confidence baseline to beat.
+
+## Compression-failure science (motivation)
+- `[silver-bullet]` 2412.17483 — gist fails on synthetic recall; lost-by-boundary/if-surprise/along-the-way. `[xrag]` loses dates/numbers/entities.
+
+## Latent-specific gate signals (our edge — N3)
+- `[razorattn]` RazorAttention (ICLR'25, 2407.15891) · `[compresskv]` 2508.02401 — retrieval-head-guided keep/evict → repurpose head-routing-onto-latents as a gate signal.
+
+## Agentic-memory benchmarks
+- LoCoMo (have it) · LongMemEval · BEAM.

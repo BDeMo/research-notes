@@ -1,5 +1,10 @@
 # Janus — metric curation: soundness × interestingness, filter, and metric-driven ideas
 
+> ⚠️ **Note (2026-06-04 eve):** the keep/filter ratings stand, but narrative annotations that lean on
+> the LC↔CF coupling (e.g. "v_norm is the single best forgetting predictor, 0.56") are inflated by
+> confounds revealed in [`mechanism-results-2026-06-04.md`](mechanism-results-2026-06-04.md)
+> (within-layer + partial|out_norm those couplings collapse). Read coupling claims here as v1-pooled.
+
 > We rate all 39 metrics on **soundness** (合理性: is it a well-justified, non-artifactual measurement?) and **interestingness** (有意思: does it reveal something non-obvious after simple analysis?). We **filter the naive/straightforward/redundant** ones and keep the metrics that are *simple-but-surprising* or *deep-and-sound*. Then we mine ideas from the survivors. Companion to [`metrics-reference.md`](metrics-reference.md) (definitions) and [`grid-metrics-2026-06-04.md`](grid-metrics-2026-06-04.md) (couplings).
 
 ## Rating rubric

@@ -1,0 +1,37 @@
+2026-06-11 03:41:24.008 | INFO     | llm_infra.models:load_base:93 - loading frozen base: /mnt/persist/checkpoints/Qwen3-8B dtype=bfloat16 device=cuda:1
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/399 [00:00<?, ?it/s]Loading weights: 100%|██████████| 399/399 [00:00<00:00, 5850.33it/s]
+Using the latest cached version of the dataset since mandarjoshi/trivia_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'rc' at /mnt/persist/hf-cache/datasets/mandarjoshi___trivia_qa/rc/0.0.0/0f7faf33a3908546c6fd5b73a660e0f8ff173c2f (last modified on Wed Jun  3 16:25:42 2026).
+2026-06-11 03:41:27.813 | INFO     | __main__:main:122 - training cartridge on corpus=trivia_qa (96 items)
+2026-06-11 03:44:01.815 | INFO     | mem_embedding.gcm.methods:train:132 - [cartridge] self-study targets: 96 (T<=16, top-64)
+/mnt/persist/v17/mem-embedding/src/mem_embedding/gcm/methods.py:152: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  logger.info(f"[cartridge] step {step}/{cfg.steps} distillKL={float(loss):.4f}")
+2026-06-11 03:44:40.040 | INFO     | mem_embedding.gcm.methods:train:152 - [cartridge] step 150/1500 distillKL=0.2095
+2026-06-11 03:44:50.181 | INFO     | mem_embedding.gcm.methods:train:152 - [cartridge] step 300/1500 distillKL=0.1287
+2026-06-11 03:45:00.352 | INFO     | mem_embedding.gcm.methods:train:152 - [cartridge] step 450/1500 distillKL=0.4253
+2026-06-11 03:45:10.525 | INFO     | mem_embedding.gcm.methods:train:152 - [cartridge] step 600/1500 distillKL=0.8708
+2026-06-11 03:45:20.680 | INFO     | mem_embedding.gcm.methods:train:152 - [cartridge] step 750/1500 distillKL=0.0490
+2026-06-11 03:45:30.872 | INFO     | mem_embedding.gcm.methods:train:152 - [cartridge] step 900/1500 distillKL=0.0579
+2026-06-11 03:45:40.836 | INFO     | mem_embedding.gcm.methods:train:152 - [cartridge] step 1050/1500 distillKL=0.1359
+2026-06-11 03:45:50.348 | INFO     | mem_embedding.gcm.methods:train:152 - [cartridge] step 1200/1500 distillKL=0.0800
+2026-06-11 03:45:59.846 | INFO     | mem_embedding.gcm.methods:train:152 - [cartridge] step 1350/1500 distillKL=0.0247
+2026-06-11 03:46:09.325 | INFO     | mem_embedding.gcm.methods:train:152 - [cartridge] step 1500/1500 distillKL=0.2612
+Using the latest cached version of the dataset since mandarjoshi/trivia_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'rc' at /mnt/persist/hf-cache/datasets/mandarjoshi___trivia_qa/rc/0.0.0/0f7faf33a3908546c6fd5b73a660e0f8ff173c2f (last modified on Wed Jun  3 16:25:42 2026).
+2026-06-11 03:46:09.362 | INFO     | __main__:main:129 - === eval trivia_qa rel=in_task: 96 items x 3 methods ===
+2026-06-11 03:50:20.957 | INFO     | __main__:main:160 - wrote /mnt/persist/v17/out/sweep/cartridge_trivia_qa_s1500_lr0.0001_K64/records_trivia_qa.jsonl
+Using the latest cached version of the dataset since hotpotqa/hotpot_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'distractor' at /mnt/persist/hf-cache/datasets/hotpotqa___hotpot_qa/distractor/0.0.0/1908d6afbbead072334abe2965f91bd2709910ab (last modified on Wed Jun  3 12:11:32 2026).
+2026-06-11 03:50:20.975 | INFO     | __main__:main:129 - === eval hotpot_qa rel=cross_task_in_domain: 96 items x 3 methods ===
+2026-06-11 03:56:03.659 | INFO     | __main__:main:160 - wrote /mnt/persist/v17/out/sweep/cartridge_trivia_qa_s1500_lr0.0001_K64/records_hotpot_qa.jsonl
+Using the latest cached version of the dataset since rajpurkar/squad_v2 couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'squad_v2' at /mnt/persist/hf-cache/datasets/rajpurkar___squad_v2/squad_v2/0.0.0/3ffb306f725f7d2ce8394bc1873b24868140c412 (last modified on Wed Jun  3 15:34:46 2026).
+2026-06-11 03:56:03.672 | INFO     | __main__:main:129 - === eval squad_v2 rel=cross_task_in_domain: 96 items x 3 methods ===
+2026-06-11 03:59:01.609 | INFO     | __main__:main:160 - wrote /mnt/persist/v17/out/sweep/cartridge_trivia_qa_s1500_lr0.0001_K64/records_squad_v2.jsonl
+Using the latest cached version of the dataset since emozilla/quality couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'default' at /mnt/persist/hf-cache/datasets/emozilla___quality/default/0.0.0/7142df0407e16a99e5cda9188edc7db01e8c151a (last modified on Wed Jun  3 12:11:13 2026).
+2026-06-11 03:59:01.622 | INFO     | __main__:main:129 - === eval quality rel=cross_task_cross_domain: 96 items x 3 methods ===
+2026-06-11 04:00:15.798 | INFO     | __main__:main:160 - wrote /mnt/persist/v17/out/sweep/cartridge_trivia_qa_s1500_lr0.0001_K64/records_quality.jsonl
+DONE gcm benchmark testing

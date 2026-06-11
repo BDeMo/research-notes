@@ -1,0 +1,49 @@
+2026-06-11 11:11:29.468 | INFO     | llm_infra.models:load_base:93 - loading frozen base: /mnt/persist/checkpoints/Qwen3-8B dtype=bfloat16 device=cuda:0
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/399 [00:00<?, ?it/s]Loading weights: 100%|██████████| 399/399 [00:00<00:00, 7376.72it/s]
+Using the latest cached version of the dataset since hotpotqa/hotpot_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'distractor' at /mnt/persist/hf-cache/datasets/hotpotqa___hotpot_qa/distractor/0.0.0/1908d6afbbead072334abe2965f91bd2709910ab (last modified on Wed Jun  3 12:11:32 2026).
+2026-06-11 11:11:33.484 | INFO     | __main__:main:125 - training cartridge on corpus=hotpot_qa (96 items)
+2026-06-11 11:17:18.730 | INFO     | mem_embedding.gcm.methods:train:134 - [cartridge] self-study targets: 96 (T<=16, top-64)
+/mnt/persist/v17/mem-embedding/src/mem_embedding/gcm/methods.py:154: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  logger.info(f"[cartridge] step {step}/{cfg.steps} distillKL={float(loss):.4f}")
+2026-06-11 11:17:57.029 | INFO     | mem_embedding.gcm.methods:train:154 - [cartridge] step 150/1500 distillKL=0.1746
+2026-06-11 11:18:07.232 | INFO     | mem_embedding.gcm.methods:train:154 - [cartridge] step 300/1500 distillKL=0.2623
+2026-06-11 11:18:17.337 | INFO     | mem_embedding.gcm.methods:train:154 - [cartridge] step 450/1500 distillKL=0.1486
+2026-06-11 11:18:27.085 | INFO     | mem_embedding.gcm.methods:train:154 - [cartridge] step 600/1500 distillKL=0.2958
+2026-06-11 11:18:36.597 | INFO     | mem_embedding.gcm.methods:train:154 - [cartridge] step 750/1500 distillKL=0.4478
+2026-06-11 11:18:46.050 | INFO     | mem_embedding.gcm.methods:train:154 - [cartridge] step 900/1500 distillKL=0.0706
+2026-06-11 11:18:55.508 | INFO     | mem_embedding.gcm.methods:train:154 - [cartridge] step 1050/1500 distillKL=0.0885
+2026-06-11 11:19:04.961 | INFO     | mem_embedding.gcm.methods:train:154 - [cartridge] step 1200/1500 distillKL=0.7435
+2026-06-11 11:19:14.417 | INFO     | mem_embedding.gcm.methods:train:154 - [cartridge] step 1350/1500 distillKL=0.0763
+2026-06-11 11:19:23.878 | INFO     | mem_embedding.gcm.methods:train:154 - [cartridge] step 1500/1500 distillKL=0.1378
+Using the latest cached version of the dataset since mandarjoshi/trivia_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'rc' at /mnt/persist/hf-cache/datasets/mandarjoshi___trivia_qa/rc/0.0.0/0f7faf33a3908546c6fd5b73a660e0f8ff173c2f (last modified on Wed Jun  3 16:25:42 2026).
+2026-06-11 11:19:23.915 | INFO     | __main__:main:132 - === eval trivia_qa rel=cross_task_in_domain: 96 items x 3 methods ===
+2026-06-11 11:23:24.475 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_cart_hotpot_qa/records_trivia_qa.jsonl
+Using the latest cached version of the dataset since hotpotqa/hotpot_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'distractor' at /mnt/persist/hf-cache/datasets/hotpotqa___hotpot_qa/distractor/0.0.0/1908d6afbbead072334abe2965f91bd2709910ab (last modified on Wed Jun  3 12:11:32 2026).
+2026-06-11 11:23:24.492 | INFO     | __main__:main:132 - === eval hotpot_qa rel=in_task: 96 items x 3 methods ===
+2026-06-11 11:26:06.772 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_cart_hotpot_qa/records_hotpot_qa.jsonl
+Using the latest cached version of the dataset since rajpurkar/squad_v2 couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'squad_v2' at /mnt/persist/hf-cache/datasets/rajpurkar___squad_v2/squad_v2/0.0.0/3ffb306f725f7d2ce8394bc1873b24868140c412 (last modified on Wed Jun  3 15:34:46 2026).
+2026-06-11 11:26:06.785 | INFO     | __main__:main:132 - === eval squad_v2 rel=cross_task_in_domain: 96 items x 3 methods ===
+2026-06-11 11:28:58.347 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_cart_hotpot_qa/records_squad_v2.jsonl
+Using the latest cached version of the dataset since emozilla/quality couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'default' at /mnt/persist/hf-cache/datasets/emozilla___quality/default/0.0.0/7142df0407e16a99e5cda9188edc7db01e8c151a (last modified on Wed Jun  3 12:11:13 2026).
+2026-06-11 11:28:58.361 | INFO     | __main__:main:132 - === eval quality rel=cross_task_cross_domain: 96 items x 3 methods ===
+2026-06-11 11:30:12.629 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_cart_hotpot_qa/records_quality.jsonl
+Using the latest cached version of the dataset since deepmind/narrativeqa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'default' at /mnt/persist/hf-cache/datasets/deepmind___narrativeqa/default/0.0.0/2e643e7363944af1c33a652d1c87320d0871c4e4 (last modified on Wed Jun  3 12:13:02 2026).
+2026-06-11 11:30:12.682 | INFO     | __main__:main:132 - === eval narrativeqa rel=cross_task_cross_domain: 96 items x 3 methods ===
+2026-06-11 11:33:02.272 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_cart_hotpot_qa/records_narrativeqa.jsonl
+Using the latest cached version of the dataset since microsoft/ms_marco couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'v2.1' at /mnt/persist/hf-cache/datasets/microsoft___ms_marco/v2.1/0.0.0/a47ee7aae8d7d466ba15f9f0bfac3b3681087b3a (last modified on Wed Jun  3 15:34:46 2026).
+2026-06-11 11:33:02.315 | INFO     | __main__:main:132 - === eval ms_marco rel=cross_task_cross_domain: 96 items x 3 methods ===
+2026-06-11 11:35:05.127 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_cart_hotpot_qa/records_ms_marco.jsonl
+Using the latest cached version of the dataset since TAUR-Lab/MuSR couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'default' at /mnt/persist/hf-cache/datasets/TAUR-Lab___mu_sr/default/0.0.0/7c365b439a222150f317764d4f16ae6c96d7d94a (last modified on Wed Jun  3 12:13:04 2026).
+2026-06-11 11:35:05.135 | INFO     | __main__:main:132 - === eval musr_mm rel=cross_task_cross_domain: 96 items x 3 methods ===
+2026-06-11 11:35:26.146 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_cart_hotpot_qa/records_musr_mm.jsonl
+DONE gcm benchmark testing

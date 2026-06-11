@@ -1,0 +1,22 @@
+2026-06-10 22:37:59.671 | INFO     | llm_infra.models:load_base:93 - loading frozen base: /mnt/persist/checkpoints/Qwen3-8B dtype=bfloat16 device=cuda:2
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/399 [00:00<?, ?it/s]Loading weights: 100%|██████████| 399/399 [00:00<00:00, 8403.81it/s]
+Using the latest cached version of the dataset since mandarjoshi/trivia_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'rc' at /mnt/persist/hf-cache/datasets/mandarjoshi___trivia_qa/rc/0.0.0/0f7faf33a3908546c6fd5b73a660e0f8ff173c2f (last modified on Wed Jun  3 16:25:42 2026).
+2026-06-10 22:38:04.249 | INFO     | __main__:main:121 - training gcm on corpus=trivia_qa (96 items)
+2026-06-10 22:38:26.012 | INFO     | svc.method:train:88 - [gcm] targets: 96 (enc=4, dec=2, K=128, cond=True, fp32=True, lam_task=1.0, lam_distill=0.0, lam_rec=1.0, lam_dev=0.05)
+2026-06-10 22:39:21.706 | INFO     | svc.method:train:128 - [gcm] step 60/600 task=0.8633 distill=0.0000 rec=6.8857 dev=0.015307
+2026-06-10 22:40:02.004 | INFO     | svc.method:train:128 - [gcm] step 120/600 task=4.1452 distill=0.0000 rec=6.3254 dev=0.007501
+2026-06-10 22:40:42.251 | INFO     | svc.method:train:128 - [gcm] step 180/600 task=6.7750 distill=0.0000 rec=6.0830 dev=0.002903
+2026-06-10 22:41:22.304 | INFO     | svc.method:train:128 - [gcm] step 240/600 task=0.0023 distill=0.0000 rec=4.5122 dev=0.001118
+2026-06-10 22:42:03.281 | INFO     | svc.method:train:128 - [gcm] step 300/600 task=0.5489 distill=0.0000 rec=5.8910 dev=0.015240
+2026-06-10 22:42:43.305 | INFO     | svc.method:train:128 - [gcm] step 360/600 task=0.0900 distill=0.0000 rec=2.2620 dev=0.095247
+2026-06-10 22:43:23.332 | INFO     | svc.method:train:128 - [gcm] step 420/600 task=0.3209 distill=0.0000 rec=4.7857 dev=0.001376
+2026-06-10 22:44:04.347 | INFO     | svc.method:train:128 - [gcm] step 480/600 task=0.0225 distill=0.0000 rec=1.9760 dev=0.012284
+2026-06-10 22:44:44.401 | INFO     | svc.method:train:128 - [gcm] step 540/600 task=0.2035 distill=0.0000 rec=2.0674 dev=0.000674
+2026-06-10 22:45:24.866 | INFO     | svc.method:train:128 - [gcm] step 600/600 task=5.0800 distill=0.0000 rec=3.4699 dev=0.008294
+Using the latest cached version of the dataset since mandarjoshi/trivia_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'rc' at /mnt/persist/hf-cache/datasets/mandarjoshi___trivia_qa/rc/0.0.0/0f7faf33a3908546c6fd5b73a660e0f8ff173c2f (last modified on Wed Jun  3 16:25:42 2026).
+2026-06-10 22:45:24.905 | INFO     | __main__:main:128 - === eval trivia_qa rel=in_task: 96 items x 3 methods ===
+2026-06-10 22:50:04.479 | INFO     | __main__:main:154 - wrote /mnt/persist/v17/out/sw_K128/records_trivia_qa.jsonl
+DONE gcm benchmark testing

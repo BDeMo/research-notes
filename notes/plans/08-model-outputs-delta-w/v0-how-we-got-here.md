@@ -4,10 +4,10 @@
 multi-seed bands landed.
 **Owner:** Mingjia (notes), Claude (write-up).
 **Settings / provenance:** historical result references in this file use
-[`settings.md`](settings/settings.md). The canonical wrapper recipe is
-[`P08-S1`](settings/settings.md#p08-s1--v1-canonical-wrapper-recipe); Phase Y /
+[`settings.md`](settings.md). The canonical wrapper recipe is
+[`P08-S1`](settings.md#p08-s1--v1-canonical-wrapper-recipe); Phase Y /
 three-regime result cells use
-[`P08-S2`](settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
+[`P08-S2`](settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
 **Purpose.** This document explains the v0 wrapper as a sequence of
 decisions, not as a list of architectural features. Every shape that
 the code has now is here because of a specific constraint, an

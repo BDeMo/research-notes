@@ -1,0 +1,70 @@
+2026-06-10 23:59:41.775 | INFO     | llm_infra.models:load_base:93 - loading frozen base: /mnt/persist/checkpoints/Qwen3-8B dtype=bfloat16 device=cuda:3
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/399 [00:00<?, ?it/s]Loading weights: 100%|██████████| 399/399 [00:00<00:00, 8771.93it/s]
+Traceback (most recent call last):
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1682, in _get_metadata_or_catch_error
+    metadata = get_hf_file_metadata(
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1604, in get_hf_file_metadata
+    response = _httpx_follow_relative_redirects_with_backoff(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/huggingface_hub/utils/_http.py", line 685, in _httpx_follow_relative_redirects_with_backoff
+    response = http_backoff(
+               ^^^^^^^^^^^^^
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/huggingface_hub/utils/_http.py", line 559, in http_backoff
+    return next(
+           ^^^^^
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/huggingface_hub/utils/_http.py", line 467, in _http_backoff_base
+    response = client.request(method=method, url=url, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/httpx/_client.py", line 825, in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/httpx/_client.py", line 914, in send
+    response = self._send_handling_auth(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/httpx/_client.py", line 942, in _send_handling_auth
+    response = self._send_handling_redirects(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/httpx/_client.py", line 977, in _send_handling_redirects
+    hook(request)
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/huggingface_hub/utils/_http.py", line 224, in hf_request_event_hook
+    raise OfflineModeIsEnabled(
+huggingface_hub.errors.OfflineModeIsEnabled: Cannot reach https://huggingface.co/datasets/gorilla-llm/Berkeley-Function-Calling-Leaderboard/resolve/main/BFCL_v3_simple.json: offline mode is enabled. To disable it, please unset the `HF_HUB_OFFLINE` environment variable.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/persist/v17/mem-embedding/src/mem_embedding/gcm/harness.py", line 159, in <module>
+    main()
+  File "/mnt/persist/v17/mem-embedding/src/mem_embedding/gcm/harness.py", line 118, in main
+    train_items = load_items(a.train_dataset, a.n_items, a.n_chunks, a.seed, a.train_split)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/v17/mem-embedding/src/mem_embedding/gcm/data.py", line 113, in load_items
+    return _call_gen(EVAL_GENS[bench], n_items=n_items, n_chunks=n_chunks, seed=seed, split=split)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/v17/mem-embedding/src/mem_embedding/gcm/data.py", line 103, in _call_gen
+    return fn(**kw)
+           ^^^^^^^^
+  File "/mnt/persist/v17/mem-embedding/src/mem_embedding/gcm/data.py", line 37, in <lambda>
+    "bfcl_simple": lambda **k: generate_bfcl(category="simple", **k),
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/v17/llm-infra/src/llm_infra/datasets.py", line 1809, in generate_bfcl
+    qf = hf_hub_download(repo, f"BFCL_v3_{category}.json", repo_type="dataset")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/huggingface_hub/utils/_validators.py", line 88, in _inner_fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1010, in hf_hub_download
+    return _hf_hub_download_to_cache_dir(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1161, in _hf_hub_download_to_cache_dir
+    _raise_on_head_call_error(head_call_error, force_download, local_files_only)
+  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/huggingface_hub/file_download.py", line 1799, in _raise_on_head_call_error
+    raise LocalEntryNotFoundError(
+huggingface_hub.errors.LocalEntryNotFoundError: An error happened while trying to locate the file on the Hub and we cannot find the requested files in the local cache. Please check your connection and try again or make sure your Internet connection is on.

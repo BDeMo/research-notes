@@ -1,0 +1,42 @@
+[w2] 20 jobs on cuda:2
+[w2] (1/20) START gcm_trivia_qa_N12_K64
+[w2] END gcm_trivia_qa_N12_K64 rc=0 1287s
+[w2] (2/20) START gcm_trivia_qa_N24_K128
+[w2] END gcm_trivia_qa_N24_K128 rc=0 1565s
+[w2] (3/20) START gcm_hotpot_qa_N16_K64
+[w2] END gcm_hotpot_qa_N16_K64 rc=0 1311s
+[w2] (4/20) START gcm_squad_v2_N8_K128
+[w2] END gcm_squad_v2_N8_K128 rc=0 1483s
+[w2] (5/20) START gcm_squad_v2_N24_K64
+[w2] END gcm_squad_v2_N24_K64 rc=0 1359s
+[w2] (6/20) START gcm_quality_N12_K128
+[w2] END gcm_quality_N12_K128 rc=0 1376s
+[w2] (7/20) START gcm_trivia_qa_N16_K64_lr0_ld0
+[w2] END gcm_trivia_qa_N16_K64_lr0_ld0 rc=0 1384s
+[w2] (8/20) START cartridge_trivia_qa_s600_lr0.0001_K64
+[w2] END cartridge_trivia_qa_s600_lr0.0001_K64 rc=0 1093s
+[w2] (9/20) START cartridge_trivia_qa_s1500_lr0.0001_K128
+[w2] END cartridge_trivia_qa_s1500_lr0.0001_K128 rc=0 1150s
+[w2] (10/20) START cartridge_hotpot_qa_s600_lr0.0003_K64
+[w2] END cartridge_hotpot_qa_s600_lr0.0003_K64 rc=0 1079s
+[w2] (11/20) START cartridge_hotpot_qa_s1500_lr0.0003_K128
+[w2] END cartridge_hotpot_qa_s1500_lr0.0003_K128 rc=0 1148s
+[w2] (12/20) START cartridge_squad_v2_s1500_lr0.0001_K64
+[w2] END cartridge_squad_v2_s1500_lr0.0001_K64 rc=0 1066s
+[w2] (13/20) START cartridge_quality_s600_lr0.0001_K128
+[w2] END cartridge_quality_s600_lr0.0001_K128 rc=0 1116s
+[w2] (14/20) START cartridge_quality_s1500_lr0.0003_K64
+[w2] END cartridge_quality_s1500_lr0.0003_K64 rc=0 1177s
+[w2] (15/20) START gist_trivia_qa_s600_lr0.0003_K128
+[w2] END gist_trivia_qa_s600_lr0.0003_K128 rc=0 838s
+[w2] (16/20) START gist_hotpot_qa_s600_lr0.0001_K64
+[w2] END gist_hotpot_qa_s600_lr0.0001_K64 rc=0 847s
+[w2] (17/20) START gist_hotpot_qa_s1500_lr0.0001_K128
+[w2] END gist_hotpot_qa_s1500_lr0.0001_K128 rc=0 1064s
+[w2] (18/20) START gist_squad_v2_s600_lr0.0003_K64
+[w2] END gist_squad_v2_s600_lr0.0003_K64 rc=0 879s
+[w2] (19/20) START gist_squad_v2_s1500_lr0.0003_K128
+[w2] END gist_squad_v2_s1500_lr0.0003_K128 rc=0 966s
+[w2] (20/20) START gist_quality_s1500_lr0.0001_K64
+[w2] END gist_quality_s1500_lr0.0001_K64 rc=0 1134s
+[w2] ALL DONE

@@ -34,12 +34,12 @@
 
 | benchmark | setting | metric | OURS μ ± σ (n=4) | GIST μ ± σ (n=4) | best baseline | regime |
 |---|---|---|---|---|---|---|
-| **QuALITY-val** | [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells) | `accuracy_letter` | **0.193 ± 0.032** | 0.180 ± 0.044 | no_context 0.141 | **A** — wrapper wins |
-| **MuSR-mm** | [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells) | `accuracy_letter` | 0.493 ± 0.008 | 0.501 ± 0.013 | full_context 0.551 | **B** — at-chance |
-| **RULER-NIAH** | [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells) | `exact_value_match` | **0.000 ± 0.000** | 0.000 ± 0.000 | full_context 0.995 | **C** — collapse |
+| **QuALITY-val** | [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells) | `accuracy_letter` | **0.193 ± 0.032** | 0.180 ± 0.044 | no_context 0.141 | **A** — wrapper wins |
+| **MuSR-mm** | [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells) | `accuracy_letter` | 0.493 ± 0.008 | 0.501 ± 0.013 | full_context 0.551 | **B** — at-chance |
+| **RULER-NIAH** | [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells) | `exact_value_match` | **0.000 ± 0.000** | 0.000 ± 0.000 | full_context 0.995 | **C** — collapse |
 
 Source and internal setting details:
-[`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
+[`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
 Per-seed RULER-NIAH: every seed = exact zero on both arms. Cleanest possible negative result.
 
 ## Output artifacts (this session)

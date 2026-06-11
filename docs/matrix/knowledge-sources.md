@@ -503,25 +503,25 @@ These five clusters were scanned during the 2026-05-28 brainstorm. They define t
 
 ## Public benchmarks used in plan-08 v1 (added 2026-06-03)
 
-These appear in `latent-mem-paper` Tables 1-2 and in `notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`. Stable IDs assigned now so all v1 + v2 docs can cite them consistently. Plan-08 headline numbers cited in this section use setting [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
+These appear in `latent-mem-paper` Tables 1-2 and in `notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`. Stable IDs assigned now so all v1 + v2 docs can cite them consistently. Plan-08 headline numbers cited in this section use setting [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
 
 ### [quality] QuALITY: Question Answering with Long Input Texts, Yes! — Pang, Parrish, Lal, et al., NAACL 2022
 - **Type**: benchmark
 - **Link**: arXiv:2112.08608 · HF `emozilla/quality`
-- **Why it matters**: 4-way MC reading comprehension on ~7K-token articles. **The Regime A canonical benchmark** in plan-08 v1: lossy compression actually *helps* here because the answer is reconstructible from a gist. Phase Y headline under [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells): OURS 0.193 ± 0.032 (n=4 seeds) vs no_context 0.141.
+- **Why it matters**: 4-way MC reading comprehension on ~7K-token articles. **The Regime A canonical benchmark** in plan-08 v1: lossy compression actually *helps* here because the answer is reconstructible from a gist. Phase Y headline under [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells): OURS 0.193 ± 0.032 (n=4 seeds) vs no_context 0.141.
 - **Used in**: plan 08 v1 paper Table 1; mem-X Phase V/X/Y
 - **Tags**: #benchmark #long-context #mc
 
 ### [musr] MuSR: Multistep Soft Reasoning — Sprague, Zhang, Sanford, et al., 2024
 - **Type**: benchmark
 - **Link**: arXiv:2310.16049
-- **Why it matters**: Closed-MC reasoning over 1000+ token narratives with multi-step temporal logic. **Regime B canonical** in plan-08 v1 under [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells): both wrappers at chance (≈ 0.495), full_context wins. Shows the wrapper learned compression but no transferable reasoning signal. Forces honest "limitations" discussion.
+- **Why it matters**: Closed-MC reasoning over 1000+ token narratives with multi-step temporal logic. **Regime B canonical** in plan-08 v1 under [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells): both wrappers at chance (≈ 0.495), full_context wins. Shows the wrapper learned compression but no transferable reasoning signal. Forces honest "limitations" discussion.
 - **Used in**: plan 08 v1 paper Table 1; mem-X Phase X/Y
 - **Tags**: #benchmark #reasoning #long-context
 
 ### [ruler] (already exists) — Hsieh et al., COLM 2024
 
-Plan-08 v1 promotes this to Regime C canonical under [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells): extract one specific string from a 2K-token WikiText haystack. Both wrappers = 0.000 ± 0.000 (4 seeds, exactly zero); full_context = 0.995. Cleanest evidence for "lossy compression destroys the needle string".
+Plan-08 v1 promotes this to Regime C canonical under [`P08-S2`](../../notes/plans/08-model-outputs-delta-w/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells): extract one specific string from a 2K-token WikiText haystack. Both wrappers = 0.000 ± 0.000 (4 seeds, exactly zero); full_context = 0.995. Cleanest evidence for "lossy compression destroys the needle string".
 
 ### [hotpotqa] HotpotQA: A Dataset for Diverse, Explainable Multi-hop QA — Yang, Qi, Zhang, et al., EMNLP 2018
 - **Type**: benchmark

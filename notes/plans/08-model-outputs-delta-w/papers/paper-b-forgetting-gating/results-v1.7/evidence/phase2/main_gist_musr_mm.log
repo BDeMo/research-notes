@@ -1,0 +1,48 @@
+2026-06-11 12:02:10.807 | INFO     | llm_infra.models:load_base:93 - loading frozen base: /mnt/persist/checkpoints/Qwen3-8B dtype=bfloat16 device=cuda:1
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/399 [00:00<?, ?it/s]Loading weights: 100%|██████████| 399/399 [00:00<00:00, 6466.19it/s]
+Using the latest cached version of the dataset since TAUR-Lab/MuSR couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'default' at /mnt/persist/hf-cache/datasets/TAUR-Lab___mu_sr/default/0.0.0/7c365b439a222150f317764d4f16ae6c96d7d94a (last modified on Wed Jun  3 12:13:04 2026).
+2026-06-11 12:02:14.665 | INFO     | __main__:main:125 - training gist on corpus=musr_mm (96 items)
+/mnt/persist/v17/mem-embedding/src/mem_embedding/gcm/methods.py:203: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  logger.info(f"[gist] step {step}/{cfg.steps} ce={float(loss):.4f}")
+2026-06-11 12:02:50.102 | INFO     | mem_embedding.gcm.methods:train:203 - [gist] step 150/1500 ce=0.3445
+2026-06-11 12:03:25.142 | INFO     | mem_embedding.gcm.methods:train:203 - [gist] step 300/1500 ce=0.1022
+2026-06-11 12:04:00.133 | INFO     | mem_embedding.gcm.methods:train:203 - [gist] step 450/1500 ce=0.0066
+2026-06-11 12:04:35.332 | INFO     | mem_embedding.gcm.methods:train:203 - [gist] step 600/1500 ce=0.0000
+2026-06-11 12:05:10.420 | INFO     | mem_embedding.gcm.methods:train:203 - [gist] step 750/1500 ce=0.0000
+2026-06-11 12:05:45.669 | INFO     | mem_embedding.gcm.methods:train:203 - [gist] step 900/1500 ce=0.0001
+2026-06-11 12:06:20.615 | INFO     | mem_embedding.gcm.methods:train:203 - [gist] step 1050/1500 ce=0.0000
+2026-06-11 12:06:55.700 | INFO     | mem_embedding.gcm.methods:train:203 - [gist] step 1200/1500 ce=0.0000
+2026-06-11 12:07:30.929 | INFO     | mem_embedding.gcm.methods:train:203 - [gist] step 1350/1500 ce=0.0002
+2026-06-11 12:08:05.970 | INFO     | mem_embedding.gcm.methods:train:203 - [gist] step 1500/1500 ce=0.0001
+Using the latest cached version of the dataset since mandarjoshi/trivia_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'rc' at /mnt/persist/hf-cache/datasets/mandarjoshi___trivia_qa/rc/0.0.0/0f7faf33a3908546c6fd5b73a660e0f8ff173c2f (last modified on Wed Jun  3 16:25:42 2026).
+2026-06-11 12:08:06.011 | INFO     | __main__:main:132 - === eval trivia_qa rel=cross_task_cross_domain: 96 items x 3 methods ===
+2026-06-11 12:12:53.316 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_gist_musr_mm/records_trivia_qa.jsonl
+Using the latest cached version of the dataset since hotpotqa/hotpot_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'distractor' at /mnt/persist/hf-cache/datasets/hotpotqa___hotpot_qa/distractor/0.0.0/1908d6afbbead072334abe2965f91bd2709910ab (last modified on Wed Jun  3 12:11:32 2026).
+2026-06-11 12:12:53.333 | INFO     | __main__:main:132 - === eval hotpot_qa rel=cross_task_cross_domain: 96 items x 3 methods ===
+2026-06-11 12:16:08.931 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_gist_musr_mm/records_hotpot_qa.jsonl
+Using the latest cached version of the dataset since rajpurkar/squad_v2 couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'squad_v2' at /mnt/persist/hf-cache/datasets/rajpurkar___squad_v2/squad_v2/0.0.0/3ffb306f725f7d2ce8394bc1873b24868140c412 (last modified on Wed Jun  3 15:34:46 2026).
+2026-06-11 12:16:08.945 | INFO     | __main__:main:132 - === eval squad_v2 rel=cross_task_cross_domain: 96 items x 3 methods ===
+2026-06-11 12:18:12.954 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_gist_musr_mm/records_squad_v2.jsonl
+Using the latest cached version of the dataset since emozilla/quality couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'default' at /mnt/persist/hf-cache/datasets/emozilla___quality/default/0.0.0/7142df0407e16a99e5cda9188edc7db01e8c151a (last modified on Wed Jun  3 12:11:13 2026).
+2026-06-11 12:18:12.970 | INFO     | __main__:main:132 - === eval quality rel=cross_task_cross_domain: 96 items x 3 methods ===
+2026-06-11 12:19:44.781 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_gist_musr_mm/records_quality.jsonl
+Using the latest cached version of the dataset since deepmind/narrativeqa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'default' at /mnt/persist/hf-cache/datasets/deepmind___narrativeqa/default/0.0.0/2e643e7363944af1c33a652d1c87320d0871c4e4 (last modified on Wed Jun  3 12:13:02 2026).
+2026-06-11 12:19:44.836 | INFO     | __main__:main:132 - === eval narrativeqa rel=cross_task_cross_domain: 96 items x 3 methods ===
+2026-06-11 12:24:55.269 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_gist_musr_mm/records_narrativeqa.jsonl
+Using the latest cached version of the dataset since microsoft/ms_marco couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'v2.1' at /mnt/persist/hf-cache/datasets/microsoft___ms_marco/v2.1/0.0.0/a47ee7aae8d7d466ba15f9f0bfac3b3681087b3a (last modified on Wed Jun  3 15:34:46 2026).
+2026-06-11 12:24:55.312 | INFO     | __main__:main:132 - === eval ms_marco rel=cross_task_cross_domain: 96 items x 3 methods ===
+2026-06-11 12:27:18.512 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_gist_musr_mm/records_ms_marco.jsonl
+Using the latest cached version of the dataset since TAUR-Lab/MuSR couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'default' at /mnt/persist/hf-cache/datasets/TAUR-Lab___mu_sr/default/0.0.0/7c365b439a222150f317764d4f16ae6c96d7d94a (last modified on Wed Jun  3 12:13:04 2026).
+2026-06-11 12:27:18.521 | INFO     | __main__:main:132 - === eval musr_mm rel=in_task: 96 items x 3 methods ===
+2026-06-11 12:28:00.468 | INFO     | __main__:main:163 - wrote /mnt/persist/v17/out/phase2/main_gist_musr_mm/records_musr_mm.jsonl
+DONE gcm benchmark testing

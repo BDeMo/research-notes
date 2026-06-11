@@ -1,0 +1,21 @@
+2026-06-11 12:42:24.252 | INFO     | llm_infra.models:load_base:93 - loading frozen base: /mnt/persist/checkpoints/Qwen3-8B dtype=bfloat16 device=cuda:1
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/399 [00:00<?, ?it/s]Loading weights: 100%|██████████| 399/399 [00:00<00:00, 5196.26it/s]
+Using the latest cached version of the dataset since mandarjoshi/trivia_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'rc' at /mnt/persist/hf-cache/datasets/mandarjoshi___trivia_qa/rc/0.0.0/0f7faf33a3908546c6fd5b73a660e0f8ff173c2f (last modified on Wed Jun  3 16:25:42 2026).
+2026-06-11 12:42:28.198 | INFO     | __main__:main:125 - training gcm on corpus=trivia_qa (96 items)
+2026-06-11 12:43:25.076 | INFO     | svc.method:train:123 - [gcm] targets: 96 (enc=24, dec=2, K=256, cond=True, fp32=False, lam_task=1.0, lam_distill=0.0, lam_rec=1.0, lam_dev=0.05)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/persist/v17/mem-embedding/src/mem_embedding/gcm/harness.py", line 168, in <module>
+    main()
+  File "/mnt/persist/v17/mem-embedding/src/mem_embedding/gcm/harness.py", line 126, in main
+    m.train(rt, train_items, cfg)
+  File "/mnt/persist/v17/svc/src/svc/method.py", line 154, in train
+    l_rec = self.svc.reconstruct(s["cid"], enc0["memory"], out_w)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/persist/v17/svc/src/svc/compressor.py", line 138, in reconstruct
+    logits = F.linear(hc.to(out_weight.dtype), out_weight).float()
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 594.00 MiB. GPU 1 has a total capacity of 79.19 GiB of which 364.50 MiB is free. Including non-PyTorch memory, this process has 78.82 GiB memory in use. Of the allocated memory 77.29 GiB is allocated by PyTorch, and 890.93 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)

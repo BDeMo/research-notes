@@ -1,0 +1,34 @@
+2026-06-10 23:08:22.119 | INFO     | llm_infra.models:load_base:93 - loading frozen base: /mnt/persist/checkpoints/Qwen3-8B dtype=bfloat16 device=cuda:0
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/399 [00:00<?, ?it/s]Loading weights: 100%|██████████| 399/399 [00:00<00:00, 7752.66it/s]
+Using the latest cached version of the dataset since mandarjoshi/trivia_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'rc' at /mnt/persist/hf-cache/datasets/mandarjoshi___trivia_qa/rc/0.0.0/0f7faf33a3908546c6fd5b73a660e0f8ff173c2f (last modified on Wed Jun  3 16:25:42 2026).
+2026-06-10 23:08:29.246 | INFO     | __main__:main:121 - training gcm on corpus=trivia_qa (96 items)
+2026-06-10 23:08:57.985 | INFO     | svc.method:train:88 - [gcm] targets: 96 (enc=8, dec=2, K=64, cond=True, fp32=True, lam_task=1.0, lam_distill=0.0, lam_rec=1.0, lam_dev=0.05)
+2026-06-10 23:10:15.289 | INFO     | svc.method:train:128 - [gcm] step 60/600 task=0.7429 distill=0.0000 rec=6.8050 dev=0.252594
+2026-06-10 23:11:13.620 | INFO     | svc.method:train:128 - [gcm] step 120/600 task=4.3876 distill=0.0000 rec=6.3022 dev=0.018831
+2026-06-10 23:12:11.367 | INFO     | svc.method:train:128 - [gcm] step 180/600 task=5.3774 distill=0.0000 rec=6.0598 dev=0.002128
+2026-06-10 23:13:08.358 | INFO     | svc.method:train:128 - [gcm] step 240/600 task=0.0020 distill=0.0000 rec=2.6986 dev=0.002528
+2026-06-10 23:14:06.727 | INFO     | svc.method:train:128 - [gcm] step 300/600 task=0.6584 distill=0.0000 rec=3.7839 dev=0.009464
+2026-06-10 23:15:04.225 | INFO     | svc.method:train:128 - [gcm] step 360/600 task=0.0128 distill=0.0000 rec=2.0594 dev=0.000990
+2026-06-10 23:16:01.773 | INFO     | svc.method:train:128 - [gcm] step 420/600 task=0.0440 distill=0.0000 rec=2.1799 dev=0.001935
+2026-06-10 23:17:00.876 | INFO     | svc.method:train:128 - [gcm] step 480/600 task=0.0180 distill=0.0000 rec=1.4137 dev=0.001098
+2026-06-10 23:17:58.600 | INFO     | svc.method:train:128 - [gcm] step 540/600 task=0.0943 distill=0.0000 rec=0.6596 dev=0.000668
+2026-06-10 23:18:56.983 | INFO     | svc.method:train:128 - [gcm] step 600/600 task=0.5520 distill=0.0000 rec=1.3407 dev=0.000549
+Using the latest cached version of the dataset since mandarjoshi/trivia_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'rc' at /mnt/persist/hf-cache/datasets/mandarjoshi___trivia_qa/rc/0.0.0/0f7faf33a3908546c6fd5b73a660e0f8ff173c2f (last modified on Wed Jun  3 16:25:42 2026).
+2026-06-10 23:18:57.021 | INFO     | __main__:main:128 - === eval trivia_qa rel=in_task: 96 items x 3 methods ===
+2026-06-10 23:23:50.250 | INFO     | __main__:main:154 - wrote /mnt/persist/v17/out/rel_N8/records_trivia_qa.jsonl
+Using the latest cached version of the dataset since hotpotqa/hotpot_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'distractor' at /mnt/persist/hf-cache/datasets/hotpotqa___hotpot_qa/distractor/0.0.0/1908d6afbbead072334abe2965f91bd2709910ab (last modified on Wed Jun  3 12:11:32 2026).
+2026-06-10 23:23:50.267 | INFO     | __main__:main:128 - === eval hotpot_qa rel=cross_task_in_domain: 96 items x 3 methods ===
+2026-06-10 23:30:02.689 | INFO     | __main__:main:154 - wrote /mnt/persist/v17/out/rel_N8/records_hotpot_qa.jsonl
+Using the latest cached version of the dataset since rajpurkar/squad_v2 couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'squad_v2' at /mnt/persist/hf-cache/datasets/rajpurkar___squad_v2/squad_v2/0.0.0/3ffb306f725f7d2ce8394bc1873b24868140c412 (last modified on Wed Jun  3 15:34:46 2026).
+2026-06-10 23:30:02.703 | INFO     | __main__:main:128 - === eval squad_v2 rel=cross_task_in_domain: 96 items x 3 methods ===
+2026-06-10 23:33:03.012 | INFO     | __main__:main:154 - wrote /mnt/persist/v17/out/rel_N8/records_squad_v2.jsonl
+Using the latest cached version of the dataset since emozilla/quality couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'default' at /mnt/persist/hf-cache/datasets/emozilla___quality/default/0.0.0/7142df0407e16a99e5cda9188edc7db01e8c151a (last modified on Wed Jun  3 12:11:13 2026).
+2026-06-10 23:33:03.026 | INFO     | __main__:main:128 - === eval quality rel=cross_task_cross_domain: 96 items x 3 methods ===
+2026-06-10 23:34:30.401 | INFO     | __main__:main:154 - wrote /mnt/persist/v17/out/rel_N8/records_quality.jsonl
+DONE gcm benchmark testing

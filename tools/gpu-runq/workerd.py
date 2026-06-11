@@ -33,6 +33,12 @@ import os, sys, json, time, glob, socket, shlex, subprocess, argparse
 
 DIRS = ["queue", "running", "done", "failed", "cancelled", "logs", "control", "workers"]
 
+def _ngpus(spec):
+    """How many GPUs a job needs. Robust to specs whose 'gpus' was rewritten to a
+    list (e.g. a running/ record manually requeued) -- never crash the claim loop."""
+    g = spec.get("gpus", 1)
+    return len(g) if isinstance(g, (list, tuple)) else int(g)
+
 def smi():
     try:
         out = subprocess.run(
@@ -166,7 +172,7 @@ class Worker:
                 pass
         cands.sort(key=lambda s: (s.get("priority", 100), s.get("ts", 0)))
         for spec in cands:
-            if int(spec.get("gpus", 1)) > ngpu_free:
+            if _ngpus(spec) > ngpu_free:
                 continue
             claimed = self.p("running", f".claim_{self.host}_{spec['id']}.tmp")
             try:
@@ -286,7 +292,7 @@ class Worker:
                 while free:
                     spec, claimed = self.claim(len(free))
                     if not spec: break
-                    need = int(spec.get("gpus", 1))
+                    need = _ngpus(spec)
                     use, free = free[:need], free[need:]
                     try:
                         self.launch(spec, use, claimed)

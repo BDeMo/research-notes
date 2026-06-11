@@ -1,0 +1,14 @@
+[w1] 6 jobs on cuda:1
+[w1] (1/6) START main_gist_trivia_qa
+[w1] END main_gist_trivia_qa rc=0 1524s
+[w1] (2/6) START main_gcm_quality
+[w1] END main_gcm_quality rc=0 1981s
+[w1] (3/6) START main_cart_narrativeqa
+[w1] END main_cart_narrativeqa rc=0 1431s
+[w1] (4/6) START main_gist_musr_mm
+[w1] END main_gist_musr_mm rc=0 1554s
+[w1] (5/6) START abl_ratio_nc2_trivia_qa
+[w1] END abl_ratio_nc2_trivia_qa rc=0 859s
+[w1] (6/6) START abl_K256_trivia_qa
+[w1] END abl_K256_trivia_qa rc=1 68s
+[w1] ALL DONE

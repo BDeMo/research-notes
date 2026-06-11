@@ -76,6 +76,77 @@ drift). Which-params-to-protect: **MoFO/MIGU**, **ESFT**, mechanistic head-freez
 
 ---
 
+## 7. Gated / co-designed compression with selective fallback (closest v1.7 neighbors, 2026-06-10)
+> The "selective/gated compression with do-no-harm fallback" idea is now crowded in 2026. Verify every id on
+> arXiv before citing (see [`references.md`](references.md)); several are very recent preprints.
+- **Context Distillation as Latent Memory Management** (2605.28889): per-context **LoRA** memory bank +
+  retrieval + **Self-Gating** (high prefix entropy ⇒ query is context-agnostic ⇒ deactivate LoRA, fall back
+  to base). This is our Track A almost exactly, but the memory is a LoRA adapter and the gate fires on
+  "context-agnostic query", not on "this compression lost the needed info".
+- **SLT: Selective Latent Thinking** (2605.25745): backbone + **reliability-aware feature decoder** +
+  **confidence gate** + latent compressor, jointly trained; compress reliable reasoning spans, fall back to
+  explicit CoT when uncertain. Same mechanism as ours but the **reasoning-chain** regime, not input context.
+- **PIPO: Pair-In, Pair-Out** (2605.27255): a lightweight **confidence head** trained with the
+  rejection-sampling acceptance probability as a **free in-distribution label**; if confidence < tau, **safe
+  fallback** to single-token decoding. Decoding regime; the "free, in-distribution gate label" trick.
+- **G-MemLLM** (2602.00015): frozen backbone + trainable latent memory bank + GRU-style gate.
+- **LycheeMemory** (2602.08382): Compressor + Gate (trained separately as a classifier) + Reasoner; frozen
+  base + LoRA compressor; joint RL.
+- **Trained Persistent Memory for Frozen Encoder-Decoder LLMs: Six Architectural Methods** (2603.16413):
+  Prefix / KV-Ext / **XAttn / Hebbian / Slot / Gated** on a frozen base. Finds **prefix collapses, XAttn best
+  (+6.76%), the Gated method has NEGATIVE net benefit, a capacity wall, and that training is necessary**.
+  This reproduces a large part of our v1.5 architecture ablation; we must cite it and cede that ground.
+- **PoC: Performance-oriented Context Compression** (2603.19733): a lightweight performance predictor picks
+  the most aggressive compression ratio that meets a user "performance floor" (predicts whether compression
+  is safe, at the ratio level, on off-the-shelf text compressors).
+- **KV-cache risk gates / fallback:** **CompilerKV** (2602.08686, risk-adaptive threshold gate, conservative
+  retention for risky prompts), **Runtime-Certified Bounded-Error Quantized Attention** (2605.20868, online
+  error bounds + a four-rung fallback ladder to exact dense attention), **RACC** (retrieve evicted KV).
+- **Text-level quality-gated compression (engineering):** **TAAC**, **ContextPilot**, **Compress the
+  Context, Keep the Commitments** (2605.17304, conservative fallback for low-confidence semantic atoms).
+> **OUR DELTA:** most of these gate "is context needed at all" (context-agnostic detection) or live at the
+> text / KV / reasoning level. We gate "did the **latent** compression of THIS context lose what THIS query
+> needs" on a **fully frozen** base (g→0 = exact base, which the LoRA-memory neighbors cannot give), frame it
+> as a **compress-decision confusion matrix** (precision / recall / F1, cost-coverage) at the **compressor
+> level**, with a **structurally-fused** gate and **two** fallbacks (base and full-context). Since the Six
+> Architectural Methods paper overlaps our architecture ablation, we **cede the architecture-comparison
+> framing** and lead with the decision-quality treatment + the agentic tool-use / RCA application that this
+> literature does not target.
+
+## 8. Compressor robustness BY DESIGN: reconstruction, calibration, verifier co-training (2026-06-10)
+> Directly relevant to "a compressor structure that stays robust under a gate". This is where the prior art
+> for a gate-friendly compressor lives.
+- **Latent Context Compilation** (2602.21221): a disposable-LoRA "compiler" distills context into Buffer
+  Tokens via **self-aligned optimization = a Context-Reconstruction task (force the buffer to encode the
+  exact content, for fidelity) + a context-agnostic random-query regularizer (preserve the general manifold,
+  i.e. do-no-harm)**. This is the closest design twin to our reconstruction-coverage + do-no-harm gate.
+- **End-to-End Context Compression at Scale (LCLM)** (2606.09659): encoder-decoder soft-token compressors
+  with an architectural search; explicit goal = "a general compressor that **preserves** the base's
+  capabilities" rather than degrading them or needing domain-specific training.
+- **Compactor** (2507.08143): **context-calibrated** compression that infers, per context, how much can be
+  evicted without quality loss (different contexts tolerate very different ratios). The compressor estimates
+  its own safe operating point.
+- **Reconstruction-error OOD/novelty detection** (1812.02765 + CVPR'22 "Rethinking Reconstruction-AE OOD" +
+  2411.10701): reconstruction error as a novelty score; **key caveat** = autoencoders can also reconstruct
+  some OOD inputs, so reconstruction error alone is a weak signal and is best **fused with a latent-distance
+  term (Mahalanobis)**; "maximally compress the latent while preserving reconstructive power" + layer-wise
+  semantic reconstruction. This is the theory (and the warning) behind using reconstruction as a gate signal.
+- **Structural Confidence / Trust in One Round** (2602.00977): single-pass confidence from the structural
+  stability of a frozen-encoder hidden-state trajectory (no logits, no sampling). A cousin of our geometry
+  feature family.
+- **Generator-Verifier co-evolution:** **VeriThinker** (2505.17941, an auxiliary verification fine-tune so
+  the model knows when to self-check), **RL Tango** (2505.15034) and **V1-PairRL** (co-train the verifier
+  IN-DISTRIBUTION with the evolving generator so it stays calibrated). The deep lesson for a gate-robust
+  compressor: co-train the gate with the compressor on free, in-distribution labels so it does not go stale.
+> **IMPLICATION for our compressor design (the gate-robust structure):** (1) train the compressor with a
+> **reconstruction objective** for fidelity + a **context-agnostic regularizer** for do-no-harm (Latent
+> Context Compilation); (2) reconstruction error alone is a weak failure detector, so **fuse it with a
+> latent-distance / geometry term** (Mahalanobis-AE lesson, matches our geometry features); (3) **co-train
+> the gate with the compressor on free in-distribution labels** so it stays calibrated as the compressor
+> changes (PIPO / Tango / V1); (4) **calibrate the safe operating point per input** (Compactor / PoC).
+
+---
+
 ## Positioning summary (the white space)
 We do **not** claim a new compressor (Cartridges), a new gating signal (TARG), or new abstention metrics.
 **Our contribution = the systematic *do-no-harm treatment* of a learned latent agentic memory:** a
@@ -86,3 +157,23 @@ across families — e.g. Mistral, capacity wall) that the always-on compression 
 agent-memory literatures don't provide. **Reviewer-mandatory baselines:** Cartridges/Gist (module) ·
 TARG/Self-RAG (gate) · SnapKV/PyramidKV (KV-compression cost point) · LLaMA-Adapter (multi-layer) ·
 SFT/LoRA (forgetting). **Adopt risk–coverage / AURC** as the gate's principled metric.
+
+### 2026-06-10 update (honest re-read after §7/§8)
+The mechanism (gated/selective compression with do-no-harm fallback on a frozen base) is **no longer novel**:
+§7 lists multiple 2026 preprints that are very close (Context-Distillation-as-LMM and Latent-Context-
+Compilation on the do-no-harm + reconstruction axes; SLT/PIPO on the co-trained confidence-gate + fallback
+axis; Six-Architectural-Methods reproduces our architecture ablation). We should therefore **stop selling the
+mechanism** and narrow the claim to the parts that survive:
+1. **Decision-quality framing:** treat compress-vs-fallback as a selective-prediction classifier and report
+   the **confusion matrix + precision/recall/F1 + cost/risk-coverage + oracle** at the **compressor level**,
+   across in-task / cross-task-in-domain / cross-task-cross-domain. The neighbors report end-task accuracy,
+   not this.
+2. **Structurally-fused, single-forward gate** (reconstruction-coverage + query-coverage + geometry), no
+   extra base pass and no separately-trained classifier; co-trained in-distribution with the compressor.
+3. **Fully frozen base + two fallbacks** (base and full-context) unified by one gate; g→0 = exact base, a
+   by-construction property the LoRA-memory neighbors do not have.
+4. **Agentic tool-use / RCA application** (BFCL, API-Bank, ToolACE, OpenRCA, RCAEval), which this literature
+   does not target.
+**Newly mandatory citations / baselines:** Context-Distillation-as-LMM (2605.28889), Latent-Context-
+Compilation (2602.21221), SLT (2605.25745), PIPO (2605.27255), PoC (2603.19733), and the Six-Architectural-
+Methods paper (2603.16413, cede the architecture-ablation framing to it).

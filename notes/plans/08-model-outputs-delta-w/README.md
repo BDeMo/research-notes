@@ -19,9 +19,9 @@ Full fact-dump at [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md). Source
 
 **Pivot menu**: [`v1-if-wrapper-doesnt-work-2026-06-03.md`](v1-if-wrapper-doesnt-work-2026-06-03.md) — 10 directions, top-3 testable-today: hybrid wrapper+retrieval (B), infilling objective (D), unfreeze last layer (I).
 
-**v1.5 gating study**: [`v1.5-intrinsic-gating-study-2026-06-04.tex`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.tex) / [`pdf`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.pdf) studies intrinsic "do-no-harm" signals for suppressing the wrapper when it would hurt a frozen-base model.
+**v1.5 gating study**: [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex) / [`pdf`](v1.5-intrinsic-gating-study-2026-06-04.pdf) studies intrinsic "do-no-harm" signals for suppressing the wrapper when it would hurt a frozen-base model.
 
-**Settings registry**: [`settings.md`](settings/settings.md) is the source of truth for
+**Settings registry**: [`settings.md`](settings.md) is the source of truth for
 which model/data/hyperparameter setting produced each result cell. New result
 tables should cite setting IDs from this file.
 
@@ -33,7 +33,7 @@ Use this section as the main human entry point for Plan 08 deliverables.
 
 - **Main v1 result summary**: [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md)
   — the full `mem-embedding` result harvest and three-regime transfer law.
-  Result cells use setting [`P08-S2`](settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
+  Result cells use setting [`P08-S2`](settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
 - **Pivot / lessons after v1**:
   [`v1-if-wrapper-doesnt-work-2026-06-03.md`](v1-if-wrapper-doesnt-work-2026-06-03.md)
   — why v1 becomes a characterization paper plus v1.5 options.
@@ -43,36 +43,31 @@ Use this section as the main human entry point for Plan 08 deliverables.
 ### v1.5 / signal grid and gating deliverables
 
 - **Compiled technical note**:
-  [`v1.5-intrinsic-gating-study-2026-06-04.pdf`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.pdf)
+  [`v1.5-intrinsic-gating-study-2026-06-04.pdf`](v1.5-intrinsic-gating-study-2026-06-04.pdf)
   — PDF report with settings, metrics, results, and next gate target.
 - **LaTeX source**:
-  [`v1.5-intrinsic-gating-study-2026-06-04.tex`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.tex)
+  [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex)
   — source for the compiled report.
-- **Gate-signal metric candidates**:
-  [`v1.5-metric-candidates-2026-06-04.md`](summary/2026-06-04/v1.5-metric-candidates-2026-06-04.md)
-  — generality × novelty × interest × soundness screen of current + new gate
-  signals (plan-09-style curation) with a code-&-validate shortlist; includes the
-  index of where the v1.5 facts/grids/analysis live.
-- **Signal grid folder**: [`raw/grids-2026-06-04/`](raw/grids-2026-06-04/)
+- **Signal grid folder**: [`grids-2026-06-04/`](grids-2026-06-04/)
   — correlation grids and ranking figures for v1.5 gating.
-  Result cells use setting [`P08-S3`](settings/settings.md#p08-s3--v15-intrinsic-signal-probe).
+  Result cells use setting [`P08-S3`](settings.md#p08-s3--v15-intrinsic-signal-probe).
 - **Help ranking figure**:
-  [`raw/grids-2026-06-04/rank_help.png`](raw/grids-2026-06-04/rank_help.png)
+  [`grids-2026-06-04/rank_help.png`](grids-2026-06-04/rank_help.png)
   — top signals for wrapper help.
 - **Non-obvious ranking figure**:
-  [`raw/grids-2026-06-04/rank_interesting.png`](raw/grids-2026-06-04/rank_interesting.png)
+  [`grids-2026-06-04/rank_interesting.png`](grids-2026-06-04/rank_interesting.png)
   — confidence-filtered signals, highlighting divergence/drift.
 - **Grid CSVs**:
-  [`grid_auroc_correct.csv`](raw/grids-2026-06-04/grid_auroc_correct.csv),
-  [`grid_auroc_noharm.csv`](raw/grids-2026-06-04/grid_auroc_noharm.csv),
-  [`grid_spearman_cont.csv`](raw/grids-2026-06-04/grid_spearman_cont.csv),
-  [`corr_long.csv`](raw/grids-2026-06-04/corr_long.csv).
+  [`grid_auroc_correct.csv`](grids-2026-06-04/grid_auroc_correct.csv),
+  [`grid_auroc_noharm.csv`](grids-2026-06-04/grid_auroc_noharm.csv),
+  [`grid_spearman_cont.csv`](grids-2026-06-04/grid_spearman_cont.csv),
+  [`corr_long.csv`](grids-2026-06-04/corr_long.csv).
 
 ### v2 / next version
 
 - **v2 plan**: [`v2-plan.md`](v2-plan.md)
   — cross-session latent memory with read/write tokens.
-  Design claims use setting [`P08-S4`](settings/settings.md#p08-s4--v2-design-setting).
+  Design claims use setting [`P08-S4`](settings.md#p08-s4--v2-design-setting).
 - **v2 related work**: [`v2-related-work.md`](v2-related-work.md)
   — crowded latent reasoning / memory-token landscape and differentiation.
 - **Q2 activation-memory probe**:
@@ -193,21 +188,18 @@ Kill criteria:
 
 ## Folder organization
 
-This plan is a **research** plan, organized by artifact type:
+This plan is organized by artifact type and version line:
 
-- Root markdown/LaTeX files are plan-level notes, result summaries, and design docs.
-- [`settings/`](settings/) holds [`settings.md`](settings/settings.md) — the
-  `P08-S*` setting/provenance registry (exact recipes behind every result).
-- [`summary/`](summary/) holds the **written reports** (narrative/analysis only),
-  in date subfolders; see [`summary/README.md`](summary/README.md).
-- [`raw/`](raw/) holds the **result data** — CSVs + figures — in per-experiment
-  folders (`grids-2026-06-04/`, `grids-xmodel-2026-06-05/`). E.g. the v1.5 signal
-  grid uses setting [`P08-S3`](settings/settings.md#p08-s3--v15-intrinsic-signal-probe).
-- [`slides/`](slides/) contains the **research** Beamer decks; local guide
-  [`slides/README.md`](slides/README.md). Weekly inputs live under `slides/weekly/`
-  and are appended in `slides/main.tex` chronologically. (The RCA *project/demo*
-  story lives in the separate `slides/main_brief_project.tex` deck, not the main one.)
-- [`misc/`](misc/) contains supporting notes / figure sources, not primary entry points.
+- Root markdown/LaTeX files are plan-level notes, result summaries, and design
+  docs.
+- [`slides/`](slides/) contains Beamer decks. Its local guide is
+  [`slides/README.md`](slides/README.md). Weekly progress inputs live under
+  `slides/weekly/` and are appended in `slides/main.tex` chronologically.
+- [`grids-2026-06-04/`](grids-2026-06-04/) contains v1.5 signal-grid CSVs and
+  ranking figures. The setting/provenance for these cells is
+  [`P08-S3`](settings.md#p08-s3--v15-intrinsic-signal-probe).
+- [`misc/`](misc/) contains supporting notes that are not primary entry points.
+  If it grows beyond ad hoc support material, add/update `misc/README.md`.
 
 Rule for child folders: if a folder contains more than one artifact type, its
 parent README must say what the folder is for and link the folder's own
@@ -215,14 +207,14 @@ parent README must say what the folder is for and link the folder's own
 
 ## Files in this plan
 - [`README.md`](README.md) — this file
-- [`settings.md`](settings/settings.md) — central settings/provenance registry for result cells
+- [`settings.md`](settings.md) — central settings/provenance registry for result cells
 - [`slides/README.md`](slides/README.md) — slide/deck organization and update rules
 - [`v0-learned-memory-wrapper.md`](v0-learned-memory-wrapper.md) — practical v0 scope
 - [`v0-learned-memory-wrapper_zh.md`](v0-learned-memory-wrapper_zh.md) — Chinese v0 scope
 - [`v0-budget.md`](v0-budget.md) — practical v0 budget
 - [`v0-budget_zh.md`](v0-budget_zh.md) — Chinese v0 budget
 - [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md) — v1 empirical state and paper claim
-- [`v1.5-intrinsic-gating-study-2026-06-04.tex`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.tex) — v1.5 intrinsic gating note
+- [`v1.5-intrinsic-gating-study-2026-06-04.tex`](v1.5-intrinsic-gating-study-2026-06-04.tex) — v1.5 intrinsic gating note
 - [`validation.md`](validation.md) — experimental protocol, baselines
 - [`channels.md`](channels.md) — benchmarks, datasets
 - [`budget.md`](budget.md) — costs by phase

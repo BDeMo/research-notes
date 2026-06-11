@@ -1,0 +1,44 @@
+[w0] 21 jobs on cuda:0
+[w0] (1/21) START gcm_trivia_qa_N8_K64
+[w0] END gcm_trivia_qa_N8_K64 rc=0 1865s
+[w0] (2/21) START gcm_trivia_qa_N16_K128
+[w0] END gcm_trivia_qa_N16_K128 rc=0 1388s
+[w0] (3/21) START gcm_hotpot_qa_N12_K64
+[w0] END gcm_hotpot_qa_N12_K64 rc=0 1244s
+[w0] (4/21) START gcm_hotpot_qa_N24_K128
+[w0] END gcm_hotpot_qa_N24_K128 rc=0 1486s
+[w0] (5/21) START gcm_squad_v2_N16_K64
+[w0] END gcm_squad_v2_N16_K64 rc=0 1238s
+[w0] (6/21) START gcm_quality_N8_K128
+[w0] END gcm_quality_N8_K128 rc=0 2034s
+[w0] (7/21) START gcm_quality_N24_K64
+[w0] END gcm_quality_N24_K64 rc=0 1588s
+[w0] (8/21) START gcm_trivia_qa_N16_K64_dec1
+[w0] END gcm_trivia_qa_N16_K64_dec1 rc=0 1355s
+[w0] (9/21) START cartridge_trivia_qa_s600_lr0.0003_K128
+[w0] END cartridge_trivia_qa_s600_lr0.0003_K128 rc=0 1077s
+[w0] (10/21) START cartridge_hotpot_qa_s600_lr0.0001_K64
+[w0] END cartridge_hotpot_qa_s600_lr0.0001_K64 rc=0 1071s
+[w0] (11/21) START cartridge_hotpot_qa_s1500_lr0.0001_K128
+[w0] END cartridge_hotpot_qa_s1500_lr0.0001_K128 rc=0 1124s
+[w0] (12/21) START cartridge_squad_v2_s600_lr0.0003_K64
+[w0] END cartridge_squad_v2_s600_lr0.0003_K64 rc=0 1000s
+[w0] (13/21) START cartridge_squad_v2_s1500_lr0.0003_K128
+[w0] END cartridge_squad_v2_s1500_lr0.0003_K128 rc=0 1049s
+[w0] (14/21) START cartridge_quality_s1500_lr0.0001_K64
+[w0] END cartridge_quality_s1500_lr0.0001_K64 rc=0 1176s
+[w0] (15/21) START gist_trivia_qa_s600_lr0.0001_K128
+[w0] END gist_trivia_qa_s600_lr0.0001_K128 rc=0 861s
+[w0] (16/21) START gist_trivia_qa_s1500_lr0.0003_K64
+[w0] END gist_trivia_qa_s1500_lr0.0003_K64 rc=0 1014s
+[w0] (17/21) START gist_hotpot_qa_s600_lr0.0003_K128
+[w0] END gist_hotpot_qa_s600_lr0.0003_K128 rc=0 856s
+[w0] (18/21) START gist_squad_v2_s600_lr0.0001_K64
+[w0] END gist_squad_v2_s600_lr0.0001_K64 rc=0 738s
+[w0] (19/21) START gist_squad_v2_s1500_lr0.0001_K128
+[w0] END gist_squad_v2_s1500_lr0.0001_K128 rc=0 880s
+[w0] (20/21) START gist_quality_s600_lr0.0003_K64
+[w0] END gist_quality_s600_lr0.0003_K64 rc=0 858s
+[w0] (21/21) START gist_quality_s1500_lr0.0003_K128
+[w0] END gist_quality_s1500_lr0.0003_K128 rc=0 1014s
+[w0] ALL DONE

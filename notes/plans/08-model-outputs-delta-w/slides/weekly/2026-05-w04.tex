@@ -255,12 +255,12 @@
       \end{itemize}
     \item \textbf{Done}: long-context builder script exists:
       \begin{itemize}
-        \item \texttt{rca-demo/scripts/compression/build\_long\_context\_rca\_benchmark.py};
+        \item \texttt{scripts/compression/build\_long\_context\_rca\_benchmark.py};
         \item converts prepared \texttt{cases.jsonl} into chunked RCA items with distractors.
       \end{itemize}
     \item \textbf{Done}: prompt-strategy preparation script exists:
       \begin{itemize}
-        \item \texttt{rca-demo/scripts/compression/prepare\_compression\_eval.py};
+        \item \texttt{scripts/compression/prepare\_compression\_eval.py};
         \item emits \texttt{full\_context}, \texttt{summary}, \texttt{retrieval}, and \texttt{learned\_memory} prompt rows.
       \end{itemize}
     \item \textbf{Not verified yet}: no end-to-end generation/score run has been completed for this demo path.
@@ -292,7 +292,7 @@
   \small
   \textbf{Step 1: build long-context RCA items}
   \begin{verbatim}
-python3 rca-demo/scripts/compression/build_long_context_rca_benchmark.py \
+python3 scripts/compression/build_long_context_rca_benchmark.py \
   --cases runs/rcaeval_v1/prepared/cases.jsonl \
   --out runs/long_context_rca_demo/items.jsonl \
   --chunk-chars 1800 \
@@ -302,7 +302,7 @@ python3 rca-demo/scripts/compression/build_long_context_rca_benchmark.py \
 
   \textbf{Step 2: prepare four prompt strategies}
   \begin{verbatim}
-python3 rca-demo/scripts/compression/prepare_compression_eval.py \
+python3 scripts/compression/prepare_compression_eval.py \
   --input runs/long_context_rca_demo/items.jsonl \
   --out runs/long_context_rca_demo/prompts.jsonl \
   --summary-chunks 8 \

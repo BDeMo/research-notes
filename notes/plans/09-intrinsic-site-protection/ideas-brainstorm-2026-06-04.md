@@ -1,5 +1,11 @@
 # Janus — idea list (brainstorm from the facts)
 
+> ⚠️ **Note (2026-06-04 eve):** the founding fact **F1 (uniform LC↔CF coupling) was falsified** under
+> controls — the surviving fact is gradient-*shielding* (long-ctx heads under-update), which *inverts*
+> the protection framing. See [`mechanism-results-2026-06-04.md`](mechanism-results-2026-06-04.md) and
+> [`paperA-plan-2026-06-05.md`](paperA-plan-2026-06-05.md). Kept as the wide-net brainstorm; re-read
+> the F1-conditioned ideas (M0–M30) against the shielding fact before building.
+
 > Generative brainstorm: every coupling cell → a candidate method, plus blue-sky
 > directions. Each idea = **Motivation (which fact) · Method · Expected insight ·
 > Frontier · Cost/Risk**. Archived 2026-06-04. Grounded in

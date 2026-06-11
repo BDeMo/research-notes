@@ -4,6 +4,12 @@
 > modes (math), the do-no-harm gate, the two-track design, training, signals, settings, and the *logic*
 > (why each piece exists). Pairs with [`logic.md`](logic.md) (decisions), [`summary-matrix.md`](summary-matrix.md)
 > (evidence), [`related-work.md`](related-work.md). Code: `mem-test/mem-embedding/src/mem_embedding/wrapper.py`.
+>
+> **2026-06-10 reframe (under review):** §4, §5, §7 below are superseded by the **Gated Compressor Module**
+> design in [`v1.7-gated-compressor-module-2026-06-10.md`](v1.7-gated-compressor-module-2026-06-10.md): the
+> gate becomes intrinsic to OUR compressor (one module emits memory + a calibrated reliability score from its
+> own internals), baselines stay vanilla, and we compare at the compressor level (drop "compressor as a
+> setting"). Read that doc first; the sections here remain as the v1.5 record.
 
 ## 0. What v1.5 is (one paragraph)
 A **recurrent soft-prompt memory wrapper** compresses a long context into **K latent tokens** on a

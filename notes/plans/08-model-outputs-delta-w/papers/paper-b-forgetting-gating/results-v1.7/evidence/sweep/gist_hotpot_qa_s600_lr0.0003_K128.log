@@ -1,0 +1,36 @@
+2026-06-11 06:35:56.727 | INFO     | llm_infra.models:load_base:93 - loading frozen base: /mnt/persist/checkpoints/Qwen3-8B dtype=bfloat16 device=cuda:0
+[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
+Loading weights:   0%|          | 0/399 [00:00<?, ?it/s]Loading weights: 100%|██████████| 399/399 [00:00<00:00, 5844.14it/s]
+Using the latest cached version of the dataset since hotpotqa/hotpot_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'distractor' at /mnt/persist/hf-cache/datasets/hotpotqa___hotpot_qa/distractor/0.0.0/1908d6afbbead072334abe2965f91bd2709910ab (last modified on Wed Jun  3 12:11:32 2026).
+2026-06-11 06:36:00.723 | INFO     | __main__:main:122 - training gist on corpus=hotpot_qa (96 items)
+/mnt/persist/v17/mem-embedding/src/mem_embedding/gcm/methods.py:201: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  logger.info(f"[gist] step {step}/{cfg.steps} ce={float(loss):.4f}")
+2026-06-11 06:36:11.976 | INFO     | mem_embedding.gcm.methods:train:201 - [gist] step 60/600 ce=5.1913
+2026-06-11 06:36:22.431 | INFO     | mem_embedding.gcm.methods:train:201 - [gist] step 120/600 ce=1.2504
+2026-06-11 06:36:33.007 | INFO     | mem_embedding.gcm.methods:train:201 - [gist] step 180/600 ce=0.7409
+2026-06-11 06:36:43.601 | INFO     | mem_embedding.gcm.methods:train:201 - [gist] step 240/600 ce=3.6361
+2026-06-11 06:36:54.032 | INFO     | mem_embedding.gcm.methods:train:201 - [gist] step 300/600 ce=4.0605
+2026-06-11 06:37:04.569 | INFO     | mem_embedding.gcm.methods:train:201 - [gist] step 360/600 ce=1.9502
+2026-06-11 06:37:15.059 | INFO     | mem_embedding.gcm.methods:train:201 - [gist] step 420/600 ce=5.3619
+2026-06-11 06:37:25.647 | INFO     | mem_embedding.gcm.methods:train:201 - [gist] step 480/600 ce=2.7410
+2026-06-11 06:37:36.222 | INFO     | mem_embedding.gcm.methods:train:201 - [gist] step 540/600 ce=3.9003
+2026-06-11 06:37:46.592 | INFO     | mem_embedding.gcm.methods:train:201 - [gist] step 600/600 ce=0.8962
+Using the latest cached version of the dataset since mandarjoshi/trivia_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'rc' at /mnt/persist/hf-cache/datasets/mandarjoshi___trivia_qa/rc/0.0.0/0f7faf33a3908546c6fd5b73a660e0f8ff173c2f (last modified on Wed Jun  3 16:25:42 2026).
+2026-06-11 06:37:46.632 | INFO     | __main__:main:129 - === eval trivia_qa rel=cross_task_in_domain: 96 items x 3 methods ===
+2026-06-11 06:42:59.755 | INFO     | __main__:main:160 - wrote /mnt/persist/v17/out/sweep/gist_hotpot_qa_s600_lr0.0003_K128/records_trivia_qa.jsonl
+Using the latest cached version of the dataset since hotpotqa/hotpot_qa couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'distractor' at /mnt/persist/hf-cache/datasets/hotpotqa___hotpot_qa/distractor/0.0.0/1908d6afbbead072334abe2965f91bd2709910ab (last modified on Wed Jun  3 12:11:32 2026).
+2026-06-11 06:42:59.771 | INFO     | __main__:main:129 - === eval hotpot_qa rel=in_task: 96 items x 3 methods ===
+2026-06-11 06:46:28.290 | INFO     | __main__:main:160 - wrote /mnt/persist/v17/out/sweep/gist_hotpot_qa_s600_lr0.0003_K128/records_hotpot_qa.jsonl
+Using the latest cached version of the dataset since rajpurkar/squad_v2 couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'squad_v2' at /mnt/persist/hf-cache/datasets/rajpurkar___squad_v2/squad_v2/0.0.0/3ffb306f725f7d2ce8394bc1873b24868140c412 (last modified on Wed Jun  3 15:34:46 2026).
+2026-06-11 06:46:28.306 | INFO     | __main__:main:129 - === eval squad_v2 rel=cross_task_in_domain: 96 items x 3 methods ===
+2026-06-11 06:48:32.389 | INFO     | __main__:main:160 - wrote /mnt/persist/v17/out/sweep/gist_hotpot_qa_s600_lr0.0003_K128/records_squad_v2.jsonl
+Using the latest cached version of the dataset since emozilla/quality couldn't be found on the Hugging Face Hub (offline mode is enabled).
+Found the latest cached dataset configuration 'default' at /mnt/persist/hf-cache/datasets/emozilla___quality/default/0.0.0/7142df0407e16a99e5cda9188edc7db01e8c151a (last modified on Wed Jun  3 12:11:13 2026).
+2026-06-11 06:48:32.406 | INFO     | __main__:main:129 - === eval quality rel=cross_task_cross_domain: 96 items x 3 methods ===
+2026-06-11 06:50:08.298 | INFO     | __main__:main:160 - wrote /mnt/persist/v17/out/sweep/gist_hotpot_qa_s600_lr0.0003_K128/records_quality.jsonl
+DONE gcm benchmark testing

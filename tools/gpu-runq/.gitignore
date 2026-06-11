@@ -1,0 +1,6 @@
+# runtime queue roots / test scratch (never commit run state)
+_*/
+*_daemon.log
+runq-root/
+__pycache__/
+*.pyc

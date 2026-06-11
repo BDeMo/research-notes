@@ -1,5 +1,15 @@
 # Plan 09 — **Janus**: intrinsic-site protection (long-context ↔ forgetting coupling)
 
+> ⛔ **PIVOTED (2026-06-04 eve) — read first.** The unifying **head-level** coupling thesis below
+> (H1/H2/H3, "same heads, two frontiers") was **falsified under controls**
+> ([`mechanism-results-2026-06-04.md`](mechanism-results-2026-06-04.md)). The work split into **two
+> papers**: **Paper A** = *long-context heads are gradient-**shielded** during fine-tuning* (the
+> surviving, opposite fact) → [`paperA-plan-2026-06-05.md`](paperA-plan-2026-06-05.md); **Paper B** =
+> the v1.5 wrapper/gating line *"know when to fall back"* →
+> [`gate-pipeline-2026-06-05.md`](gate-pipeline-2026-06-05.md) (filed here for now; belongs to the
+> Plan 08 wrapper line, to be relocated). Everything below is the original pre-pivot plan, kept for
+> history — its success/kill criteria refer to the falsified H2.
+
 > **Codename**: **Janus** (working; one site, two faces — *read*-time long-context overload vs *write*-time forgetting perturbation. "dual-frontier" is the descriptive alias. Name is not load-bearing; change freely.)
 > **Status**: drafting (novelty audit done 2026-06-04, brainstorm §5.5–5.6). **Phase-0 detectors validated on Qwen3-8B 2026-06-03** → [`phase0-results-2026-06-03.md`](phase0-results-2026-06-03.md). **Phase-1 exploration 8 models / 7 H100s 2026-06-04** → [`phase1-results-2026-06-04.md`](phase1-results-2026-06-04.md). Key empirical findings: (1) sink heads ≠ retrieval heads (Jaccard 0) across 0.6→14B → protect the **retrieval heads**, not the sink; (2) ρ(retrieval, SFT-drift) > ρ(sink, SFT-drift) in nearly every model (direction robust, clears 0.4 gate only on smallest 2 Qwen3 → **H2 partial**); (3) grad-mask protection causally removes the coupling; (4) **to fix**: harden NIAH probe + induce real forgetting (math-SFT was too gentle to test H3).
 > **Created**: 2026-06-03
@@ -76,10 +86,20 @@ Kill criteria:
 - [`phase0-results-2026-06-03.md`](phase0-results-2026-06-03.md) — Phase-0 detector validation on Qwen3-8B (actual run)
 - [`phase1-results-2026-06-04.md`](phase1-results-2026-06-04.md) — **Phase-1 exploration, 8 models / 7 H100s (actual run)** — H2 partial, sink≠retrieval robust, NIAH+forgetting setup needs hardening
 - [`facts-2026-06-04.md`](facts-2026-06-04.md) — **broad fact-finding on the 7–9B cohort** (Qwen3.5-9B, GLM-4-9B, Qwen3-8B, Qwen2.5-7B-Inst; ~30 metrics × 5 angles, native bf16): cross-family collapse-axis facts + the drift↔retrieval coupling
-- [`grid-metrics-2026-06-04.md`](grid-metrics-2026-06-04.md) — **unified decoupled metric grid** (12 angles × 39 metrics × 12 benchmarks × 4 models = 41 cells): the headline **LC(inference) × CF(training) coupling** — every long-context head metric positively predicts every forgetting metric (uniformly +0.17–0.56, cross-family/cross-dataset)
+- [`grid-metrics-2026-06-04.md`](grid-metrics-2026-06-04.md) — v1 pooled metric grid (41 cells). **⛔ Its "uniformly positive coupling" headline is superseded** (falsified under controls — see `mechanism-results-2026-06-04.md`).
+- [`mechanism-results-2026-06-04.md`](mechanism-results-2026-06-04.md) — **the controlled re-analysis that falsified head-level coupling** and established gradient-shielding (authoritative).
+- [`paperA-plan-2026-06-05.md`](paperA-plan-2026-06-05.md) — **Paper A plan** (gradient-shielding): main tables, ablations, pre-exps.
+- [`paper-preexp-plan-2026-06-04.md`](paper-preexp-plan-2026-06-04.md) — Paper A pre-experiment plan (A1 carrier, A2 a-priori→drift).
+- [`cohort-grid-results-2026-06-04.md`](cohort-grid-results-2026-06-04.md) — cohort grid read-out (flags the sign-inconsistent pairs).
+- [`gate-pipeline-2026-06-05.md`](gate-pipeline-2026-06-05.md) — **Paper B (v1.5)** pipeline spec + "good gating signal" definition (D1–D6).
+- [`gate-scope-litreview-2026-06-05.md`](gate-scope-litreview-2026-06-05.md) — **Paper B** scope (parametric agentic memory) + literature review + novelty defense.
+- [`gate-critical-review-2026-06-05.md`](gate-critical-review-2026-06-05.md) — **Paper B** ICLR-2027 self-review (3 rounds).
+- [`matrix-archive-2026-06-04.md`](matrix-archive-2026-06-04.md) — archived v1 measurement ledger.
 - `figs/` — headline + facts figures; `runs/` — detector/runner/viz/analysis code + GPU strategy
 
-## Status vs success criteria (live, after Phase-1 exploration 2026-06-04)
+## Status vs success criteria (updated 2026-06-05, post-pivot)
 - **H1 (coexistence)** — ✅ detectors find the small site sets at every scale (Phase-1 R1).
-- **H2 (coupling)** — ◐ *partial*: ρ(retrieval, drift) > ρ(sink, drift) robustly (direction), but clears the ≥0.4 gate only on the two smallest Qwen3 (magnitude). Re-measure on a forgetting-inducing setup before a verdict.
-- **H3 (causal)** — ⏳ untested: the gentle math-SFT setup didn't induce forgetting; protection mechanism works mechanically (R4) but needs a setup that actually forgets (R6).
+- **H2 (head-level coupling)** — ⛔ **FALSIFIED under controls** (partial|out_norm + within-layer + CIs): the pooled "+" was a depth/activation/hybrid-Qwen3.5 artifact; within-layer the sign reverses. See [`mechanism-results-2026-06-04.md`](mechanism-results-2026-06-04.md).
+- **Surviving fact → Paper A** — long-context heads are gradient-**shielded** (under-updated) during task-SFT; activation-mediated, task-objective-specific, scale-fading. Plan: [`paperA-plan-2026-06-05.md`](paperA-plan-2026-06-05.md).
+- **H3 (causal protection)** — superseded by the Paper A framing; the original protection-sweep is archived (no head-level coupling to protect against). Forgetting "dial" found (lr 1e-3 = selective MMLU drop, NIAH intact).
+- **Paper B (v1.5 gating)** — separate line, running: see §0.GATE in [`matrix.md`](matrix.md).

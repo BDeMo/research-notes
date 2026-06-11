@@ -1,5 +1,11 @@
 # Paper B — Summary Matrix (writing-agent handoff)
 
+> **2026-06-10: SUPERSEDED for the current program by the v1.7 reframe.** The active brief is
+> [`summary-matrix-v1.7-2026-06-10.md`](summary-matrix-v1.7-2026-06-10.md) (gated compressor module; the
+> compress-decision confusion matrix / F1 objective; compressor-level comparison with vanilla Cartridge/Gist).
+> This file stays as the **v1.5/v1.6 archive**; its still-valid evidence (forgetting, capacity wall, cross-model
+> signal, TARG) is carried into v1.7 §7 and must be re-validated under the v1.7 protocol.
+>
 > **Purpose:** single-source brief for the **writing agent**. Everything needed to draft Paper B —
 > thesis, claims↔evidence (with exact numbers + source files), the main table, baselines, novelty
 > defense, the do-not-overclaim list, section plan, asset index, status. **Read this first**; deep-dive

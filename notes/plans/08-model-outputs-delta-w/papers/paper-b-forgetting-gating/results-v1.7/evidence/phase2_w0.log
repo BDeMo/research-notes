@@ -1,0 +1,12 @@
+[w0] 6 jobs on cuda:0
+[w0] (1/6) START main_gcm_trivia_qa
+[w0] END main_gcm_trivia_qa rc=0 1894s
+[w0] (2/6) START main_cart_hotpot_qa
+[w0] END main_cart_hotpot_qa rc=0 1441s
+[w0] (3/6) START main_gist_narrativeqa
+[w0] END main_gist_narrativeqa rc=0 1577s
+[w0] (4/6) START main_gcm_musr_mm
+[w0] END main_gcm_musr_mm rc=0 1894s
+[w0] (5/6) START abl_initrandom_trivia_qa
+[w0] END abl_initrandom_trivia_qa rc=0 1906s
+[w0] (6/6) START abl_K32_trivia_qa
