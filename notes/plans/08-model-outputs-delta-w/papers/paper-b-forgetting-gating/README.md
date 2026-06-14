@@ -5,7 +5,8 @@
 > clean as **v1.7.3**, and the thesis was **reframed** from "a better compressor" to **a compressor-agnostic
 > robustness layer** — a confidence / self-verification gate that *detects when compression is unsafe and falls
 > back to full context* (do-no-harm). **Start here:**
-> [`results-v1.7.3/results-v1.7.3.md`](results-v1.7.3/results-v1.7.3.md) ·
+> one-page brief [`summary-matrix-v1.7.3.md`](summary-matrix-v1.7.3.md) ·
+> full results [`results-v1.7.3/results-v1.7.3.md`](results-v1.7.3/results-v1.7.3.md) ·
 > thesis+plan [`results-v1.7.3/robustness-plan.md`](results-v1.7.3/robustness-plan.md) ·
 > reviewer-response [`results-v1.7.3/reviewer-response.md`](results-v1.7.3/reviewer-response.md) ·
 > setup [`results-v1.7.3/experimental-setup.md`](results-v1.7.3/experimental-setup.md).

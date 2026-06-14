@@ -2,6 +2,7 @@
 
 > **SUPERSEDED — v1.5/v1.6 archive.** The current program is **v1.7.3**: a clean re-run (after fixing a v1.7
 > **train/eval leakage bug**) with the thesis reframed to a **compressor-agnostic robustness layer**. Start at
+> **[`summary-matrix-v1.7.3.md`](summary-matrix-v1.7.3.md)** (one-page brief) →
 > **[`results-v1.7.3/results-v1.7.3.md`](results-v1.7.3/results-v1.7.3.md)** (+ `robustness-plan.md`,
 > `reviewer-response.md`). The intermediate v1.7 brief
 > [`summary-matrix-v1.7-2026-06-10.md`](summary-matrix-v1.7-2026-06-10.md) is **also superseded** (leakage-era

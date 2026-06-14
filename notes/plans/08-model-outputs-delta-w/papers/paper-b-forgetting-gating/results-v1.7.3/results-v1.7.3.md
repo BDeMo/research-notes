@@ -116,22 +116,22 @@ Per-config **average compress** over the 9 value-add benches (§2.2, all 5 confi
 *(gAcc_cv / fallback% / gate F1·P·R / AUROC for every config are in `out/clean/p1/<bench>__<cfg>`; the recommended `combo` row's full metrics are in §2.1.)*
 
 ### 2.4 Matched-budget baselines + ★ the compressor-agnostic gate (E1)
-All three at the **same budget** (n_items **384**, steps **3000**, K **64**; each method's own lr) — the fair comparison. *(Cartridge complete; Gist landing — partial.)*
+All three at the **same budget** (n_items **384**, steps **3000**, K **64**; each method's own lr) — the fair comparison. *(Cartridge + Gist complete.)*
 
 **(a) Compress, matched budget** (GCM = combo):
 | bench | no_ctx | full | GCM | Cartridge | Gist |
 |---|---|---|---|---|---|
 | bfcl_live_multiple | 0.010 | 0.906 | **0.719** | 0.510 | 0.000 |
-| bfcl_live_simple | 0.013 | 0.910 | **0.526** | 0.308 | *(run)* |
-| hermes | 0.33 | ~0.92 | **0.500** | 0.455 | *(run)* |
-| glaive | 0.333 | 0.990 | 0.771 | 0.760 | *(run)* |
-| bfcl_parallel | 0.100 | 0.950 | 0.300 | 0.283 | *(run)* |
-| bfcl_simple | 0.021 | 0.990 | 0.167 | 0.146 | *(run)* |
-| bfcl_multiple | 0.017 | 0.883 | 0.150 | 0.117 | *(run)* |
-| bfcl_parallel_multiple | 0.067 | 0.767 | 0.117 | 0.117 | *(run)* |
-| rca_openrca | ~0.10 | ~0.42 | 0.104 | 0.125 | *(run)* |
+| bfcl_live_simple | 0.013 | 0.910 | **0.526** | 0.308 | 0.000 |
+| hermes | 0.333 | ~0.92 | **0.500** | 0.455 | 0.094 |
+| glaive | 0.333 | 0.990 | 0.771 | 0.760 | 0.104 |
+| bfcl_parallel | 0.100 | 0.950 | **0.300** | 0.283 | 0.200 |
+| bfcl_simple | 0.021 | 0.990 | **0.167** | 0.146 | 0.062 |
+| bfcl_multiple | 0.017 | 0.883 | **0.150** | 0.117 | 0.017 |
+| bfcl_parallel_multiple | 0.067 | 0.767 | **0.117** | 0.117 | 0.033 |
+| rca_openrca | ~0.10 | ~0.42 | 0.104 | 0.125 | 0.135 |
 
-→ **At matched budget, GCM's edge shrinks but holds on the live/conversational benches** (live_multiple +0.21, live_simple +0.22, hermes +0.05) and is a **tie elsewhere** (glaive, parallel_multiple) or slightly behind (rca). More budget helped Cartridge a lot (live_multiple 0.30→0.51) — the earlier unfair table **overstated** GCM. **None beats full.**
+→ **At matched budget GCM ≥ Cartridge ≫ Gist** — GCM's edge holds on the live/conversational benches (live_multiple +0.21, live_simple +0.22) but is a **tie** on short/synthetic (glaive, parallel_multiple) or slightly behind on rca; **Gist is near-zero**. More budget helped Cartridge a lot (live_multiple 0.30→0.51), so the earlier unfair table overstated GCM. **None beats full** (and §2.4c shows trivial truncation is a tougher baseline than any of them on short ctx).
 
 **(b) ★ The gate is compressor-agnostic** — apply the same confidence signal to **Cartridge**: it detects Cartridge's failures and recovers ≈full (`harm` = full−compress = what always-compress would lose; the gate prevents it):
 | Cartridge bench | compress | harm if always-compress | conf-gate AUROC | gAcc_cv (gated) |
@@ -143,7 +143,22 @@ All three at the **same budget** (n_items **384**, steps **3000**, K **64**; eac
 | glaive | 0.760 | +0.23 | 0.62 | 0.979 |
 | bfcl_simple | 0.146 | +0.84 | 0.61 | 0.979 |
 
-→ **The robustness layer is NOT tied to our encoder.** The same confidence gate, applied to **Cartridge**, gives **failure-detection AUROC 0.6–0.8** and **gАcc ≈ full** — it catches when *Cartridge* dropped what the query needed and falls back. That is the core "compressor-agnostic do-no-harm" claim, demonstrated on a *different* compressor. (Gist + the full E1 table land shortly.)
+→ **The robustness layer is NOT tied to our encoder.** The same confidence gate, applied to **Cartridge**, gives **failure-detection AUROC 0.6–0.8** and **gАcc ≈ full** — it catches when *Cartridge* dropped what the query needed and falls back. That is the core "compressor-agnostic do-no-harm" claim, demonstrated on a *different* compressor. (On **Gist** the gate is weaker/degenerate because Gist's compress ≈ 0 ⇒ the gate just always-falls-back.)
+
+**(c) ★ Necessity vs trivial truncation (NO training)** — the toughest baseline. `trunc` = keep the first K=64 context-token embeddings; `meanpool` = K segment-means; `randk` = K random vectors (floor):
+| bench | full | GCM compress | **trunc** | meanpool | randk |
+|---|---|---|---|---|---|
+| bfcl_live_simple | 0.910 | 0.526 | **0.910** | 0.872 | 0.026 |
+| glaive | 0.990 | 0.771 | **0.990** | 0.990 | 0.385 |
+| bfcl_simple | 0.990 | 0.167 | **0.990** | 0.990 | 0.021 |
+| bfcl_parallel | 0.950 | 0.300 | **0.950** | 0.950 | 0.117 |
+| hermes | 0.938 | 0.500 | **0.938** | 0.625 | 0.365 |
+| **bfcl_live_multiple** | 0.906 | **0.719** | 0.458 | 0.031 | 0.000 |
+| bfcl_multiple | 0.883 | 0.150 | 0.600 | 0.250 | 0.017 |
+| bfcl_parallel_multiple | 0.767 | 0.183 | 0.617 | 0.383 | 0.083 |
+| toolace | 0.948 | 0.140 | 0.010 | 0.010 | 0.010 |
+
+→ **On short-context benches `trunc` (first-K, no training) MATCHES full and BEATS GCM** (live_simple/glaive/simple/parallel/hermes: trunc = full ≈ 0.9–1.0; GCM 0.17–0.77) — because the context is ~K tokens, **there is nothing to compress**. **GCM beats trivial truncation on exactly one bench, `bfcl_live_multiple`** (0.72 vs 0.46; ctx ≈ 2.8×K), and both fail on the long bench (toolace, ctx 9×K). **This is the necessity boundary: a learned compressor only earns its keep when ctx ≫ K** — which sharpens the thesis that the deployable contribution is the *gate* (do-no-harm regardless of compressor), not the compressor. (Always report `trunc` as a baseline.)
 
 ### 2.5 Model-generality sweep (does the pattern hold beyond Qwen3-8B?)
 GCM in-task on bfcl_simple/multiple, base-ish config, across 12 base models (dense + MoE).
