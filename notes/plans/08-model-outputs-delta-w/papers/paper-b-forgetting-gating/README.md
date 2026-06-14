@@ -1,5 +1,17 @@
 # Paper B — Do-No-Harm Adaptation (Forgetting & Gating)
 
+> 🟢 **CURRENT STATE (2026-06-13): v1.7.3.** The program ran through v1.7 (a gated compressor on tool-use / RCA);
+> a code review then found a **train/eval leakage bug** that had inflated the tool results. Everything was re-run
+> clean as **v1.7.3**, and the thesis was **reframed** from "a better compressor" to **a compressor-agnostic
+> robustness layer** — a confidence / self-verification gate that *detects when compression is unsafe and falls
+> back to full context* (do-no-harm). **Start here:**
+> [`results-v1.7.3/results-v1.7.3.md`](results-v1.7.3/results-v1.7.3.md) ·
+> thesis+plan [`results-v1.7.3/robustness-plan.md`](results-v1.7.3/robustness-plan.md) ·
+> reviewer-response [`results-v1.7.3/reviewer-response.md`](results-v1.7.3/reviewer-response.md) ·
+> setup [`results-v1.7.3/experimental-setup.md`](results-v1.7.3/experimental-setup.md).
+> The v1.5/v1.6 material below is **historical context**; v1.7 (`results-v1.7/`, `summary-matrix-v1.7-*`) is
+> **archived (leakage-era — do not cite its numbers).**
+
 > 📨 **Writing agent: start at [`summary-matrix.md`](summary-matrix.md)** — the single-source handoff
 > brief (thesis · claims↔evidence with exact numbers + sources · main table · baselines · novelty
 > defense · ⛔do-not-overclaim list · section plan · asset index · status).
@@ -69,7 +81,6 @@ Write-side (Plan 09) is **parked** (read-only scope).
 - **2026-06-08 decision log (scope/framing/experiment decisions):** [`decisions-2026-06-08.md`](decisions-2026-06-08.md)
 - **lit-review + claim check (novelty, must-cite, gaps):** [`litreview-claimcheck-2026-06-08.md`](litreview-claimcheck-2026-06-08.md)
 - **gate-generality experiment design:** [`exp-gate-generality.md`](exp-gate-generality.md)
-- **ICLR 2027 story spine:** [`iclr2027-story.md`](iclr2027-story.md)
 - **outline + claim→evidence map:** [`outline.md`](outline.md)
 - evidence ledger: `mem-test/mem-embedding/summary/matrix.md` (§2 signals · §7/§7b gate · §7c forgetting+multi-depth · §8 boundary)
 - settings: [`../../settings/settings.md`](../../settings/settings.md) (P08-S6 probe · P08-S8 gate)

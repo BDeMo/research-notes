@@ -1,10 +1,12 @@
 # Paper B — Summary Matrix (writing-agent handoff)
 
-> **2026-06-10: SUPERSEDED for the current program by the v1.7 reframe.** The active brief is
-> [`summary-matrix-v1.7-2026-06-10.md`](summary-matrix-v1.7-2026-06-10.md) (gated compressor module; the
-> compress-decision confusion matrix / F1 objective; compressor-level comparison with vanilla Cartridge/Gist).
-> This file stays as the **v1.5/v1.6 archive**; its still-valid evidence (forgetting, capacity wall, cross-model
-> signal, TARG) is carried into v1.7 §7 and must be re-validated under the v1.7 protocol.
+> **SUPERSEDED — v1.5/v1.6 archive.** The current program is **v1.7.3**: a clean re-run (after fixing a v1.7
+> **train/eval leakage bug**) with the thesis reframed to a **compressor-agnostic robustness layer**. Start at
+> **[`results-v1.7.3/results-v1.7.3.md`](results-v1.7.3/results-v1.7.3.md)** (+ `robustness-plan.md`,
+> `reviewer-response.md`). The intermediate v1.7 brief
+> [`summary-matrix-v1.7-2026-06-10.md`](summary-matrix-v1.7-2026-06-10.md) is **also superseded** (leakage-era
+> numbers). This file's still-valid prior evidence (forgetting, capacity wall, cross-model signal, TARG) must be
+> re-validated under the v1.7.3 leak-free protocol before reuse.
 >
 > **Purpose:** single-source brief for the **writing agent**. Everything needed to draft Paper B —
 > thesis, claims↔evidence (with exact numbers + source files), the main table, baselines, novelty

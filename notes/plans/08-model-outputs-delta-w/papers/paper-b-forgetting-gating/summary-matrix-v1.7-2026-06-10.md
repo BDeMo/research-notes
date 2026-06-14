@@ -1,4 +1,10 @@
-# Paper B Summary Matrix v1.7 (writing-agent handoff)
+# Paper B Summary Matrix v1.7 (writing-agent handoff)   ⛔️ SUPERSEDED
+
+> ⛔️ **SUPERSEDED (2026-06-13) — DO NOT CITE THESE NUMBERS.** v1.7 had a **train/eval leakage bug** (≈71% of
+> BFCL eval items seen in training) that inflated every tool result. The clean redo + the reframed thesis
+> (**a compressor-agnostic robustness layer**, not a better compressor) live in
+> **[`results-v1.7.3/results-v1.7.3.md`](results-v1.7.3/results-v1.7.3.md)**. Kept only as a record of the
+> (now-retracted) v1.7 brief.
 
 > Purpose: single-source brief for the writing agent, **reset for the v1.7 "gated compressor module"
 > reframe**. Read the design first: [`v1.7-gated-compressor-module-2026-06-10.md`](v1.7-gated-compressor-module-2026-06-10.md).

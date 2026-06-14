@@ -1,0 +1,176 @@
+% Week naming rule:
+% 2026-06-w02 means the Monday of this report week is in June 2026,
+% and it is the 2nd Monday in that month.
+% Date range: Mon 2026-06-08 to Sun 2026-06-14.
+
+\section{June 2026 Week 2}
+
+\begin{frame}{Reporting Period: June 2026 Week 2}
+  \begin{center}
+    \small Date range: Mon 2026-06-08 to Sun 2026-06-14 \\
+    \scriptsize Goal: concise progress record; detailed facts live in linked notes (results-v1.7.3). \\
+    \scriptsize This week = rigorous re-validation of the gated compressor + a reframe of the contribution.
+  \end{center}
+\end{frame}
+
+\begin{frame}{Continuity From June Week 1}
+  \begin{block}{Week 1 result}
+    The wrapper learns useful compression only in a bounded regime; therefore place a
+    do-no-harm \emph{gate} between wrapper memory and the frozen base.
+  \end{block}
+  \begin{itemize}
+    \item Week 2 stress-tested the gated compressor on \textbf{agentic tool-use + RCA}.
+    \item We \textbf{hardened the evaluation} (leak-free, held-out, matched-budget) and re-ran clean (v1.7.3).
+    \item The clean results moved the story from ``build a better compressor'' to
+      ``\textbf{a compressor-agnostic robustness layer}.''
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{This Week: Main Message}
+  \begin{block}{Reframed contribution}
+    Not a better compressor --- a \textbf{robustness layer}: an external confidence /
+    self-verification signal that detects when compression is unsafe and falls back to full
+    context (do-no-harm). It works on top of \emph{any} compressor.
+  \end{block}
+  \begin{itemize}
+    \item Compression alone is \textbf{capacity-bound} and \textbf{never beats full} --- which is
+      exactly why a detect-and-fallback layer is needed.
+    \item The gate is \textbf{compressor-agnostic}: it recovers $\approx$ full on our method
+      \emph{and} on a faithful Cartridge baseline.
+    \item Evaluation hardened to leak-free / held-out / matched-budget; honest numbers throughout.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Why The Reframe: What The Clean Data Shows}
+  \begin{itemize}
+    \item Fixed-size soft-prompt compression is \textbf{capacity-bound}:
+      correlation(context length, value-add) $= -0.4$ --- it helps at low compression ratio
+      (short context, $\le 3\times$) and \textbf{fails at high ratio} ($\ge 9\times$, long context).
+    \item On every tool benchmark, compressed accuracy stays \textbf{below full context};
+      the realized compute saving from compression alone is $\approx 0$.
+    \item So the deployable value is not ``compress better'' but
+      \textbf{``detect bad compression and fall back''} --- a safety layer usable with any compressor.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{High-Level: Robustness Layer (compressor-agnostic)}
+  \centering
+  \small
+  \begin{tikzpicture}[
+    scale=0.8, transform shape, node distance=0.7cm and 0.7cm,
+    box/.style={draw, rounded corners, align=center, minimum width=2.2cm, minimum height=0.8cm, fill=blue!7},
+    comp/.style={draw, rounded corners, align=center, minimum width=2.5cm, minimum height=0.8cm, fill=green!9},
+    gate/.style={draw, diamond, aspect=2.1, align=center, inner sep=1.2pt, fill=orange!16},
+    arr/.style={-{Latex[length=2mm]}, thick}
+  ]
+    \node[box] (ctx) {Long context $c_{1:n}$};
+    \node[box, below=of ctx] (query) {Query $q$};
+    \node[comp, right=0.8cm of ctx] (comp) {Any compressor\\(GCM / Cartridge / Gist)};
+    \node[box, right=0.8cm of comp] (mem) {Memory $m$ +\\confidence signal};
+    \node[gate, right=0.8cm of mem] (gate) {trust?};
+    \node[box, above right=0.5cm and 0.8cm of gate] (cp) {Compress path\\$F_\theta(q,m)$};
+    \node[box, below right=0.5cm and 0.8cm of gate] (fb) {Fallback:\\full context};
+    \node[box, right=0.8cm of $(cp)!0.5!(fb)$] (out) {Answer $y$};
+
+    \draw[arr] (ctx) -- (comp);
+    \draw[arr] (comp) -- (mem);
+    \draw[arr] (mem) -- (gate);
+    \draw[arr] (query.east) -| (gate.south);
+    \draw[arr] (gate) -- node[above, sloped]{safe} (cp);
+    \draw[arr] (gate) -- node[below, sloped]{unsafe} (fb);
+    \draw[arr] (cp) -- (out);
+    \draw[arr] (fb) -- (out);
+  \end{tikzpicture}
+
+  \vspace{0.4em}
+  \begin{block}{Core idea}
+    Any compressor makes memory; a confidence / self-verification signal scores it; the gate
+    compresses when safe and falls back to full when not --- never worse than full.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Core Clean Findings (v1.7.3, leak-free, in-task)}
+  \small
+  \begin{table}
+    \centering
+    \begin{tabular}{lccccc}
+      \toprule
+      Tool benchmark & no-ctx & full & GCM compress & gate gAcc & detect AUROC \\
+      \midrule
+      BFCL live-multiple & 0.01 & 0.91 & 0.72 & 0.89 & 0.75 \\
+      BFCL live-simple   & 0.01 & 0.91 & 0.53 & 0.92 & 0.88 \\
+      BFCL simple        & 0.02 & 0.99 & 0.17 & 0.99 & 0.52 \\
+      ToolACE            & 0.01 & 0.95 & 0.14 & 0.94 & 0.53 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \vspace{-0.2em}
+  \begin{itemize}
+    \item Compression stays \textbf{below full} everywhere; the \textbf{gate gAcc $\approx$ full}
+      (held-out, within $-0.05 .. +0.03$).
+    \item Detection works where compression is learnable (live benches AUROC 0.75--0.88);
+      elsewhere the gate \textbf{safely abstains} (falls back to full).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Headline: The Gate Is Compressor-Agnostic}
+  \small
+  \begin{table}
+    \centering
+    \begin{tabular}{llccc}
+      \toprule
+      Compressor & benchmark & compress & detect AUROC & gate gAcc \\
+      \midrule
+      GCM (ours)         & BFCL live-simple   & 0.53 & 0.88 & 0.92 \\
+      \textbf{Cartridge} & BFCL parallel      & 0.28 & \textbf{0.81} & 0.93 \\
+      \textbf{Cartridge} & BFCL live-multiple & 0.51 & \textbf{0.73} & 0.90 \\
+      \textbf{Cartridge} & BFCL live-simple   & 0.31 & 0.70 & 0.90 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \begin{block}{Why it matters}
+    The same confidence gate, applied to a \emph{different} compressor (Cartridge), still
+    detects its failures (AUROC 0.6--0.8) and recovers $\approx$ full. The robustness layer is
+    not tied to our encoder --- it is a reusable safety net for any compressor.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Evaluation Rigor Added This Week}
+  \begin{itemize}
+    \item \textbf{Leak-free splits}: a seed-independent train/eval partition (caught and fixed a
+      train/eval overlap; all tool results re-run clean as v1.7.3).
+    \item \textbf{Held-out gate}: 5-fold cross-validated threshold (removes in-sample optimism).
+    \item \textbf{Matched-budget baselines}: Cartridge / Gist re-trained at equal data, steps, and memory.
+    \item \textbf{Args-aware tool scoring} (function name + arguments) and \textbf{multi-seed} confidence intervals (in progress).
+    \item \textbf{Breadth}: tool benchmarks from \textbf{5 independent teams}
+      (BFCL, API-Bank, ToolACE, Hermes, Glaive) plus RCA.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Next Steps}
+  \begin{enumerate}
+    \item \textbf{K-sweep}: map the capacity / compression-ratio frontier --- does more memory rescue long context?
+    \item \textbf{Transfer matrix}: in-task / cross-task / cross-domain for the gated system + baselines.
+    \item \textbf{Args-aware verdict}: do the tool wins survive when arguments must also be correct?
+    \item \textbf{Agnostic claim}: apply the gate to a strong external compressor (LLMLingua).
+    \item \textbf{Paper identity}: lock ``diagnosis + do-no-harm robustness layer'' (well supported by the clean data).
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Where To Read More (v1.7.3)}
+  \small
+  \begin{tabular}{p{0.30\textwidth}p{0.62\textwidth}}
+    \toprule
+    Item & Link \\
+    \midrule
+    Clean results &
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/results-v1.7.3/results-v1.7.3.md}{results-v1.7.3} \\
+    Reframed thesis + plan &
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/results-v1.7.3/robustness-plan.md}{robustness-plan} \\
+    Reviewer-response plan &
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/results-v1.7.3/reviewer-response.md}{reviewer-response} \\
+    Setup / recipe / protocol &
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/results-v1.7.3/experimental-setup.md}{experimental-setup} \\
+    \bottomrule
+  \end{tabular}
+\end{frame}
