@@ -6,7 +6,7 @@
 > conversational memory.
 >
 > **Setting / provenance**: this is external-resource provenance for
-> [`P08-S4`](settings.md#p08-s4--v2-design-setting), not a verified experiment.
+> [`P08-S4`](settings/settings.md#p08-s4--v2-design-setting), not a verified experiment.
 > Any future v2 result table must cite a separate result setting in
 > `settings.md`.
 >

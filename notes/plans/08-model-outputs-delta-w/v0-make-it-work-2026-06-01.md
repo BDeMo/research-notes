@@ -8,9 +8,9 @@
 > **Settings / provenance:** this is a historical/exploratory backlog.
 > Result cells here predate the final v1 setting registry; unless a row states
 > otherwise, interpret them as exploratory variants of
-> [`P08-S1`](settings.md#p08-s1--v1-canonical-wrapper-recipe), not final
+> [`P08-S1`](settings/settings.md#p08-s1--v1-canonical-wrapper-recipe), not final
 > headline cells. Final headline cells live under
-> [`P08-S2`](settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
+> [`P08-S2`](settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
 >
 > **VERDICT 2026-06-02 18:48 UTC — Tier S WON.** Phase L's `data_500`
 > (Tier-S #5) and `3stage_2000` (Tier-S #7) both **cleared the bar**:
