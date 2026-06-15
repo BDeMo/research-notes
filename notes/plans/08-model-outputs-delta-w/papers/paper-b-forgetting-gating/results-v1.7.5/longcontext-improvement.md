@@ -1,8 +1,8 @@
 # v1.7.4 — Making GCM work on LONG context (length-adaptive memory)
 
 > **Status: implemented + smoke-validated + 46 jobs queued (~46 GPU-h), 2026-06-14.** This is the improvement
-> increment on top of [v1.7.3](results-v1.7.3.md). Settings: [experimental-setup.md](experimental-setup.md) ·
-> mechanism: [gcm-lora-mechanism.md](gcm-lora-mechanism.md). Numbers fill in as the queue drains.
+> increment on top of [v1.7.3](../results-v1.7.3/results-v1.7.3.md). Settings: [experimental-setup.md](../results-v1.7.3/experimental-setup.md) ·
+> mechanism: [gcm-lora-mechanism.md](../results-v1.7.3/gcm-lora-mechanism.md). Numbers fill in as the queue drains.
 
 ## 1. The problem (diagnosed in v1.7.3)
 GCM (and every compressor we tried) is **capacity-bound**: it only beats trivial truncation when the context is

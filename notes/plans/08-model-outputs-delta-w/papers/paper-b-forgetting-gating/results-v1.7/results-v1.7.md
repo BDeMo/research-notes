@@ -623,7 +623,7 @@ Both: AdamW, grad-clip 1.0. Code: `gcm/methods.py`; GCM trainer `svc/method.py`;
 **Design & rationale** (sibling docs):
 [v1.7 gated-compressor-module design](../v1.7-gated-compressor-module-2026-06-10.md) ·
 [training design (losses, M0/Mq, gate taxonomy, pitfalls)](../training-design-2026-06-10.md) ·
-[v1.7 central ledger / thesis & queue](../summary-matrix-v1.7-2026-06-10.md).
+[v1.7 central ledger / thesis & queue](../summary-matrix-v1.7.md).
 
 **Honest assessment** (read these with the results):
 [negative-results & limitations](../negative-results.md) ·

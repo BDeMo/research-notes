@@ -1,12 +1,15 @@
 # Paper B — Do-No-Harm Adaptation (Forgetting & Gating)
 
-> 🟢 **CURRENT STATE (2026-06-13): v1.7.3.** The program ran through v1.7 (a gated compressor on tool-use / RCA);
+> 🟢 **CURRENT STATE (2026-06-15): v1.7.5.** The program ran through v1.7 (a gated compressor on tool-use / RCA);
 > a code review then found a **train/eval leakage bug** that had inflated the tool results. Everything was re-run
 > clean as **v1.7.3**, and the thesis was **reframed** from "a better compressor" to **a compressor-agnostic
 > robustness layer** — a confidence / self-verification gate that *detects when compression is unsafe and falls
-> back to full context* (do-no-harm). **Start here:**
+> back to full context* (do-no-harm). v1.7.4/v1.7.5 then showed (cleanly, under stable training) that compression is
+> **capacity-bound** — length-adaptive memory and scaling don't help, the memory is OOD — so the cure is the gate +
+> **minimize-scale**. **Start here:**
+> latest [`results-v1.7.5/results-v1.7.5.md`](results-v1.7.5/results-v1.7.5.md) ·
 > one-page brief [`summary-matrix-v1.7.3.md`](summary-matrix-v1.7.3.md) ·
-> full results [`results-v1.7.3/results-v1.7.3.md`](results-v1.7.3/results-v1.7.3.md) ·
+> full v1.7.3 results [`results-v1.7.3/results-v1.7.3.md`](results-v1.7.3/results-v1.7.3.md) ·
 > thesis+plan [`results-v1.7.3/robustness-plan.md`](results-v1.7.3/robustness-plan.md) ·
 > reviewer-response [`results-v1.7.3/reviewer-response.md`](results-v1.7.3/reviewer-response.md) ·
 > setup [`results-v1.7.3/experimental-setup.md`](results-v1.7.3/experimental-setup.md).

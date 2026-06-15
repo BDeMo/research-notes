@@ -2,14 +2,12 @@
 
 **This supersedes [`../results-v1.7/`](../results-v1.7/results-v1.7.md) (ARCHIVED).** v1.7 had a **train/eval data-leakage bug** that inflated every tool result; v1.7.3 is the leak-free redo. Methodology: [`experimental-setup.md`](experimental-setup.md) · mechanism + gate: [`gcm-lora-mechanism.md`](gcm-lora-mechanism.md) · one-page brief: [`../summary-matrix-v1.7.3.md`](../summary-matrix-v1.7.3.md).
 
-> 🔬 **v1.7.4/v1.7.5 (long-context + scaling + stability) — see [`longcontext-improvement.md`](longcontext-improvement.md):**
-> tried a **length-adaptive (chunked) memory** to make GCM work on long context. **Verdicts (negative, but clean):**
-> (1) **chunking does NOT rescue long context** — ties/loses to trivial `trunc`, never beats `full` (§6);
-> (2) **the compressor does NOT scale** — avg-acc flat ~0.26 across 24× FLOPs / data / depth (§8);
-> (3) the soft memory is **OOD** (nearest-token decode = gibberish, cos 0.096, §10).
-> Together these **confirm compression is capacity-bound** and re-center the contribution on the **do-no-harm gate**.
-> Also: fixed the noisy **training dynamics** (batch-1 → grad-accum + warmup/cosine + EMA + val tracking, §11); 6 2025+
-> context-compression baselines added (ICAE/AOC/Beacon/X500/ComprExIT/LCC) — **faithful rewrite pending** (§9). Paper draft: [`../paper/main.tex`](../paper/main.tex).
+> 🔬 **v1.7.4/v1.7.5 superseded this for the long-context + scaling work — see [`../results-v1.7.5/results-v1.7.5.md`](../results-v1.7.5/results-v1.7.5.md).**
+> Verdicts (negative, but clean): (1) a **length-adaptive (chunked) memory** does NOT rescue long context (ties trivial
+> `trunc`, never beats `full`); (2) **no scaling** — avg-acc flat across 24× FLOPs / data / depth, and capacity K does
+> not scale either; (3) the soft memory is **OOD** (nearest-token cos ≈ 0.10). Together these **confirm compression is
+> capacity-bound** → contribution = the **do-no-harm gate** + minimize-scale. Also: **faithful** 2025 baselines
+> (ICAE/AOC/Beacon/500x/ComprExIT/LCC) + **stable training** (grad-accum/warmup/cosine/val). Paper: [`../paper/main_v1.7.5.tex`](../paper/main_v1.7.5.tex).
 
 ---
 ## 0. What changed from v1.7 (why a new version)

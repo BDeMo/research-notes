@@ -1,7 +1,7 @@
 # Paper B — Summary Matrix v1.7.3 (writing-agent handoff)
 
 > **Single-source brief, current as of 2026-06-13.** Supersedes `summary-matrix.md` (v1.5/v1.6) and
-> `summary-matrix-v1.7-2026-06-10.md` (leakage-era). Detailed results:
+> `summary-matrix-v1.7.md` (leakage-era). Detailed results:
 > [`results-v1.7.3/results-v1.7.3.md`](results-v1.7.3/results-v1.7.3.md) · thesis+plan:
 > [`results-v1.7.3/robustness-plan.md`](results-v1.7.3/robustness-plan.md) · reviewer plan:
 > [`results-v1.7.3/reviewer-response.md`](results-v1.7.3/reviewer-response.md) · setup:

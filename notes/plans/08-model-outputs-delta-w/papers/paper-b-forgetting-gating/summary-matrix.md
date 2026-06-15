@@ -5,7 +5,7 @@
 > **[`summary-matrix-v1.7.3.md`](summary-matrix-v1.7.3.md)** (one-page brief) →
 > **[`results-v1.7.3/results-v1.7.3.md`](results-v1.7.3/results-v1.7.3.md)** (+ `robustness-plan.md`,
 > `reviewer-response.md`). The intermediate v1.7 brief
-> [`summary-matrix-v1.7-2026-06-10.md`](summary-matrix-v1.7-2026-06-10.md) is **also superseded** (leakage-era
+> [`summary-matrix-v1.7.md`](summary-matrix-v1.7.md) is **also superseded** (leakage-era
 > numbers). This file's still-valid prior evidence (forgetting, capacity wall, cross-model signal, TARG) must be
 > re-validated under the v1.7.3 leak-free protocol before reuse.
 >
