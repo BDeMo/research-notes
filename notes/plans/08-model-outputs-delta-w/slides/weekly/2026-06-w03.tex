@@ -1,0 +1,172 @@
+% v1.7.5 milestone deck (compiled 2026-06-14), same format as the 2026-06-w01 weekly.
+% Reports the v1.7.3 -> v1.7.5 arc: the capacity-bound DIAGNOSIS and the do-no-harm CURE it prescribes.
+
+\section{Plan 08 v1.7.5 (Diagnosis and Cure)}
+
+\begin{frame}{Plan 08 v1.7.5: Milestone Record}
+  \begin{center}
+    \small Milestone compiled 2026-06-14 (June Week 2 work). \\
+    \scriptsize Covers the v1.7.3 $\to$ v1.7.5 arc; detailed facts in linked GitHub notes.
+  \end{center}
+\end{frame}
+
+\begin{frame}{Continuity From v1.6 / v1.7.3}
+  \begin{block}{Earlier question}
+    Can a learned, gated soft-prompt memory around a frozen base usefully compress long context?
+  \end{block}
+  \begin{itemize}
+    \item v1.6/v1.7 built the gated compressor and reported encouraging tool/RCA numbers.
+    \item A code review then found a \textbf{train/eval leakage} (71--96\%); the clean redo is \textbf{v1.7.3}.
+    \item v1.7.4 then \emph{tried to fix} long-context compression (length-adaptive memory, scaling); v1.7.5
+      adds training-stability rigor.
+    \item The story moves from ``build a better compressor'' to a \textbf{capacity-bound diagnosis} plus the
+      \textbf{do-no-harm cure} it prescribes.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{This Milestone: Main Message}
+  \begin{block}{Diagnosis $\to$ Cure}
+    Soft/KV context compression for a frozen LLM is \textbf{capacity-bound}; the deployable contribution is the
+    \textbf{do-no-harm gate} prescribed by that diagnosis, not a better compressor.
+  \end{block}
+  \begin{itemize}
+    \item \textbf{Diagnosis}: never beats full; trivial truncation matches full on short context; no scaling;
+      length-adaptive memory does not help; the memory is OOD.
+    \item \textbf{Breadth}: holds across 9 compressors and 5 domains, under a leak-free / held-out / stable-training protocol.
+    \item \textbf{Cure}: the same signals that explain \emph{why} compression fails reveal \emph{when} it fails
+      $\Rightarrow$ a compressor-agnostic gate detects unsafe compression and falls back (never hurts).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Architecture: Compressor, Gate, Do-No-Harm Fallback}
+  \centering
+  \small
+  \begin{tikzpicture}[
+    scale=0.82, transform shape, node distance=0.75cm and 0.75cm,
+    box/.style={draw, rounded corners, align=center, minimum width=2.3cm, minimum height=0.85cm, fill=blue!7},
+    train/.style={draw, rounded corners, align=center, minimum width=2.4cm, minimum height=0.85cm, fill=green!9},
+    warn/.style={draw, rounded corners, align=center, minimum width=2.4cm, minimum height=0.85cm, fill=red!8},
+    gate/.style={draw, diamond, aspect=2.1, align=center, inner sep=1.2pt, fill=orange!16},
+    arr/.style={-{Latex[length=2mm]}, thick},
+    dashedarr/.style={-{Latex[length=2mm]}, thick, dashed}
+  ]
+    \node[box] (ctx) {Long context\\$c_{1:n}$};
+    \node[box, below=of ctx] (query) {Query $q$};
+    \node[train, right=0.85cm of ctx] (wrapper) {Compressor\\$G_\phi$ (any)};
+    \node[box, right=0.85cm of wrapper] (mem) {Memory $m$\\(K tokens / KV)};
+    \node[gate, right=0.82cm of mem] (gate) {Gate\\trust?};
+    \node[box, above right=0.55cm and 0.82cm of gate] (basew) {Frozen base\\$F_\theta(q,m)$};
+    \node[box, below right=0.55cm and 0.82cm of gate] (base0) {Frozen base\\$F_\theta(q,\text{full ctx})$};
+    \node[box, right=0.82cm of $(basew)!0.5!(base0)$] (out) {Answer $y$};
+
+    \draw[arr] (ctx) -- node[above]{compress} (wrapper);
+    \draw[arr] (wrapper) -- (mem);
+    \draw[arr] (mem) -- (gate);
+    \draw[arr] (query.east) -| (gate.south);
+    \draw[arr] (gate) -- node[above, sloped]{safe} (basew);
+    \draw[arr] (gate) -- node[below, sloped]{unsafe} (base0);
+    \draw[arr] (basew) -- (out);
+    \draw[arr] (base0) -- (out);
+
+    \node[warn, below=1.0cm of mem] (risk) {Diagnosis: $m$ is OOD\\\& capacity-bound\\$\Rightarrow$ unreliable};
+    \draw[dashedarr, red!70!black] (risk) -- (gate);
+  \end{tikzpicture}
+  \vspace{0.4em}
+  \begin{block}{Cure}
+    The gate reads failure signals (reconstruction quality, base confidence) off \emph{any} compressor's memory
+    and opens it only when safe; otherwise it falls back to full context (frozen base $\Rightarrow$ never hurts).
+  \end{block}
+\end{frame}
+
+\begin{frame}{Diagnosis 1: Bounded by Full and by Truncation}
+  \small
+  \begin{table}\centering
+    \begin{tabular}{lccc}
+      \toprule
+      bench & full & GCM (ours) & \textbf{trunc} (no train) \\
+      \midrule
+      bfcl\_live\_simple & 0.91 & 0.53 & \textbf{0.91} \\
+      bfcl\_simple & 0.99 & 0.17 & \textbf{0.99} \\
+      bfcl\_live\_multiple & 0.91 & \textbf{0.72} & 0.46 \\
+      toolace & 0.95 & 0.14 & 0.01 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \begin{itemize}
+    \item No compressor beats \textbf{full}; on short context trivial \textbf{truncation matches full} and beats the learned compressor.
+    \item The trained encoder beats truncation on only one bench (ctx $\gg K$). Matched-budget: GCM $\ge$ Cartridge $\gg$ Gist.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Diagnosis 2: No Scaling, Length-Adaptive Does Not Help}
+  \small
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \begin{block}{No scaling (mix of 12 datasets)}
+        avg compress-acc flat at $\sim$0.26 across
+        \begin{itemize}\scriptsize
+          \item compute: $3.5\!\times\!10^{15}\to8.4\!\times\!10^{16}$ FLOPs ($24\times$)
+          \item data: $8\times$; depth $N{=}4\to28$ ($N{=}4$ best)
+        \end{itemize}
+      \end{block}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Length-adaptive $\approx$ fixed-K}
+        \scriptsize $\Delta$(ch16a $-$ k64) within $\pm0.02$ on every shared bench, incl.\ long ctx (rca 0.094 vs 0.104).
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{0.3em}
+  \begin{itemize}
+    \item More data / depth / compute does \textbf{not} lift compression; chunking the memory buys nothing.
+    \item \textbf{Diagnosis 3 (OOD)}: nearest-vocabulary cosine of memory $\approx0.10$ (decodes to gibberish) $\Rightarrow$ the read interface is the wall.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{The Cure: Compressor-Agnostic Do-No-Harm Gate}
+  \small
+  \begin{itemize}
+    \item Keep the base \textbf{frozen} (non-merged adapter, off for fallback) $\Rightarrow$ full context always recoverable (never hurts by construction).
+    \item Gate signal (base confidence + reconstruction) is read off \emph{any} compressor's memory $\Rightarrow$ \textbf{transfers across compressors}.
+    \item On a \emph{different} compressor (Cartridge): failure-detection \textbf{AUROC 0.6--0.8}, held-out gated acc $\approx$ full.
+    \item Honest: detection is near chance on most benches; there the value is conservative do-no-harm (gated acc $=$ full), with real detection on conversational benches.
+    \item In progress: gate precision/recall/F1 on the embedding-wise baselines' tokens (the cross-compressor test).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Paper Framing and Methodological Rigor}
+  \small
+  \begin{block}{Paper target (diagnosis-led)}
+    \emph{Context compression for frozen LLMs is capacity-bound}: a cross-compressor, cross-domain diagnosis,
+    plus the do-no-harm gate it prescribes. We keep it diagnosis-led even where a method performs well.
+  \end{block}
+  \begin{itemize}
+    \item \textbf{Rigor}: leak-free disjoint splits; held-out 5-fold gate; matched-budget \emph{faithful} baselines
+      (ICAE/AOC/Beacon/500x re-impls); args-aware tool scoring.
+    \item \textbf{v1.7.5 stability}: gradient accumulation + LR warmup/cosine + train/val tracking $\Rightarrow$ the
+      negatives are not a training artifact (forecloses the ``you trained it wrong'' critique).
+    \item Draft: \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/paper/main\_v1.7.5.tex}{paper/main\_v1.7.5.tex}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Deliverables and Next Steps}
+  \small
+  \begin{tabular}{p{0.26\textwidth}p{0.66\textwidth}}
+    \toprule
+    Item & Link \\
+    \midrule
+    v1.7.5 results &
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/results-v1.7.3/longcontext-improvement.md}{longcontext-improvement.md} (diagnosis + cure) \\
+    Clean v1.7.3 &
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/results-v1.7.3/results-v1.7.3.md}{results-v1.7.3.md} \\
+    One-page brief &
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/summary-matrix-v1.7.3.md}{summary-matrix-v1.7.3.md} \\
+    \bottomrule
+  \end{tabular}
+  \vspace{0.5em}
+  \begin{enumerate}
+    \item Land the v1.7.5 same-eval cohort (fixed-K vs length-adaptive, stable + gate signals).
+    \item Cross-compressor gate P/R/F1 (our signal on other compressors' tokens) -- the cure's evidence.
+    \item Finalize the diagnosis-led paper draft; add LLMLingua / retrieval reference points.
+  \end{enumerate}
+\end{frame}

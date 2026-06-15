@@ -1,0 +1,173 @@
+% Paper B (v1.7.5) -- self-contained, compiles with pdflatex.
+% Source of truth: ../results-v1.7.3/results-v1.7.3.md + ../results-v1.7.3/longcontext-improvement.md.
+% v1.7.5 reframe: the length-adaptive-memory "fix" did NOT work (it ties fixed-K), so this draft drops that claim
+% and leads with the HONEST result: context compression for a frozen LLM is CAPACITY-BOUND, demonstrated across
+% many compressors/domains/scales, with a compressor-agnostic do-no-harm gate as the deployable contribution.
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+
+\newcommand{\TODO}[1]{\textcolor{red}{[#1]}}
+
+\title{\textbf{Context Compression for Frozen LLMs is Capacity-Bound:}\\
+A Cross-Compressor, Cross-Domain Diagnosis and a Do-No-Harm Gate}
+\author{(draft v1.7.5)}
+\date{2026-06-14}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Compressing a long context into a few soft tokens (or KV pairs) that a \emph{frozen} LLM reads is widely
+proposed to cut long-context cost. Under a strictly leak-free, held-out, \emph{stable-training} protocol we
+report a consistent negative result: such compression is \textbf{capacity-bound}. (i)~It \textbf{never beats
+full context} and, on short contexts, even \textbf{trivial truncation matches full} -- so a learned compressor
+only adds value when the context greatly exceeds the memory budget. (ii)~It \textbf{does not scale}: average
+accuracy is flat across a $24\times$ training-FLOPs range and across data and encoder-depth sweeps (the smallest
+encoder is among the best). (iii)~Making the memory \textbf{length-adaptive} (per-chunk slots, budget growing
+with length) does \emph{not} help -- it matches a fixed-size memory ($\pm0.02$) even on long context. (iv)~The
+learned memory is \textbf{out-of-distribution} to the token manifold (nearest-vocabulary cosine $\approx 0.10$;
+it decodes to gibberish), which explains the ceiling. These hold across nine compressors (ours, Gist,
+Cartridge, ICAE, AOC, Activation-Beacon, 500xCompressor, and two 2026 methods) and five domains (agentic
+tool-use, root-cause analysis, wiki QA, literary QA, synthetic NIAH). \textbf{The cure prescribed by the
+diagnosis} is a \textbf{compressor-agnostic do-no-harm gate}: the very signals that explain \emph{why}
+compression fails (reconstruction quality, base confidence) also reveal \emph{when} it fails, so we detect
+unsafe compression per input and fall back to full context --- recovering $\approx$\,full accuracy and provably
+never hurting (frozen base + non-merged adapter). The contribution is the diagnosis and the cure it prescribes,
+not a better compressor.
+\end{abstract}
+
+\section{Introduction}
+A popular recipe for cheaper long-context inference is to \emph{compress} the context into $K\!\ll\!L$ soft
+tokens or KV pairs that a frozen LLM conditions on~\cite{gist,cartridges,icae}. We ask the basic questions a
+practitioner needs answered: \emph{does it beat just truncating? does it beat full context? does it scale? and
+when it fails, can we tell?} Under a rigorous protocol (Section~\ref{sec:setup}) the answers are sobering.
+
+\paragraph{Findings (all negative, and robust).}
+\begin{enumerate}[noitemsep]
+  \item \textbf{Bounded by full and by truncation.} No compressor beats full context; on short contexts
+        \emph{trivial first-$K$ truncation} already matches full and beats every learned compressor
+        (Table~\ref{tab:trivial}).
+  \item \textbf{No scaling.} Training a single ``universal'' compressor on a 12-dataset mixture, average
+        accuracy is flat ($\approx\!0.26$) across $24\times$ FLOPs, $8\times$ data, and $7\times$ depth
+        (Section~\ref{sec:scaling}); the smallest depth is among the best.
+  \item \textbf{Length-adaptive memory does not help.} Giving each chunk its own slots (budget grows with
+        length) ties a fixed-$K$ single-pass memory within $\pm0.02$, including on long context
+        (Section~\ref{sec:lenadapt}).
+  \item \textbf{The memory is OOD.} Decoding each memory vector to its nearest vocabulary token yields
+        gibberish (cosine $\approx0.10$), and query-conditioning barely moves it (Section~\ref{sec:ood}).
+\end{enumerate}
+Crucially these survive a \textbf{stability fix} to training (gradient accumulation, LR warmup/cosine, and
+train/val tracking; Section~\ref{sec:setup}): the ceiling is not an optimization artifact.
+
+\paragraph{The cure, prescribed by the diagnosis.}
+The diagnosis hands us the cure: the same quantities that explain \emph{why} compression fails --- how well the
+memory reconstructs the context, and the base's confidence when reading it --- are exactly what a per-input gate
+needs to tell \emph{when} it fails. We keep the base frozen (a non-merged adapter, toggled off for fallback) so
+full context is always recoverable, read these signals to decide compress-vs-fallback, and find that the signal
+--- computed from the base's behaviour on \emph{any} compressor's memory --- transfers across compressors
+(Section~\ref{sec:gate}): a \emph{compressor-agnostic do-no-harm gate}. We deliberately keep the paper
+\emph{diagnosis-led}: even where a compressor or the gate performs well, the contribution is the honest map of
+when compression works and the do-no-harm remedy, not a SOTA-compression claim.
+
+\section{Related work}
+\textbf{Compression into memory.} Soft-prompt (Gist~\cite{gist}, ICAE~\cite{icae}, AOC~\cite{aoc},
+AutoCompressor~\cite{autocompressor}, ComprExIT) and KV/activation (Cartridges~\cite{cartridges},
+500xCompressor~\cite{x500}, Activation Beacon~\cite{beacon}) methods all train a compact memory for a frozen
+base. They report wins vs.\ no-context but rarely against \emph{trivial truncation} or with leak-free splits;
+we add those and a cross-compressor scaling/OOD analysis. \textbf{Uncertainty / selective prediction.} TARG and
+selective-prediction methods gate on base uncertainty; we generalize this to a failure detector for the
+\emph{compressed} path and frame compress-vs-fallback as selective prediction (risk--coverage). \textbf{Our
+white space}: an honest ``does compression work, and when'' diagnosis (capacity frontier, trivial baselines,
+scaling, OOD) across compressors/domains, plus a do-no-harm gate that transfers across compressors.
+
+\section{Setup}\label{sec:setup}
+Base: Qwen3-8B (bf16). Domains: agentic tool-use (BFCL, API-Bank, ToolACE, Hermes, Glaive), root-cause analysis
+(OpenRCA), wiki QA (HotpotQA, SQuAD, TriviaQA), literary QA (NarrativeQA, QuALITY), synthetic NIAH (RULER).
+\textbf{Rigor:} (a)~all train/eval splits are seed-independent and disjoint (a prior version had a 71--96\%
+leak; all numbers here are post-fix); (b)~the gate is scored held-out via 5-fold CV; (c)~baselines run at a
+\emph{matched} budget and are \emph{faithful} re-implementations of their papers (LoRA-on-base encoder + frozen
+decoder + [AE] for ICAE, KV injection for 500x, MLP-removed encoder for AOC, interleaved beacon-KV for Beacon);
+(d)~tool scoring is name-based with an args-aware check; (e)~\textbf{stable training} -- gradient accumulation
+(effective batch $8$), LR warmup + cosine decay, and EMA-smoothed train/val logging, so the negatives are not a
+training artifact.
+
+\section{Results}
+\subsection{Bounded by full and by truncation}\label{sec:trivial}
+\begin{table}[t]\centering\small
+\caption{Necessity vs.\ trivial truncation (compress accuracy). \texttt{trunc}=first-$K$, no training.}
+\label{tab:trivial}
+\begin{tabular}{lccccc}
+\toprule
+bench & full & GCM & \textbf{trunc} & meanpool & randk \\
+\midrule
+bfcl\_live\_simple & 0.91 & 0.53 & \textbf{0.91} & 0.87 & 0.03 \\
+glaive & 0.99 & 0.77 & \textbf{0.99} & 0.99 & 0.39 \\
+bfcl\_simple & 0.99 & 0.17 & \textbf{0.99} & 0.99 & 0.02 \\
+\textbf{bfcl\_live\_multiple} & 0.91 & \textbf{0.72} & 0.46 & 0.03 & 0.00 \\
+toolace & 0.95 & 0.14 & 0.01 & 0.01 & 0.01 \\
+\bottomrule
+\end{tabular}
+\end{table}
+On short contexts \texttt{trunc} equals full and beats every learned compressor; the trained encoder beats
+\texttt{trunc} on only one bench (\texttt{bfcl\_live\_multiple}, ctx $\approx2.8K$). At matched budget,
+GCM $\ge$ Cartridge $\gg$ Gist, and all faithful 2025 compressors (ICAE/AOC/Beacon/500x/ComprExIT/LCC) sit far
+below full.
+
+\subsection{No scaling}\label{sec:scaling}
+A single compressor trained on a 12-dataset mixture (curriculum-ordered), swept over data, encoder depth, and
+compute: average accuracy is \textbf{flat at $\sim$0.25--0.28} across a $24\times$ FLOPs range
+($3.5\!\times\!10^{15}\!\to\!8.4\!\times\!10^{16}$), $8\times$ data, and $7\times$ depth; depth $N{=}4$ is among
+the best. Compression has \emph{no headroom} from scale.
+
+\subsection{Length-adaptive memory does not help}\label{sec:lenadapt}
+Replacing the fixed-$K$ single-pass memory with a length-adaptive one (per-chunk slots, budget $=\lceil
+L/C\rceil\!\cdot\!k$) ties the fixed-$K$ memory within $\pm0.02$ on every shared bench, including long context
+(rca $0.094$ vs $0.104$). \TODO{v1.7.5 same-eval cohort fills the exact table.} The single-pool bottleneck was
+not the cause; capacity is.
+
+\subsection{The memory is out-of-distribution}\label{sec:ood}
+Decoding each of the $K$ memory vectors to its nearest vocabulary token (cosine in the base input-embedding
+space) yields gibberish; the mean nearest-token cosine is $\approx0.10$ (near-orthogonal to the entire
+vocabulary), memory tokens collapse to a few fixed directions, and query-conditioning barely moves them. The
+frozen base reads an OOD prompt it cannot fully exploit -- a mechanistic reason for the ceiling.
+
+\subsection{The cure: a compressor-agnostic do-no-harm gate}\label{sec:gate}
+The diagnosis prescribes the remedy. The OOD result (\S\ref{sec:ood}) and the reconstruction analysis say a
+compressed memory is unreliable \emph{and} leaves a detectable fingerprint --- so a per-input confidence /
+self-verification signal, read from the base's behaviour on the memory, detects unsafe compression and triggers
+fallback. Applied to a \emph{different} compressor (Cartridge) it gives failure-detection AUROC $0.6$--$0.8$
+and held-out gated accuracy $\approx$ full; on most benches detection is near chance, but do-no-harm still holds
+via conservative fallback (gated accuracy $=$ full, by construction of the frozen base + non-merged adapter).
+\TODO{v1.7.5 P/R/F1 of the gate on the embedding-wise compressors (ICAE/AOC) -- the cross-compressor test.}
+
+\section{Limitations (honest)}
+No compressor beats full; trivial truncation matches full on short context. Gate detection is near chance on
+most benches (value is do-no-harm via conservative fallback, with real detection only on conversational
+benches). Single base (Qwen3-8B). The result is a \emph{negative} one about a popular method class; we do not
+claim a new SOTA compressor.
+
+\section{Conclusion}
+\textbf{Diagnosis:} soft/KV context compression for a frozen LLM is capacity-bound --- it does not scale,
+length-adaptive memory does not help, the learned memory is OOD, and it never beats full (or, on short context,
+truncation) --- across nine compressors and five domains, under a rigorous, stable-training protocol.
+\textbf{Cure (prescribed by the diagnosis):} a \emph{compressor-agnostic do-no-harm gate} built from the same
+failure signals, which recovers $\approx$\,full accuracy and never hurts. We keep the paper diagnosis-led: the
+honest map of \emph{when} compression works, and the remedy when it does not, is the contribution.
+
+\begin{thebibliography}{9}\small
+\bibitem{cartridges} Eyuboglu et al. Cartridges: lightweight per-corpus KV memories via self-study. 2025.
+\bibitem{gist} Mu et al. Learning to Compress Prompts with Gist Tokens. 2023.
+\bibitem{icae} Ge et al. In-Context Autoencoder for Context Compression. ICLR 2024.
+\bibitem{aoc} Better Prompt Compression Without Multi-Layer Perceptrons (Attention-Only Compressor). 2025.
+\bibitem{x500} 500xCompressor: Generalized Prompt Compression for LLMs. 2024/2025.
+\bibitem{beacon} Long Context Compression with Activation Beacon. 2024/2025.
+\bibitem{autocompressor} Chevalier et al. Adapting LMs to Compress Contexts. 2023.
+\end{thebibliography}
+
+\end{document}

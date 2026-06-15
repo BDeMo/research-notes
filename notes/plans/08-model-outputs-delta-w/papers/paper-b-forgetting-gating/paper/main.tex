@@ -1,0 +1,178 @@
+% Paper B (v1.7.3 + v1.7.4 long-context) -- self-contained, compiles with pdflatex.
+% Source of truth for numbers: ../results-v1.7.3/results-v1.7.3.md and ../summary-matrix-v1.7.3.md.
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+
+% ---- placeholders (update from results-v1.7.3.md as runs land) ----
+\newcommand{\TODO}[1]{\textcolor{red}{[#1]}}
+\newcommand{\version}{v1.7.3/v1.7.4}
+
+\title{\textbf{Do-No-Harm Context Compression:}\\
+A Compressor-Agnostic Robustness Gate and Length-Adaptive Memory\\
+for Agentic Tool-Use and Root-Cause Analysis}
+\author{(draft \version)}
+\date{2026-06-14}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Soft-prompt context compression promises cheaper long-context inference for a frozen LLM, but we find it is
+\emph{unreliable}: a fixed-size memory is \emph{capacity-bound} (it helps only when the context is several
+times larger than the memory), it \emph{never beats full context}, and on short contexts even \emph{trivial
+truncation} matches full. Rather than chase a better compressor, we make compression \emph{safe} and make it
+\emph{scale}. (i)~A \textbf{compressor-agnostic robustness gate}: a per-input confidence / self-verification
+signal that detects when compression is unsafe and falls back to full context (do-no-harm). Applied to our
+module \emph{and} to a faithful Cartridge baseline, it recovers $\approx$\,full accuracy while compressing
+where safe. (ii)~A \textbf{length-adaptive memory} that chunks the context and gives each chunk dedicated
+slots, so the budget scales with length at a fixed compression ratio --- removing the single-pool bottleneck
+that makes fixed-size memory fail on long context. We evaluate on agentic tool-use (five independent
+benchmark families) and root-cause analysis under a strictly leak-free, held-out protocol, and we are explicit
+about the negatives: no compressor beats full, and a learned compressor only earns its keep when the context
+substantially exceeds the memory budget.
+\end{abstract}
+
+\section{Introduction}
+Long contexts (tool catalogs, logs, conversations) make frozen-LLM inference expensive. A popular remedy is to
+\emph{compress} the context into a few soft tokens (a learned memory) that the frozen model reads in place of
+the raw context~\cite{cartridges,gist,icae}. We ask a simple question: \emph{is this safe and does it scale?}
+
+Under a strictly leak-free, held-out evaluation (Section~\ref{sec:setup}), the answer to ``safe'' is
+\emph{not by itself}. Across agentic tool-use and root-cause analysis we find three robust negatives:
+\begin{enumerate}[noitemsep]
+  \item No compressor (ours, Cartridge, or Gist) beats \emph{full context} on any benchmark.
+  \item On \emph{short} contexts, \emph{trivial truncation} (keep the first $K$ context tokens, no training)
+        already matches full --- there is nothing to compress.
+  \item Compression is \emph{capacity-bound}: it adds value over truncation only when the context is several
+        times larger than the memory; on genuinely long context (e.g.\ a $9\times$ ratio) it fails.
+\end{enumerate}
+These negatives reframe the contribution. If compression is unreliable, the deployable value is (a)~\emph{knowing
+when not to trust it}, and (b)~\emph{making it scale} when the context is genuinely long. We contribute both:
+
+\paragraph{Contribution 1: a compressor-agnostic do-no-harm gate.}
+We keep the frozen base weights so that a \emph{fallback} to full context is always available, and we read a
+per-input confidence / self-verification signal (first-token confidence, memory--query deviation,
+reconstruction) to decide compress-vs-fallback. The same gate, applied to a \emph{different} compressor
+(Cartridge), detects its failures (detection AUROC $0.6$--$0.8$) and recovers $\approx$\,full accuracy --- the
+robustness layer is not tied to our encoder.
+
+\paragraph{Contribution 2: length-adaptive memory.}
+The standard fixed-$K$, single-pass memory is a global bottleneck: $K$ slots must pool the entire context. We
+chunk the context and give each chunk its own $k$ slots, concatenating to a memory of length $S\cdot k$
+($S=\lceil L/C\rceil$). The compression ratio $C/k$ is fixed, but the budget scales with length and preserves
+per-region locality; optional query-relevance routing keeps only the top-$m$ chunks (soft retrieval). This is
+designed to flatten the capacity frontier on long context (Section~\ref{sec:longctx}).
+
+\section{Related work}
+\textbf{Context compression into memory.} Cartridges/self-study~\cite{cartridges} trains a per-corpus KV
+memory; Gist tokens~\cite{gist} train the LM (via masking/LoRA) to compress prompts; ICAE~\cite{icae} and
+AutoCompressor~\cite{autocompressor} learn autoencoder-style memories; LLMLingua~\cite{llmlingua} prunes tokens.
+All target the \emph{compressor}; none provides a per-input safety fallback, and they are typically reported
+without a trivial-truncation baseline. \textbf{Uncertainty / gating.} TARG and selective-prediction methods
+gate on base-model uncertainty; we generalize this to a compressor-agnostic \emph{failure detector} for the
+compressed path. \textbf{Our white space} is the combination: an honest ``when does compression work''
+diagnosis (capacity frontier + trivial baselines) $+$ a do-no-harm layer that works across compressors $+$ a
+length-adaptive memory that addresses the diagnosed failure.
+
+\section{Method}
+\subsection{Gated Compressor Module (GCM)}
+An encoder (a trainable copy of the base's first $N$ blocks) reads $[\text{ctx};\text{query};K\text{ slots}]$
+and emits $K$ memory vectors $M$, projected into the base's input-embedding space and injected as a soft prefix:
+the \emph{frozen} base answers from $[M;\text{query}]$. Training minimizes a gold-answer cross-entropy (forcing
+$M$ to carry the answer), an unconditional-reconstruction term (the memory must reconstruct the context), and a
+deviation anchor. Because the base is frozen (optionally with a \emph{non-merged} LoRA that is toggled off for
+fallback), full context is always recoverable.
+
+\subsection{The do-no-harm gate}
+At inference we read signals from the compressed run --- first-token confidence/margin/entropy, the
+conditional--unconditional memory gap ($\Delta$code/$\Delta$logit), and reconstruction quality --- and compress
+only when the signal clears a threshold, else fall back to full. The signal is computed from the \emph{base
+model's behavior on the compressed memory}, so it applies to \emph{any} compressor (Section~\ref{sec:gate}).
+
+\subsection{Length-adaptive memory}\label{sec:lam}
+For context length $L$ and chunk size $C$, we encode each chunk $[\text{chunk}_i;\text{query};k\text{ slots}]$
+independently and concatenate: $M=[M_1;\dots;M_S]$, $S=\lceil L/C\rceil$, $|M|=S\cdot k$. The ratio $C/k$ is
+fixed; the budget grows with $L$. Optional routing keeps the top-$m$ chunks by query relevance
+($|M|\le m\cdot k$). Gradient checkpointing makes the $S$ encoder graphs fit one GPU.
+
+\section{Experimental setup}\label{sec:setup}
+Base: Qwen3-8B (bf16). Benchmarks: agentic tool-use from five independent teams (BFCL, API-Bank, ToolACE,
+Hermes, Glaive) and root-cause analysis (OpenRCA). \textbf{Data hygiene:} all train/eval splits are
+seed-independent and disjoint (a prior version had a 71--96\% train/eval leak that inflated tool results; all
+numbers here are post-fix). \textbf{Gate metric:} held-out via 5-fold cross-validation (in-sample gate accuracy
+is an optimistic ceiling). \textbf{Tool scoring:} name-based (\texttt{tool\_acc}) with an args-aware
+re-scoring (\texttt{tool\_call\_acc}) as a robustness check. Baselines are run at \emph{matched} training
+budget. Full settings: \texttt{experimental-setup.md}.
+
+\section{Results}
+\subsection{Compression is bounded by full and by truncation}
+Table~\ref{tab:trivial} reports the necessity check. On short-context benches, \texttt{trunc} (first-$K$, no
+training) matches full and beats GCM; GCM beats trivial truncation only on \texttt{bfcl\_live\_multiple}
+(ctx $\approx 2.8\times K$). No method beats full.
+
+\begin{table}[t]\centering\small
+\caption{Necessity vs.\ trivial truncation (compress accuracy, Qwen3-8B, leak-free).}
+\label{tab:trivial}
+\begin{tabular}{lccccc}
+\toprule
+bench & full & GCM & \textbf{trunc} & meanpool & randk \\
+\midrule
+bfcl\_live\_simple & 0.91 & 0.53 & \textbf{0.91} & 0.87 & 0.03 \\
+glaive & 0.99 & 0.77 & \textbf{0.99} & 0.99 & 0.39 \\
+bfcl\_simple & 0.99 & 0.17 & \textbf{0.99} & 0.99 & 0.02 \\
+hermes & 0.94 & 0.50 & \textbf{0.94} & 0.63 & 0.37 \\
+\textbf{bfcl\_live\_multiple} & 0.91 & \textbf{0.72} & 0.46 & 0.03 & 0.00 \\
+toolace & 0.95 & 0.14 & 0.01 & 0.01 & 0.01 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Matched-budget baselines}
+At matched budget (384 items, 3000 steps, $K{=}64$), GCM $\ge$ Cartridge $\gg$ Gist on the live/conversational
+benches and ties on short/synthetic; none beats full. (Full table: \texttt{results-v1.7.3.md} \S2.4.)
+
+\subsection{The gate is compressor-agnostic}\label{sec:gate}
+Applying the same confidence gate to \emph{Cartridge} yields failure-detection AUROC $0.6$--$0.8$
+(parallel 0.81, live\_multiple 0.73, live\_simple 0.70) and held-out gated accuracy $\approx$ full --- it
+catches when Cartridge dropped what the query needed and falls back. The robustness layer transfers across
+compressors.
+
+\subsection{Length-adaptive memory on long context}\label{sec:longctx}
+\TODO{capacity-frontier figure: compress vs n\_ctx\_tokens, lines = k64 / k256 / ch16a / ch16r.}
+We compare fixed-$K$ ($K{=}64$, $K{=}256$) against length-adaptive chunked memory (ch16a, keep-all) and
+routed (ch16r, keep-8) on six long-context benches plus multi-seed CIs.
+\begin{itemize}[noitemsep]
+  \item \textbf{H1 capacity-bound:} \TODO{k256 vs k64 on toolace/rca}.
+  \item \textbf{H2 locality:} \TODO{ch16a vs k256 at matched budget}.
+  \item \textbf{H3 length-adaptive (headline):} \TODO{frontier flattens for ch16a vs k64}.
+  \item \textbf{H4 retrieval:} \TODO{ch16r vs ch16a on the longest benches}.
+\end{itemize}
+
+\section{Limitations (honest)}
+No compressor beats full. Trivial truncation matches full on short context and beats GCM there. Realized
+compute saving is $\approx 0$ except in the high-ratio regime. The gate is near chance on most benches
+(do-no-harm there is via conservative fallback, with real detection only on the live benches). Non-merged LoRA
+adds only $\sim$\,$+0.02$. Single-base (Qwen3-8B) headline; multi-seed and args-aware re-scoring are reported
+as robustness checks.
+
+\section{Conclusion}
+Context compression for a frozen LLM is unreliable, but it can be made \emph{safe} (a compressor-agnostic
+do-no-harm gate) and made to \emph{scale} (length-adaptive memory). We argue that the durable contribution is
+the robustness layer plus an honest diagnosis of when compression helps, rather than a claim of state-of-the-art
+compression.
+
+\begin{thebibliography}{9}\small
+\bibitem{cartridges} Cartridges: lightweight per-corpus KV memories via self-study. 2025.
+\bibitem{gist} Learning to Compress Prompts with Gist Tokens. 2023.
+\bibitem{icae} In-Context Autoencoder for Context Compression. 2024.
+\bibitem{autocompressor} Adapting LMs to Compress Contexts (AutoCompressor). 2023.
+\bibitem{llmlingua} LLMLingua: Compressing Prompts for Accelerated Inference. 2023.
+\end{thebibliography}
+
+\end{document}
