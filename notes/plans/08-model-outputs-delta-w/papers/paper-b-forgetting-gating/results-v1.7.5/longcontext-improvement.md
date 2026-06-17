@@ -119,15 +119,15 @@ on the medium benches above, exactly where it trails. The crossover is **ctx ≳
 (580→9 chunks→144 slots), rca, narrativeqa, ruler-nc24. **Those are the benches still training** — the headline
 test is pending, not yet decided.
 
-### 6.2 The do-no-harm gate holds on the chunked method ✅
-| ch16a bench | gate AUROC | gAcc_cv | fallback% |
-|---|---|---|---|
-| bfcl_live_multiple | 0.700 | 0.938 (≈full) | 99% |
-| hermes | 0.702 | 0.938 (≈full) | 95% |
-| bfcl_multiple | 0.646 | 0.883 (≈full) | 98% |
-| bfcl_parallel_multiple | 0.603 | 0.750 (≈full) | 98% |
-| hotpot_qa | 0.526 | 0.331 (≈full) | 52% |
-→ the compressor-agnostic gate still recovers ≈full via fallback on the chunked memory (robustness layer is method-independent).
+### 6.2 The do-no-harm gate holds on the chunked method ✅ (F1 primary)
+| ch16a bench | **F1** | precision | recall | AUROC | gAcc_cv |
+|---|---|---|---|---|---|
+| bfcl_live_multiple | **0.89** | 0.80 | 1.00 | 0.68 | 0.94 (≈full) |
+| hermes | 0.73 | 0.60 | 0.94 | 0.70 | 0.94 (≈full) |
+| bfcl_multiple | 0.48 | 0.34 | 0.79 | 0.65 | 0.88 (≈full) |
+| bfcl_parallel_multiple | 0.62 | 0.53 | 0.73 | 0.60 | 0.75 (≈full) |
+| hotpot_qa | 0.88 | 0.78 | 1.00 | 0.53 | (≈full) |
+→ Best where **F1 high AND AUROC>0.6** (live_multiple F1 0.89/AUROC 0.68, hermes 0.73/0.70). Where AUROC≈0.5 (hotpot, etc.) the high F1 is "always-compress" base-rate, not detection — do-no-harm there via conservative fallback. The robustness layer is method-independent.
 
 ### 6.3 Status of related runs
 - **args-aware (R3): INVALID, re-queued.** `--bfcl-full-call` changed the prompt but generation was capped at
@@ -181,6 +181,8 @@ data/depth/compute lifts the average — i.e., whether compression has headroom 
 | **depth** (D=384) | N=4 → 28 (7×) | **0.285 → 0.279** (N=4 is *best*) |
 
 → More data / depth / compute does **not** improve the compressor; the **smallest** depth (N=4) is among the best. The compressor is **capacity-bound — it does not scale.** Figure: `out/clean/scale/scaling.png`. This is the central negative that anchors the robustness-layer thesis.
+
+> **Caveat + follow-up (see [`scaling-critical-review.md`](scaling-critical-review.md)):** the flat *average* masks two per-bench nuances — depth scales **down** (N=4 best ⇒ *minimize* depth), and one bench (bfcl_live_multiple) does data-scale modestly (0.15→0.27). The grid also **fixed K=64**, so the **capacity axis was untested here**; the v1.7.5 HP sweep tested it and found **K also does not scale** (K16≈K64≥K256). Net: still capacity-bound, and the cure is **minimize-scale**.
 
 **New 2025+ baselines (from related-work scan):**
 - **`tokprune`** (queued, 10 benches) — query-AGNOSTIC hard-prompt pruning: keep the K highest-**self-information**

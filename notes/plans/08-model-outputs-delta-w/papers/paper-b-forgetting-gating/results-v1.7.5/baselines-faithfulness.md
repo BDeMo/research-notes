@@ -8,12 +8,12 @@
 ## Summary table
 | method | paper | original mechanism (verified) | our impl | faithful? |
 |---|---|---|---|---|
-| **ICAE** | Ge, ICLR'24 (2307.06945) | encoder = base **+ LoRA(q,v)** over `[ctx ; K mem toks]`; mem toks' **output hidden states** = slots; **frozen base** decoder; **[AE]** token; AE + LM/FT | LoRA(q,v) encoder → hidden slots; frozen-base decoder; learnable [AE]; AE + task CE | ✅ exact |
-| **500x** | 2408.03094 | = ICAE but decoder conditions on the compressed tokens' **KV values** (per layer), `[BOS]`-triggered | same LoRA encoder, extract last-K **KV** per layer, inject via KV path; task CE | ✅ exact |
+| **ICAE** | Ge, ICLR'24 (2307.06945) | encoder = base **+ LoRA** over `[ctx ; K mem toks]`; mem toks' **output hidden states** = slots; **frozen base** decoder; **[AE]** token; AE + LM/FT; paper rank≈128, K=128 | LoRA(**q,k,v,o**) **rank 128** encoder → hidden slots; frozen-base decoder; learnable [AE]; AE + task CE | ✅ exact (arch + LoRA scope) |
+| **500x** | 2408.03094 | = ICAE but decoder conditions on the compressed tokens' **KV values** (per layer), `[BOS]`-triggered | same **rank-128 (q,k,v,o)** LoRA encoder, extract last-K **KV** per layer, inject via KV path; task CE | ✅ exact |
 | **AOC** | 2501.06730 | ICAE with a separate **attention-only** encoder (MLP sublayers **removed**), trained fully | separate encoder copy, **MLP sublayers zeroed** (`_ZeroMLP`), trained fully; frozen-base decoder; AE+task | ✅ exact (MLP removed) |
-| **Beacon** | 2401.03462 | interleave 1 beacon per α-token unit; compress each unit into **beacons' KV**; accumulate KV across chunks | LoRA-base, interleave 1 beacon/α toks, keep **beacon-position KV**, inject via KV path | 🟡 core (single-pass; cross-chunk **KV accumulation simplified** at our ≤1024 budget) |
-| **ComprExIT** | 2602.03784 | LLM-as-encoder + explicit info **transmission into anchor tokens** across layers | attention-only encoder → anchor/memory tokens (AOC-style) | 🟡 core (cross-layer transmission approximated; needs authors' code for exact) |
-| **LCC** | 2602.21221 | **test-time** disposable-LoRA "compiler"; reconstruction + context-agnostic regularizer → buffer tokens | **test-time** buffer optimized by reconstruction + on-manifold regularizer (per context) | 🟡 core (buffer instead of a disposable LoRA) |
+| **Beacon** | 2401.03462 | interleave 1 beacon per α-token unit; compress each unit into **beacons' KV**; **sample α each step**; LM/recon objective; accumulate KV across chunks | LoRA-base, interleave 1 beacon/α (**α sampled {8,16,32}**, eval 16), beacon-KV + **ctx-reconstruction (LM)** + task CE | 🟢 core+ (sampled-α + recon now faithful; cross-chunk **KV accum still single-pass** at ≤1024) |
+| **ComprExIT** | 2602.03784 | LLM-as-encoder + explicit info **transmission into anchor tokens across layers** | LLM-as-encoder (LoRA) + **learned cross-LAYER transmission** = softmax-weighted anchor hidden-states across ALL layers (distinct from ICAE last-layer & from AOC) | 🟢 core (now a genuine distinct mechanism, not AOC-relabeled) |
+| **LCC** | 2602.21221 | **test-time** disposable-LoRA "compiler"; reconstruction + context-agnostic regularizer → buffer tokens | **test-time** buffer optimized by **full-ctx reconstruction** (≤768) + on-manifold regularizer, 20 steps/ctx | 🟡 core (buffer parameterization ≈ disposable-LoRA; both compile per-ctx by reconstruction) |
 
 ## Notes on exactness
 - **ICAE / 500x / AOC are exact** re-implementations of the published architecture (LoRA-on-base encoder + frozen
@@ -29,3 +29,31 @@
   the frozen base reads → the §2.4 comparison and the (amortized) efficiency comparison are apples-to-apples.
 - **Not baselines for efficiency:** token-pruning/selection (`trunc`, `retrieval`, dropped `tokprune`) and runtime
   KV-prune/merge (KVzip/SnapKV) — different mechanism class; reported only as necessity floors, never efficiency rivals.
+
+## Code-faithfulness fixes (2026-06-16, `baselines2025.py`)
+Applied after a per-method re-audit against the papers:
+- **ICAE / 500x:** LoRA scope `(q,v)`→**`(q,k,v,o)`**, rank 64→**128** (paper scope). 
+- **Beacon:** single α=16 → **sample α∈{8,16,32} per step** + add the **context-reconstruction (LM)** term (paper trains with sampled ratios + compression-based AR, not task-CE only). Eval still α=16.
+- **ComprExIT:** was literally `AOC.train()` (a relabel) → now a **distinct mechanism**: LLM-as-encoder (LoRA) with a **learned softmax-weighted combination of the anchor hidden-states across ALL layers** ("cross-layer transmission"), distinct from ICAE (last layer) and AOC (separate MLP-free encoder).
+- **LCC:** reconstruct **full ctx (≤768)** not just first 256; 12→**20** compile steps.
+- Smoke-tested (Qwen3-8B, 10 steps): all six produce valid non-null scores, no errors.
+
+## Recipe NON-uniformity found (T2 provenance) → uniform re-run launched
+The T2 numbers were **not** at one recipe (logs/queue scripts): GCM ran **lr3e-4 / 1600 steps / K64∪K128**, Gist **1500 steps**, the 2025 family **lr1e-4 / 3000 steps**, HP sweep **K128 / 96-items / 800-steps** — and the older cohorts predate the stable-training instrumentation (py3.11). So T2's "All enc-16/K64/384-items/3000-steps" header is inaccurate, and the lr gap (GCM 3e-4 vs rivals 1e-4) *advantaged* GCM. **Fix:** `run_baselines_uniform.sh` re-runs GCM + all rivals at **one** recipe (K64/384/3000/lr3e-4/grad-accum8) on the claim benches + a **K128 paper-setting validation** block. Running on `sam-dev-test` (`out/baselines_uniform/`).
+
+## Reproduction vs original-paper reported (retention = compressed ÷ full)
+Pre-fix T2 numbers; the comparison is normalized to retention because the papers use different benchmarks/metrics
+(regen BLEU / LongBench / QA-F1) than our tool/QA benches. Paper numbers are **with large-scale pretraining**, K=128/KV.
+| method | paper benchmark / metric | **paper retention** | our repro — hermes (QA-like) | our repro — bfcl_live_multiple (tool) |
+|---|---|---|---|---|
+| ICAE | regen BLEU; 4×, K128, *pretrain* | ~99% / "near-lossless" | 54% | 7% |
+| 500x | ArxivQA/SQuAD F1·EM; 6–480×, *pretrain* | **62–84%** | 39% | 2% |
+| AOC | prompt **regeneration** EM/BLEU; ≤480× | ~0.98 (n=96) | 44% | 9% |
+| Beacon | LongBench task; 2–8×, *pretrain*, sampled-ratio | ~**99–100%** | 66% | 3% |
+| ComprExIT / LCC | (2026; no public numbers) | n/a | 50% / 37% | 9% / 1% |
+
+→ **On QA-like (hermes) our matched-budget repro retains ~40–66% vs papers' ~62–99%** — the ~25–40pp shortfall is the
+**no-pretraining + K64 (vs K128) + 384-item budget** (ICAE's own ablation: "pretrained ≫ non-pretrained at same ratio;
+pretrained 8×/K64 = non-pretrained 4×/K128"). **On tool-calling everyone collapses (2–9%)** — a regime the papers never
+evaluated (exact-match function calls are far more compression-sensitive). The post-fix uniform re-run + K128 validation
+will confirm the impls reproduce paper-range retention on QA, making the tool-collapse a credible *finding* rather than a repro gap.

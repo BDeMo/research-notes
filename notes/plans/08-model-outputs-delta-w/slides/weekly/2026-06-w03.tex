@@ -1,40 +1,57 @@
-% v1.7.5 milestone deck (compiled 2026-06-14), same format as the 2026-06-w01 weekly.
-% Reports the v1.7.3 -> v1.7.5 arc: the capacity-bound DIAGNOSIS and the do-no-harm CURE it prescribes.
+% June Week 3 weekly: Mon 2026-06-15 to Sun 2026-06-21.
+% This week the v1.7.5 experiments LANDED: cross-model breadth, module ablation, a deployable (test-agnostic)
+% gate threshold, signal selection, and the honest net-win gap. Recall + Preliminaries per slide conventions.
 
-\section{Plan 08 v1.7.5 (Diagnosis and Cure)}
+\section{June Week 3 (Mon 2026-06-15 to Sun 2026-06-21)}
 
-\begin{frame}{Plan 08 v1.7.5: Milestone Record}
+\begin{frame}{Reporting Period}
   \begin{center}
-    \small Milestone compiled 2026-06-14 (June Week 2 work). \\
-    \scriptsize Covers the v1.7.3 $\to$ v1.7.5 arc; detailed facts in linked GitHub notes.
+    \textbf{Plan 08 / Paper B --- June Week 3} \\[0.3em]
+    \small Mon 2026-06-15 to Sun 2026-06-21 \\
+    \scriptsize Weekly progress / fact record. Detailed facts + settings in the linked GitHub notes.
   \end{center}
 \end{frame}
 
-\begin{frame}{Continuity From v1.6 / v1.7.3}
-  \begin{block}{Earlier question}
-    Can a learned, gated soft-prompt memory around a frozen base usefully compress long context?
+% ---- per the convention: busy collaborators have no context; recall + define terms first ----
+\begin{frame}{Recall: Why We Are Doing This}
+  \begin{block}{The problem}
+    Feeding an LLM a long context every turn is slow and expensive. We study whether we can \textbf{compress the
+    context into a few latent ``memory'' tokens} a \emph{frozen} base model reads --- and, when that compression
+    would lose what the query needs, \textbf{fall back to the full context} (``do-no-harm'').
   \end{block}
   \begin{itemize}
-    \item v1.6/v1.7 built the gated compressor and reported encouraging tool/RCA numbers.
-    \item A code review then found a \textbf{train/eval leakage} (71--96\%); the clean redo is \textbf{v1.7.3}.
-    \item v1.7.4 then \emph{tried to fix} long-context compression (length-adaptive memory, scaling); v1.7.5
-      adds training-stability rigor.
-    \item The story moves from ``build a better compressor'' to a \textbf{capacity-bound diagnosis} plus the
-      \textbf{do-no-harm cure} it prescribes.
+    \item \textbf{Last week:} a clean (leak-free, stable-training) study reframed the work from ``build a better
+      compressor'' to a \textbf{capacity-bound diagnosis} + the \textbf{do-no-harm gate} it prescribes.
+    \item \textbf{This week:} the supporting experiments actually \emph{landed} --- cross-model breadth, a module
+      ablation, a \emph{deployable} gate threshold, and an honest read of what is still missing.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{This Milestone: Main Message}
-  \begin{block}{Diagnosis $\to$ Cure}
-    Soft/KV context compression for a frozen LLM is \textbf{capacity-bound}; the deployable contribution is the
-    \textbf{do-no-harm gate} prescribed by that diagnosis, not a better compressor.
+\begin{frame}{Preliminaries: Terms Used Today}
+  \small
+  \begin{itemize}
+    \item \textbf{Frozen base}: the pretrained LLM; weights never change (so behavior is recoverable).
+    \item \textbf{Learned memory / soft prompt}: $K$ trained latent vectors ($\approx$ ``compressed context'') the base reads.
+    \item \textbf{Compressor}: the module that maps long context $\to$ memory (ours = GCM; rivals = ICAE/Beacon/500x/\dots).
+    \item \textbf{Gate}: a per-input decision --- \emph{keep} the compressed memory (cheap) or \emph{fall back} to full context (safe).
+    \item \textbf{Do-no-harm}: the gate never lowers quality below full context (by construction the base is recoverable).
+    \item \textbf{AUROC}: how well a gate \emph{signal} ranks safe-vs-unsafe inputs (0.5 = chance, 1.0 = perfect).
+    \item \textbf{recall@P95 / coverage}: how much we can safely compress at $\ge$95\% precision (the savings we can claim).
+    \item \textbf{ctx$>$K}: items where the context is longer than the memory budget --- the only items where ``compression'' is real.
+    \item \textbf{test-agnostic threshold}: a gate cutoff set \emph{without} test labels (so it is deployable on any dataset).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{This Week: Main Message}
+  \begin{block}{Diagnosis holds across models; the gate is deployable; the net-win is the open gap}
+    The capacity-bound diagnosis \textbf{reproduces across 5 model families}; a module ablation shows \textbf{only
+    distillation + reconstruction are load-bearing}; and a \textbf{label-free gate threshold} gives do-no-harm on
+    every model --- but its \emph{savings} are still the piece we must prove.
   \end{block}
   \begin{itemize}
-    \item \textbf{Diagnosis}: never beats full; trivial truncation matches full on short context; no scaling;
-      length-adaptive memory does not help; the memory is OOD.
-    \item \textbf{Breadth}: holds across 9 compressors and 5 domains, under a leak-free / held-out / stable-training protocol.
-    \item \textbf{Cure}: the same signals that explain \emph{why} compression fails reveal \emph{when} it fails
-      $\Rightarrow$ a compressor-agnostic gate detects unsafe compression and falls back (never hurts).
+    \item \textbf{Verified}: none of 9 compressors beats full; at real compression (ctx$>$K) trivial truncation beats every learned 2025 baseline; only our GCM beats truncation.
+    \item \textbf{Verified}: cross-model (GLM, Qwen3, Mistral, 2$\times$Llama) + module ablation + a test-agnostic gate threshold.
+    \item \textbf{Open (next)}: the cost-quality net-win (tokens saved at matched quality) vs gate baselines (TARG / entropy / LLM-judge).
   \end{itemize}
 \end{frame}
 
@@ -42,7 +59,7 @@
   \centering
   \small
   \begin{tikzpicture}[
-    scale=0.82, transform shape, node distance=0.75cm and 0.75cm,
+    scale=0.8, transform shape, node distance=0.7cm and 0.7cm,
     box/.style={draw, rounded corners, align=center, minimum width=2.3cm, minimum height=0.85cm, fill=blue!7},
     train/.style={draw, rounded corners, align=center, minimum width=2.4cm, minimum height=0.85cm, fill=green!9},
     warn/.style={draw, rounded corners, align=center, minimum width=2.4cm, minimum height=0.85cm, fill=red!8},
@@ -55,10 +72,9 @@
     \node[train, right=0.85cm of ctx] (wrapper) {Compressor\\$G_\phi$ (any)};
     \node[box, right=0.85cm of wrapper] (mem) {Memory $m$\\(K tokens / KV)};
     \node[gate, right=0.82cm of mem] (gate) {Gate\\trust?};
-    \node[box, above right=0.55cm and 0.82cm of gate] (basew) {Frozen base\\$F_\theta(q,m)$};
-    \node[box, below right=0.55cm and 0.82cm of gate] (base0) {Frozen base\\$F_\theta(q,\text{full ctx})$};
+    \node[box, above right=0.5cm and 0.82cm of gate] (basew) {Frozen base\\$F_\theta(q,m)$};
+    \node[box, below right=0.5cm and 0.82cm of gate] (base0) {Frozen base\\$F_\theta(q,\text{full})$};
     \node[box, right=0.82cm of $(basew)!0.5!(base0)$] (out) {Answer $y$};
-
     \draw[arr] (ctx) -- node[above]{compress} (wrapper);
     \draw[arr] (wrapper) -- (mem);
     \draw[arr] (mem) -- (gate);
@@ -67,106 +83,135 @@
     \draw[arr] (gate) -- node[below, sloped]{unsafe} (base0);
     \draw[arr] (basew) -- (out);
     \draw[arr] (base0) -- (out);
-
-    \node[warn, below=1.0cm of mem] (risk) {Diagnosis: $m$ is OOD\\\& capacity-bound\\$\Rightarrow$ unreliable};
+    \node[warn, below=0.9cm of mem] (risk) {Memory is OOD\\\& capacity-bound\\$\Rightarrow$ unreliable};
     \draw[dashedarr, red!70!black] (risk) -- (gate);
   \end{tikzpicture}
-  \vspace{0.4em}
-  \begin{block}{Cure}
-    The gate reads failure signals (reconstruction quality, base confidence) off \emph{any} compressor's memory
-    and opens it only when safe; otherwise it falls back to full context (frozen base $\Rightarrow$ never hurts).
+  \begin{block}{Idea}
+    The gate reads a cheap failure signal off \emph{any} compressor's memory; opens it only when safe, else falls back to full (never hurts).
   \end{block}
 \end{frame}
 
-\begin{frame}{Diagnosis 1: Bounded by Full and by Truncation}
+\begin{frame}{Verified: No Compressor Beats Full (whole field, real compression)}
   \small
   \begin{table}\centering
     \begin{tabular}{lccc}
       \toprule
-      bench & full & GCM (ours) & \textbf{trunc} (no train) \\
+      method (acc, ctx$>$K) & bfcl\_live\_multiple & hermes$^\dagger$ & bfcl\_multiple \\
       \midrule
-      bfcl\_live\_simple & 0.91 & 0.53 & \textbf{0.91} \\
-      bfcl\_simple & 0.99 & 0.17 & \textbf{0.99} \\
-      bfcl\_live\_multiple & 0.91 & \textbf{0.72} & 0.46 \\
-      toolace & 0.95 & 0.14 & 0.01 \\
+      \textbf{full} (ceiling) & \textbf{0.91} & \textbf{0.93} & \textbf{0.92} \\
+      \textbf{GCM (ours)} & \textbf{0.67} & 0.52 & --- \\
+      trunc (no train) & 0.46 & 0.93$^\dagger$ & 0.59 \\
+      Beacon (best 2025) & 0.31 & 0.85 & 0.24 \\
+      ICAE / Cartridge & 0.22 / 0.34 & 0.67 / 0.46 & 0.08 / 0.12 \\
+      500x / AOC / Gist & 0.09 / 0.05 / 0.00 & 0.51 / 0.34 / 0.34 & 0.10 / 0.10 / 0.00 \\
       \bottomrule
     \end{tabular}
   \end{table}
   \begin{itemize}
-    \item No compressor beats \textbf{full}; on short context trivial \textbf{truncation matches full} and beats the learned compressor.
-    \item The trained encoder beats truncation on only one bench (ctx $\gg K$). Matched-budget: GCM $\ge$ Cartridge $\gg$ Gist.
+    \item Measured on \textbf{ctx$>$K only} (where compression is real), \textbf{matched budget}, faithful re-impls.
+    \item \textbf{Trivial truncation beats every learned 2025 baseline}; \textbf{only GCM beats truncation}; none beats full.
+    \item $^\dagger$hermes is front-loaded (answer in first $K$ tokens) $\Rightarrow$ trunc=full trivially (not a real test).
+  \end{itemize}
+  \scriptsize Setting: v1.7.5 uniform (K64 / 3000 steps / lr3e-4); see results-v1.7.5.md T2$'$.
+\end{frame}
+
+\begin{frame}{Verified: The Diagnosis Reproduces Across Model Families}
+  \small
+  \begin{table}\centering
+    \begin{tabular}{lcccc}
+      \toprule
+      model (bfcl\_live\_multiple) & no-ctx & full & GCM & gate AUROC \\
+      \midrule
+      GLM-4-9B & 0.01 & 0.85 & 0.66 & 0.70 \\
+      Qwen3-4B-2507 & 0.00 & 0.88 & 0.71 & 0.82 \\
+      Ministral-8B & 0.02 & 0.88 & 0.63 & 0.79 \\
+      Llama-xLAM-8B & 0.00 & 0.90 & 0.76 & 0.81 \\
+      ToolACE-8B & 0.00 & 0.88 & 0.72 & 0.90 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \begin{itemize}
+    \item \textbf{5 dense families} (GLM, Qwen3, Mistral, 2$\times$Llama): same story --- necessity holds, compress $\ll$ full, do-no-harm gate recovers $\approx$full.
+    \item Real gate detection (high AUROC) concentrates on high-headroom tool benches; the 2 MoE were dropped (95\,GB OOM).
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Diagnosis 2: No Scaling, Length-Adaptive Does Not Help}
+\begin{frame}{Verified: Module Ablation --- Only Distillation + Reconstruction Matter}
   \small
   \begin{columns}[T]
-    \begin{column}{0.5\textwidth}
-      \begin{block}{No scaling (mix of 12 datasets)}
-        avg compress-acc flat at $\sim$0.26 across
+    \begin{column}{0.52\textwidth}
+      \begin{block}{From the full method, remove one module}
+        \scriptsize (Qwen3-8B; $\Delta$compress-acc vs full config; 2 benches)
         \begin{itemize}\scriptsize
-          \item compute: $3.5\!\times\!10^{15}\to8.4\!\times\!10^{16}$ FLOPs ($24\times$)
-          \item data: $8\times$; depth $N{=}4\to28$ ($N{=}4$ best)
+          \item $-$ \textbf{distillation}: $-0.51$ / $-0.22$ \;\textbf{(collapse)}
+          \item $-$ \textbf{reconstruction}: gate AUROC $0.75\!\to\!0.48$ \;\textbf{(gate dies)}
+          \item $-$ task loss: bench-dependent (keep it)
+          \item depth 16$\to$4, $K$64$\to$4, random init, $-$dev: $\approx$ neutral
         \end{itemize}
       \end{block}
     \end{column}
-    \begin{column}{0.5\textwidth}
-      \begin{block}{Length-adaptive $\approx$ fixed-K}
-        \scriptsize $\Delta$(ch16a $-$ k64) within $\pm0.02$ on every shared bench, incl.\ long ctx (rca 0.094 vs 0.104).
+    \begin{column}{0.48\textwidth}
+      \begin{block}{Takeaway}
+        \scriptsize \textbf{Minimal sufficient method} = a \emph{tiny} encoder ($N\!\approx\!4$, $K\!\approx\!16$) + distillation +
+        reconstruction (which powers the gate) + task loss. Everything else (big encoder, large $K$, alignment
+        losses, OOD fixes) is droppable $\Rightarrow$ supports ``minimize-scale; the gate is the contribution.''
       \end{block}
     \end{column}
   \end{columns}
-  \vspace{0.3em}
-  \begin{itemize}
-    \item More data / depth / compute does \textbf{not} lift compression; chunking the memory buys nothing.
-    \item \textbf{Diagnosis 3 (OOD)}: nearest-vocabulary cosine of memory $\approx0.10$ (decodes to gibberish) $\Rightarrow$ the read interface is the wall.
-  \end{itemize}
 \end{frame}
 
-\begin{frame}{The Cure: Compressor-Agnostic Do-No-Harm Gate}
+\begin{frame}{Verified: A Deployable (Test-Agnostic) Gate Threshold}
   \small
-  \begin{itemize}
-    \item Keep the base \textbf{frozen} (non-merged adapter, off for fallback) $\Rightarrow$ full context always recoverable (never hurts by construction).
-    \item Gate signal (base confidence + reconstruction) is read off \emph{any} compressor's memory $\Rightarrow$ \textbf{transfers across compressors}.
-    \item On a \emph{different} compressor (Cartridge): failure-detection \textbf{AUROC 0.6--0.8}, held-out gated acc $\approx$ full.
-    \item Honest: detection is near chance on most benches; there the value is conservative do-no-harm (gated acc $=$ full), with real detection on conversational benches.
-    \item In progress: gate precision/recall/F1 on the embedding-wise baselines' tokens (the cross-compressor test).
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Paper Framing and Methodological Rigor}
-  \small
-  \begin{block}{Paper target (diagnosis-led)}
-    \emph{Context compression for frozen LLMs is capacity-bound}: a cross-compressor, cross-domain diagnosis,
-    plus the do-no-harm gate it prescribes. We keep it diagnosis-led even where a method performs well.
+  \begin{block}{The deployment question}
+    In production you have no labels --- so you cannot tune the gate cutoff $\tau$ on the test set. \emph{Is there a $\tau$ rule that works on any dataset?}
   \end{block}
   \begin{itemize}
-    \item \textbf{Rigor}: leak-free disjoint splits; held-out 5-fold gate; matched-budget \emph{faithful} baselines
-      (ICAE/AOC/Beacon/500x re-impls); args-aware tool scoring.
-    \item \textbf{v1.7.5 stability}: gradient accumulation + LR warmup/cosine + train/val tracking $\Rightarrow$ the
-      negatives are not a training artifact (forecloses the ``you trained it wrong'' critique).
-    \item Draft: \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/paper/main\_v1.7.5.tex}{paper/main\_v1.7.5.tex}.
+    \item \textbf{Yes, with a calibrated-probability signal} (base ``margin'' = top1$-$top2 prob): a fixed threshold is dataset-independent.
+    \item \textbf{margin $\ge 0.95$ $\Rightarrow$ do-no-harm on all 20 model$\times$bench cells} (worst $-0.01$); coverage \emph{auto-adapts} (compress where safe, fall back where not).
+    \item Intrinsic signals (reconstruction-based) are \emph{not} test-agnostic (arbitrary scale $\Rightarrow$ need per-dataset calibration).
+    \item Signal ranking (T10): agnostic \texttt{neg\_entropy}/\texttt{conf} $\approx$ best intrinsic ($\sim$0.6 mean AUROC); others at chance.
   \end{itemize}
+\end{frame}
+
+\begin{frame}{Honest Status: Good News and the Open Gap}
+  \small
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \textbf{Good news (Verified)}
+      \begin{itemize}\scriptsize
+        \item Diagnosis is robust (whole field, 5 families, leak-free + stable).
+        \item Do-no-harm gate works and is \emph{deployable} (label-free $\tau$).
+        \item Method is minimal (distill + recon + tiny encoder).
+        \item Baselines re-implemented faithfully + at one recipe.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \textbf{Bad news / risk (TODO)}
+      \begin{itemize}\scriptsize
+        \item \textbf{Net-win not yet shown}: do-no-harm holds, but at safe $\tau$ coverage is low $\Rightarrow$ savings are bounded by signal quality. \textbf{This is the make-or-break next experiment.}
+        \item Cross-domain gate transfer (T8c) needs a clean re-run.
+        \item Net-win Pareto vs TARG / entropy / LLM-judge gates = next.
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}{Deliverables and Next Steps}
   \small
-  \begin{tabular}{p{0.26\textwidth}p{0.66\textwidth}}
+  \begin{tabular}{p{0.24\textwidth}p{0.68\textwidth}}
     \toprule
     Item & Link \\
     \midrule
     v1.7.5 results &
-    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/results-v1.7.5/results-v1.7.5.md}{results-v1.7.5.md} (diagnosis + cure) \\
-    Clean v1.7.3 &
-    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/results-v1.7.3/results-v1.7.3.md}{results-v1.7.3.md} \\
-    One-page brief &
-    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/summary-matrix-v1.7.3.md}{summary-matrix-v1.7.3.md} \\
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/results-v1.7.5/results-v1.7.5.md}{results-v1.7.5.md} (T1--T11 + roadmap) \\
+    Deploy / teardown &
+    \href{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-model-outputs-delta-w/papers/paper-b-forgetting-gating/results-v1.7.5/results-v1.7.5.md}{mem-test/deploy/} (PVC bootstrap + recovery, in code repo) \\
     \bottomrule
   \end{tabular}
   \vspace{0.5em}
   \begin{enumerate}
-    \item Land the v1.7.5 same-eval cohort (fixed-K vs length-adaptive, stable + gate signals).
-    \item Cross-compressor gate P/R/F1 (our signal on other compressors' tokens) -- the cure's evidence.
-    \item Finalize the diagnosis-led paper draft; add LLMLingua / retrieval reference points.
+    \item \textbf{TODO (top):} cost-quality \textbf{net-win Pareto} + recall@P95 vs gate baselines (TARG / entropy / LLM-judge) --- the payoff claim.
+    \item \textbf{TODO:} clean cross-task/domain gate-transfer matrix; bootstrap CIs on the headline numbers.
+    \item \textbf{Planned:} fold the remaining uniform-recipe benches; finalize the diagnosis-led paper draft.
   \end{enumerate}
 \end{frame}

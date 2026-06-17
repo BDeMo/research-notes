@@ -45,16 +45,46 @@ grid uses n=96 to tighten.)*
 - **Minimize-scale N×K grid** (`ab_min_*`, free): N∈{2,4}×K∈{8,16,32,64} on bfcl_live_multiple + bfcl_multiple → H4.
 - Per-bench re-analysis (`analyze_scale.py` extended) → H1 (done).
 
-## 5b. Preliminary results (2026-06-15 10:25; sweep 49/80, search benches only)
-- **H2 (capacity K scales?) — REJECTED.** On bfcl_live_multiple (the bench with headroom), compress vs K:
-  K16 0.688 / K32 0.677 / K64 0.688 / K128 0.646 / K256 0.635 — flat / slightly **down**, never up (Δ within
-  noise). So the untested capacity axis also does NOT scale. *Critical review: PASS (n=96; monotone non-increase).*
-- **H4 (minimize scale) — SUPPORTED.** `enc4` 0.708 ≥ `enc16` 0.688 ≥ `enc28` 0.667; `K16` = `K64`. The
-  smallest config (N≈4, K≈16) matches the big one at ~10× less compute → minimize-scale is the cure.
-- **Bonus:** λ_distill is load-bearing — `distill0` collapses to 0.021 (vs base 0.69) on live_multiple.
-- **H5 (OOD-induced ceiling) — PENDING** (manif/mnorm configs not yet run; the potential overturner).
-- **`ab_min` N×K grid (extreme min N2/K8) — PENDING** (runs after the sweep).
-> Net so far: "capacity-bound" survives (depth AND capacity flat); the cure is minimize-scale. Hold for H5.
+## 5b. Results (2026-06-15 13:10; sweep 69/80, search benches bfcl_live_multiple + bfcl_multiple, avg over both)
+- **H2 (capacity K scales?) — REJECTED.** compress vs K (live_multiple): K16 0.688 / K32 0.677 / K64 0.688 /
+  K128 0.646 / K256 0.635 — flat / slightly **down**, never up. The untested capacity axis also does NOT scale.
+  *Critical review: PASS (n=96; monotone non-increase).*
+- **H4 (minimize scale) — SUPPORTED.** `enc4` (avg 0.429) ≥ `enc16`/base (0.371); `K16` = `K64`. The smallest
+  config (N≈4, K≈16) matches the big one at ~10× less compute → minimize-scale is the cure.
+- **H5 (OOD-induced ceiling) — preliminary REJECTED.** `manif01` avg 0.401 ≈ base 0.371 (on live_multiple it is
+  even *lower*, 0.635 vs 0.688); the on-manifold fix does **not** break the ceiling. *manif10 / mnorm landing —
+  will confirm.* So "capacity-bound" survives; OOD is a symptom, not the fixable cause.
+- **★ Best HP = lr 3e-4** (avg over the 2 search benches **0.450** vs base **0.411** on the *same* 2 benches —
+  base lr1e-4 was a touch low). lr5e5 0.423 / lr2e4 0.414 also beat base. Next non-lr: `ch16a` 0.430, `enc4`
+  0.429, `distill10` 0.421. *Critical review: on 2 benches, n=96; live_multiple 0.75 vs base 0.69 is ~1σ —
+  suggestive, not decisive; comparison must use the **common** benches (the analyzer's raw `avg` mixes bench-counts
+  — `base` was over 6 benches incl. the floored hotpot/narrativeqa, so its raw 0.371 is NOT comparable). Confirm lr3e4 on more benches.*
+- **λ_distill is load-bearing** — `distill0` collapses to 0.021 (vs base 0.69) on live_multiple.
+- **`ab_min` N×K extreme-min grid — PENDING** (runs after the sweep, ~2h).
+> Net: "capacity-bound" **survives** (depth, capacity, AND the OOD-fix all fail to scale/rescue). The wins are
+> **tuning** (lr↑ to 3e-4) and **minimize-scale** (N=4/K=16), not more scale. Hold for manif10/mnorm + ab_min.
+
+## 5c. HP sweep data table (compress; sweep 69/80; in-task on the 2 search benches)
+`avg` = mean over the two benches all configs share (bfcl_live_multiple, bfcl_multiple); each cell n=96. Sorted by `avg`.
+| config (Δ vs base) | live_multiple | multiple | **avg** | gate AUROC |
+|---|---|---|---|---|
+| **lr3e4** (lr 3e-4) | 0.750 | 0.150 | **0.450** | 0.65 |
+| ch16a (len-adaptive) | 0.760 | 0.100 | 0.430 | 0.53 |
+| enc4 (N=4) | 0.708 | 0.150 | 0.429 | 0.61 |
+| lr5e5 (lr 5e-5) | 0.729 | 0.117 | 0.423 | 0.54 |
+| distill10 (λ_dist 1.0) | 0.708 | 0.133 | 0.421 | 0.59 |
+| ch32a | 0.698 | 0.133 | 0.416 | 0.59 |
+| lr2e4 (lr 2e-4) | 0.677 | 0.150 | 0.414 | 0.68 |
+| **base** (enc16/K64/lr1e-4/lora32) | 0.688 | 0.133 | 0.411 | — |
+| dev20 / ga4 / lora64 / lora16 / enc8 | ~0.66–0.71 | ~0.10–0.15 | 0.403–0.408 | 0.58–0.67 |
+| **manif01** (A2 OOD-fix, H5) | 0.635 | 0.167 | 0.401 | — |
+| K256 / K32 / initrand / K16 / enc28 | 0.64–0.69 | 0.08–0.15 | 0.384–0.393 | 0.63 |
+| dev0 / ga16 / lora0 / K128 | 0.65–0.69 | 0.08–0.12 | 0.365–0.382 | — |
+| **distill0** (no distill) | **0.021** | 0.117 | **0.069** | — |
+
+Reading: **lr3e4 tops** (0.450 vs base 0.411); the **OOD-fix (manif01) sits mid-pack at base level** (H5 reject);
+**bigger K is worse** (K128/K256 near the bottom); **distill0 collapses**. (manif10/mnorm/rec/the other-domain
+columns + the `ab_min` extreme-min grid still landing — table fills out then.)
 
 ## 5. What the 10h report will answer
 1. Does capacity ($K$) scale on a learnable bench (H2)? — decides "minimize K" vs "scale K".

@@ -1,10 +1,25 @@
 # Plan 08 — Model Outputs ΔW as Part of Generation (Self-Modifying LLMs)
 
-> **Status**: **v1 paper submitting (characterization)** · v1.5 intrinsic gating in progress · north star (self-modifying ΔW) on hold pending v2
-> **Created**: 2026-05-26 · **Last updated**: 2026-06-04
+> **Status**: **Paper B = v1.7.5 (gated context compression, do-no-harm)** — diagnosis + cure; this week cross-model + module ablation + deployable gate **landed**; **net-win Pareto = open gap** · north star (self-modifying ΔW) parked
+> **Created**: 2026-05-26 · **Last updated**: 2026-06-17
 > **Owner**: Mingjia
 > **Parent idea**: brainstorm H6 (also entangles H3, H7, I3)
 > **One-liner**: At each turn, the model produces not just an answer $y$ but also a **weight delta $\Delta W$** representing what it just learned. A verifier decides whether to apply, reject, or scale $\Delta W$. Over time, the model literally rewrites itself.
+
+## Paper B (current line) — v1.7.5: gated context compression
+
+> **The active work is Paper B**: a *learned latent memory + do-no-harm gate* for a frozen LLM (compress the
+> context into K latent tokens; fall back to full context when compression is unsafe). The v1/ΔW north star
+> (below) is parked. Everything current lives under [`papers/paper-b-forgetting-gating/`](papers/paper-b-forgetting-gating/).
+
+- **Results + live experiment matrix (T1–T11 + roadmap):** [`results-v1.7.5/results-v1.7.5.md`](papers/paper-b-forgetting-gating/results-v1.7.5/results-v1.7.5.md)
+- **This week's slides:** [`slides/weekly/2026-06-w03.tex`](slides/weekly/2026-06-w03.tex) (deck wrapper [`slides/main.tex`](slides/main.tex))
+- **Deploy / recovery / teardown (code repo):** `mem-test/deploy/` — `pod_bootstrap.sh`, `DEPLOY.md`, `TEARDOWN.md` (`/mnt/persist` is a **PVC** on sam-dev-free; results survive pod deletion).
+
+### Weekly human update — week of 2026-06-15
+- **Verified:** the capacity-bound diagnosis **reproduces across 5 model families** (GLM, Qwen3, Mistral, 2× Llama); at real compression (ctx>K) **trivial truncation beats every learned 2025 baseline, only our GCM beats truncation, none beats full**; a **module ablation** shows only **distillation + reconstruction** are load-bearing (everything else reducible/droppable); a **test-agnostic gate threshold** (`margin ≥ 0.95`) gives do-no-harm on all 20 model×bench cells.
+- **Open gap (next):** the **net-win** — tokens saved at matched quality vs gate baselines (TARG / entropy / LLM-judge). Do-no-harm holds, but coverage at a safe threshold is low, so the savings claim must still be proven.
+- **Infra:** all runs on `/mnt/persist` (PVC); fast new-pod recovery + safe teardown are scripted in `mem-test/deploy/`.
 
 ## v1 (mem-X / soft-prompt) — current paper-submitting branch
 
