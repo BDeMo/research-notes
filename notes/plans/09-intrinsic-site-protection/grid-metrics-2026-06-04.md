@@ -1,13 +1,5 @@
 # Janus — unified intrinsic-metric grid (12 angles × 39 metrics × 12 datasets, 2026-06-04)
 
-> ⛔ **SUPERSEDED (2026-06-04 eve).** The "every LC head-metric positively predicts every CF
-> metric, no negative cell" headline is a **pooled-grid artifact** (depth + activation magnitude +
-> the hybrid Qwen3.5). Under within-layer + partial(|out_norm) controls it dissolves/reverses →
-> long-context heads are gradient-**shielded** (see
-> [`mechanism-results-2026-06-04.md`](mechanism-results-2026-06-04.md);
-> [`cohort-grid-results-2026-06-04.md`](cohort-grid-results-2026-06-04.md) already flags 4
-> sign-inconsistent pairs). Kept as the v1 pooled-correlation artifact.
-
 > Focus (user): the two frontiers are **long-context = inference (LC)** and **catastrophic forgetting = training (CF)**. This run builds the full decoupled metric grid and asks the headline question: **do the sites that carry LC behaviour predict the sites that CF perturbs?**
 
 ## What ran

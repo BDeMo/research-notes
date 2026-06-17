@@ -1,10 +1,5 @@
 # Janus — Metric reference (codebook) + full correlation ranking
 
-> ⚠️ **The correlation RANKING here is the v1 pooled-grid result; the head-level LC↔CF coupling it
-> implies was falsified under controls** (see
-> [`mechanism-results-2026-06-04.md`](mechanism-results-2026-06-04.md) — surviving fact is
-> gradient-shielding). The **metric definitions / codebook (PART II) remain valid and current.**
-
 > Complete reference for the 39 intrinsic metrics: **how each is computed, why it's
 > designed that way, how to read it, and its range** — plus the **full correlation
 > ranking** from the 41-cell grid. Companion to [`grid-metrics-2026-06-04.md`](grid-metrics-2026-06-04.md)
