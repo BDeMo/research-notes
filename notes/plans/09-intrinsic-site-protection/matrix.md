@@ -19,56 +19,6 @@
 
 ---
 
-## 0 · GATE · ACTIVE LINE (2026-06-05): Paper B — "Know When to Fall Back"
-> **Paper B = the v1.5 wrapper/gating line (Plan 08 v1.5), NOT Janus/Plan 09.** Docs filed here
-> for now; to be relocated to the wrapper line. Janus (this plan) = Paper A.
-> Spec: [`gate-pipeline-2026-06-05.md`](gate-pipeline-2026-06-05.md) · scope+litreview+novelty:
-> [`gate-scope-litreview-2026-06-05.md`](gate-scope-litreview-2026-06-05.md) · ICLR self-review:
-> [`gate-critical-review-2026-06-05.md`](gate-critical-review-2026-06-05.md).
-
-**Scope (locked 2026-06-05): parametric / latent-space *agentic* memory** (MemoryLLM/Memory³/ICAE
-substrate, not text-RAG). **Idea.** Compress context → latent memory (wrapper); a **gate** decides
-per-query if memory suffices, else **fall back to full context**. Fallback ⇒ correctness floor ⇒
-the whole game is **gate reliability** ⇒ study the **gating signal**, not the architecture.
-
-**Novelty wedge (after 2026 audit).** Gated escalation is now crowded in *non-parametric* agent
-memory (D-Mem/Oblivion/RF-Mem/HyMem, all 2026) and latent-memory models (MemoryLLM/M+/Memory³)
-have *no* reliability gate. We fill the empty cell: **latent memory × read-path reliability gate ×
-full-context fallback**, + the first **systematic signal study** (D1–D6, cross-X, calibration) +
-**latent-specific signals** (counterfactual-KL, retrieval-head routing onto slots) that beat
-LLM-judge/entropy cheaper. Defense: [`gate-scope-litreview-2026-06-05.md`](gate-scope-litreview-2026-06-05.md) §3.
-
-**Why it's a paper (and the risk).** Surviving seam after the 2026 audit (D-Mem / Entropy-Gate /
-SLT / RazorAttention all do gate-or-fallback in pieces): make the contribution a **cheap,
-mechanism-grounded, calibrated signal** that **matches the LLM-judge at ≫10× lower cost** + a
-**cross-shift guarantee**. Reviewer sim verdict: current scope = reject (~4.7, "confidence-signal
-benchmark"); +baselines+oracle+trained-compressor → accept (~6.7); +conformal guarantee+deployment
-→ spotlight (~7.5). Contribution, not coverage, is the gate.
-
-**"Good signal" = D1–D6** (falsifiable): in-domain AUROC≥0.7 · sig·boot-CI · universality
-coverage@0.7≥0.8 + sign-consistent · cross-domain/task/dataset transfer (ΔAUROC≤0.05, ECE≤0.1) ·
-cheap (≤10% overhead, no full-ctx) · Pareto-dominates random/entropy/LLM-judge.
-
-**Code.** `gate_study.py` (collect labels+13 signals) · `gate_analyze.py` (scorecard:
-AUROC/universality/LODO/LOMO). **Fix applied:** Qwen3 **thinking-mode off** + strip `<think>` +
-concise prompt → qwen3-8b/squad full_acc **0.30→1.0** (and de-poisons confidence signals).
-
-**Status (running).** ray 4×H100, **8 models × 8 datasets = 64 cells** (glm4-32b dropped — not
-cached offline; qwen3.5-4b added), n=60. Now driven by the **`gpu-runq` monitor** (tmux daemon on
-ray), not the orch scripts.
-
-**Clean scorecard (post `<think>`-fix; 13 bases / 663 items — see
-[`gate-scope-litreview-2026-06-05.md`](gate-scope-litreview-2026-06-05.md) §3.1b):** generation
-confidence wins — `ans_entropy` median AUROC **0.88**, coverage@0.7 **1.0**, transfers LODO/LOMO
-**~0.87**. The latent-specific proxies (`kl_mem_vs_q`, `attn_to_mem`) are at the bottom (~0.60) →
-**N3 not yet supported**; needs the real retrieval-head-routing signal on a trained wrapper.
-
-**TODO-B:** (1) full clean fanout → scorecard. (2) D-Mem-judge + Entropy-Gate + oracle baselines
-in-harness + Pareto. (3) trained-wrapper transfer (Activation-Beacon/ICAE). (4) conformal fallback
-guarantee + latency table. (5) LoCoMo head-to-head vs D-Mem.
-
----
-
 ## 0 · Status (one screen)
 
 | # | item | state |

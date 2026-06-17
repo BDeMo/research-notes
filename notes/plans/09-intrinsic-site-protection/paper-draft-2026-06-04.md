@@ -1,12 +1,5 @@
 # Janus: One Site, Two Frontiers — Long-Context (Inference) and Catastrophic Forgetting (Training) Are Governed by the Same Intrinsic Heads
 
-> ⛔ **SUPERSEDED (2026-06-04 eve) — the head-level "same heads" thesis was FALSIFIED.** Under
-> partial(|out_norm) + within-layer + bootstrap-CI controls the coupling dissolves and, within a
-> layer, **reverses**: long-context heads receive *smaller* SFT gradients (gradient-**shielding**).
-> The live paper is [`paperA-plan-2026-06-05.md`](paperA-plan-2026-06-05.md); the controlled
-> re-analysis is [`mechanism-results-2026-06-04.md`](mechanism-results-2026-06-04.md). This draft is
-> retained as the v1 pooled-grid artifact only — do not cite its abstract/§5.4 as current.
-
 *Working paper draft · Plan 09 · 2026-06-04. Status: measurement complete (G); causal test (H3) running.*
 
 ---

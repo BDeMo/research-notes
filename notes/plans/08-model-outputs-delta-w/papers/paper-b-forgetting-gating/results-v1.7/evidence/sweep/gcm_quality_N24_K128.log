@@ -1,24 +1,0 @@
-2026-06-11 03:15:39.714 | INFO     | llm_infra.models:load_base:93 - loading frozen base: /mnt/persist/checkpoints/Qwen3-8B dtype=bfloat16 device=cuda:1
-[transformers] `torch_dtype` is deprecated! Use `dtype` instead!
-Loading weights:   0%|          | 0/399 [00:00<?, ?it/s]Loading weights: 100%|██████████| 399/399 [00:00<00:00, 7077.36it/s]
-Using the latest cached version of the dataset since emozilla/quality couldn't be found on the Hugging Face Hub (offline mode is enabled).
-Found the latest cached dataset configuration 'default' at /mnt/persist/hf-cache/datasets/emozilla___quality/default/0.0.0/7142df0407e16a99e5cda9188edc7db01e8c151a (last modified on Wed Jun  3 12:11:13 2026).
-2026-06-11 03:15:43.674 | INFO     | __main__:main:122 - training gcm on corpus=quality (96 items)
-2026-06-11 03:16:39.988 | INFO     | svc.method:train:120 - [gcm] targets: 96 (enc=24, dec=2, K=128, cond=True, fp32=False, lam_task=1.0, lam_distill=0.0, lam_rec=1.0, lam_dev=0.05)
-Traceback (most recent call last):
-  File "<frozen runpy>", line 198, in _run_module_as_main
-  File "<frozen runpy>", line 88, in _run_code
-  File "/mnt/persist/v17/mem-embedding/src/mem_embedding/gcm/harness.py", line 165, in <module>
-    main()
-  File "/mnt/persist/v17/mem-embedding/src/mem_embedding/gcm/harness.py", line 123, in main
-    m.train(rt, train_items, cfg)
-  File "/mnt/persist/v17/svc/src/svc/method.py", line 154, in train
-    loss.backward()
-  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/torch/_tensor.py", line 631, in backward
-    torch.autograd.backward(
-  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/torch/autograd/__init__.py", line 381, in backward
-    _engine_run_backward(
-  File "/mnt/persist/envs/miniforge3/envs/llm/lib/python3.11/site-packages/torch/autograd/graph.py", line 869, in _engine_run_backward
-    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 594.00 MiB. GPU 1 has a total capacity of 79.19 GiB of which 452.50 MiB is free. Including non-PyTorch memory, this process has 78.74 GiB memory in use. Of the allocated memory 77.34 GiB is allocated by PyTorch, and 742.17 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)
