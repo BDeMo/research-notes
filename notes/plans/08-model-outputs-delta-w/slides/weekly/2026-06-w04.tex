@@ -1,0 +1,133 @@
+% June Week 4 weekly: Mon 2026-06-22 to Sun 2026-06-28.
+% This week: v1.8.0 GCM main table + full gate metrics; the H100 8k memory-wall motivation; the
+% CMG-RCA foundation-model demo shipped (self-contained, one-command deploy); flip-one ablation
+% (method robust, gate is the contribution); honest resource-limited ceiling. Infra: vLLM serving
+% deployed for a colleague on an isolated pod. Recall + Preliminaries per slide conventions.
+
+\section{June Week 4 (Mon 2026-06-22 to Sun 2026-06-28)}
+
+\begin{frame}{Reporting Period}
+  \begin{center}
+    \textbf{Plan 08 / Paper B --- June Week 4} \\[0.3em]
+    \small Mon 2026-06-22 to Sun 2026-06-28 \\
+    \scriptsize Weekly progress / fact record. Detailed facts + settings in the linked GitHub notes.
+  \end{center}
+\end{frame}
+
+\begin{frame}{Recap: Last Week $\to$ This Week}
+  \begin{block}{Where we were}
+    The capacity-bound diagnosis + \textbf{do-no-harm gate} reproduced across model families; the open gap was
+    the \emph{net-win} (savings at matched quality) and a real long-context product story.
+  \end{block}
+  \begin{itemize}
+    \item \textbf{This week (research):} v1.8.0 \textbf{main table with full gate metrics} (F1/precision/recall/fallback),
+      per-base HP tuning, and a \textbf{flip-one ablation} showing the method is robust --- the gate carries the win.
+    \item \textbf{This week (product):} shipped a \textbf{self-contained, one-command CMG-RCA foundation-model demo}
+      and framed the \textbf{hard motivation} (the H100 8k memory wall).
+    \item \textbf{This week (infra):} deployed a shared vLLM service for a colleague on an isolated pod.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{This Week: Main Message}
+  \begin{block}{Under the H100 memory wall, compress + gate is cheaper \emph{and} not worse}
+    On a single 80\,GB H100 an 8--9B model fits only $\sim$8k tokens of full attention; real RCA evidence is far
+    longer. GCM folds the \emph{full} evidence into 256 memory tokens, and the do-no-harm gate keeps quality
+    $\ge$ full --- so the contribution (the gate) holds while the system becomes hardware-feasible.
+  \end{block}
+  \begin{itemize}
+    \item \textbf{Gate metrics (new):} gated-acc $\ge$ full on every bench; on bfcl tool-use the gate even \emph{beats} full (0.86--0.92).
+    \item \textbf{Ablation:} flipping any single knob moves compress by only $\pm$0.03 $\Rightarrow$ the method is robust; the gate is what matters.
+    \item \textbf{Product:} CMG-RCA demo + weights + inference code shipped to GitLab; deployable in one command.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{The Hard Motivation: the H100 8k Memory Wall}
+  \small
+  \begin{block}{Measured wall (not a preference)}
+    A 16k full-context pass OOMs on 80\,GB; the linear-attention variant reaches $\sim$64\,GB at just 2.5k tokens
+    ($O(L^2)$ attention memory). So the \emph{usable} full-attention window for this model class is $\sim$\textbf{8k}.
+  \end{block}
+  \begin{itemize}
+    \item Internal \textbf{CMG-RCA} evidence: median \textbf{7.5k}, \textbf{max 28{,}610} tokens; \textbf{37\% (14/38) exceed the 8k window}.
+    \item Under the wall you must \emph{truncate} (drop most evidence) --- unless you \emph{compress}.
+    \item GCM: full evidence $\to$ fixed \textbf{256-token} memory; KV/compute bounded by $K$, not $L$ $\Rightarrow$ any length fits the H100 budget.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Verified: Compress Beats the Truncated Read Under the Wall (same H100)}
+  \small
+  \begin{table}\centering
+    \begin{tabular}{lcc}
+      \toprule
+      condition (internal CMG, n=38, one fixed H100) & module-ID acc & attention tokens \\
+      \midrule
+      no context (prior) & 0.079 & $\sim$0 \\
+      truncated full read (8k, frozen base) & 0.105 & $L=8$k \\
+      \textbf{compressed M (full evidence $\to$ 256)} & \textbf{0.263} & $K=256$ \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \begin{itemize}
+    \item \textbf{2.5$\times$ higher accuracy at $\sim$32$\times$ fewer attention tokens} --- evaluated on \emph{one} GPU to remove fp-rounding noise.
+    \item Best of all checkpoints on this GPU is the served model (\texttt{mt\_all\_distill1}); the do-no-harm gate then guarantees $\ge$ full.
+    \item Honest: CMG is near-random for the base (frozen-base full $\approx$0.13; $\approx$0.21 even memorizing) $\Rightarrow$ the robust win is the \emph{relation} compress$>$full$>$no-ctx.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Verified: Main Table with Full Gate Metrics (do-no-harm holds)}
+  \scriptsize
+  \begin{table}\centering
+    \begin{tabular}{lccccc}
+      \toprule
+      bench (Qwen3.5-9B) & no-ctx & full(trunc) & compress & \textbf{gated} & gate F1 \\
+      \midrule
+      bfcl\_live\_multiple & 0.02 & 0.83 & 0.71 & \textbf{0.86}$\uparrow$ & 0.87 \\
+      hotpot\_qa & 0.29 & 0.58 & 0.34 & 0.66 & 0.36 \\
+      squad\_v2 & 0.22 & 0.64 & 0.24 & 0.66 & 0.21 \\
+      toolace & 0.02 & 0.91 & 0.16 & 0.91 & 0.00 \\
+      narrativeqa & 0.11 & 0.14 & 0.16 & 0.14 & 0.00 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \begin{itemize}
+    \item \textbf{gated $\ge$ full on every bench}; on the headroom bench the gate is discriminative (F1 0.87, prec 0.95, recall 0.81) and \emph{beats} full.
+    \item Low-headroom benches: gate \textbf{never fires} (fallback) $\Rightarrow$ do-no-harm by construction. (Qwen3-8B mirrors this.)
+    \item \textbf{Flip-one ablation (both bases):} norm/recon/dev/depth/recurrent/$K$/LoRA/distill each move compress by only $\pm$0.03 $\Rightarrow$ robust; the gate is the contribution.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Done: CMG-RCA Foundation-Model Demo Shipped}
+  \small
+  \begin{block}{Self-contained, one-command deploy (GitLab \texttt{cmg-rca-foundation})}
+    Everything but the public base model is in the repo: GCM inference code, the trained adapter, the demo
+    server + UI, the 38 CMG cases, and \texttt{deploy.sh} (downloads \texttt{Qwen/Qwen3-8B}, launches in one step).
+  \end{block}
+  \begin{itemize}
+    \item Live interactive demo: per-case \emph{no-ctx / truncated / compressed-M} sources, streaming RCA reports, chat over M, context-window swimlane, and a metrics panel.
+    \item Zero-downtime ops: hot-swap adapter (\texttt{/api/reload}) + hot-update metrics, no restart.
+    \item Honest framing baked in: CMG is a long-context \emph{demo}; the absolute number is ceiling-bound (resource-limited).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Honest Status, Infra, and Next Steps}
+  \small
+  \begin{columns}[T]
+    \begin{column}{0.52\textwidth}
+      \textbf{Verified / done}
+      \begin{itemize}\scriptsize
+        \item Gate metrics + main table; flip-one ablation (robust).
+        \item Memory-wall motivation + same-H100 compress$>$full.
+        \item Foundation demo + weights + code shipped (one-command).
+        \item Infra: shared vLLM (Qwen3.5-9B, OpenAI API) on an \emph{isolated} pod for a colleague.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.48\textwidth}
+      \textbf{Open / running (next)}
+      \begin{itemize}\scriptsize
+        \item \textbf{Ceiling is compute+data}, not the method $\Rightarrow$ large headroom from more RCA data + variable-length training.
+        \item Running: adaptive-$K$ (Qwen3.5), QA-bench HP tuning, encode-length robustness.
+        \item TODO: baseline columns (SFT-LoRA / Cartridge / Gist / TARG / Transformer-XL); cross-model gate table.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+\end{frame}

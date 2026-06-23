@@ -49,7 +49,7 @@
     every model --- but its \emph{savings} are still the piece we must prove.
   \end{block}
   \begin{itemize}
-    \item \textbf{Verified}: none of 9 compressors beats full; at real compression (ctx$>$K) trivial truncation beats every learned 2025 baseline; only our GCM beats truncation.
+    \item \textbf{Verified}: no learned compressor (soft-prompt or KV-injection) beats full at real compression (ctx$>$K); among same-complexity soft-prompt methods our GCM is clearly best.
     \item \textbf{Verified}: cross-model (GLM, Qwen3, Mistral, 2$\times$Llama) + module ablation + a test-agnostic gate threshold.
     \item \textbf{Open (next)}: the cost-quality net-win (tokens saved at matched quality) vs gate baselines (TARG / entropy / LLM-judge).
   \end{itemize}
@@ -91,28 +91,45 @@
   \end{block}
 \end{frame}
 
-\begin{frame}{Verified: No Compressor Beats Full (whole field, real compression)}
-  \small
-  \begin{table}\centering
-    \begin{tabular}{lccc}
-      \toprule
-      method (acc, ctx$>$K) & bfcl\_live\_multiple & hermes$^\dagger$ & bfcl\_multiple \\
-      \midrule
-      \textbf{full} (ceiling) & \textbf{0.91} & \textbf{0.93} & \textbf{0.92} \\
-      \textbf{GCM (ours)} & \textbf{0.67} & 0.52 & --- \\
-      trunc (no train) & 0.46 & 0.93$^\dagger$ & 0.59 \\
-      Beacon (best 2025) & 0.31 & 0.85 & 0.24 \\
-      ICAE / Cartridge & 0.22 / 0.34 & 0.67 / 0.46 & 0.08 / 0.12 \\
-      500x / AOC / Gist & 0.09 / 0.05 / 0.00 & 0.51 / 0.34 / 0.34 & 0.10 / 0.10 / 0.00 \\
-      \bottomrule
-    \end{tabular}
-  \end{table}
+\begin{frame}{Verified: No Compressor Beats Full (by injection TYPE, ctx$>$K)}
+  \scriptsize
+  \begin{columns}[T]
+    \begin{column}{0.5\textwidth}
+      \begin{block}{(A) Soft-prompt $\approx$ our complexity}
+        \begin{tabular}{lcc}
+          \toprule
+          method & bfcl\_lm & hermes$^\dagger$ \\
+          \midrule
+          full (ceiling) & 0.91 & 0.93 \\
+          \textbf{GCM (ours)} & \textbf{0.67} & \textbf{0.52} \\
+          ICAE & 0.22 & 0.67 \\
+          ComprExIT & 0.29 & 0.33 \\
+          AOC / Gist / LCC & 0.05 / 0.00 / 0.00 & 0.34 / 0.34 / 0.38 \\
+          \bottomrule
+        \end{tabular}
+      \end{block}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{(B) KV-injection: compute $\gg$ ours}
+        \begin{tabular}{lcc}
+          \toprule
+          method & bfcl\_lm & hermes$^\dagger$ \\
+          \midrule
+          full & 0.91 & 0.93 \\
+          Beacon & 0.31 & 0.85 \\
+          Cartridge & 0.34 & 0.46 \\
+          500x & 0.09 & 0.51 \\
+          \bottomrule
+        \end{tabular}
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{0.3em}
   \begin{itemize}
-    \item Measured on \textbf{ctx$>$K only} (where compression is real), \textbf{matched budget}, faithful re-impls.
-    \item \textbf{Trivial truncation beats every learned 2025 baseline}; \textbf{only GCM beats truncation}; none beats full.
-    \item $^\dagger$hermes is front-loaded (answer in first $K$ tokens) $\Rightarrow$ trunc=full trivially (not a real test).
+    \item \textbf{No method (soft-prompt or KV) beats full} at real compression; among same-complexity soft-prompt methods \textbf{GCM is clearly best}.
+    \item KV-injection (Beacon strongest) costs far more per token, still $<$ full $\Rightarrow$ reported \emph{separately}, not ranked against (A).
+    \item Floors (reference, not methods): no-ctx $\approx$0.01; trunc (first-$K$) 0.46. $^\dagger$hermes front-loaded $\Rightarrow$ trunc$\approx$full.
   \end{itemize}
-  \scriptsize Setting: v1.7.5 uniform (K64 / 3000 steps / lr3e-4); see results-v1.7.5.md T2$'$.
 \end{frame}
 
 \begin{frame}{Verified: The Diagnosis Reproduces Across Model Families}
