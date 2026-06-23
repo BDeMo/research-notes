@@ -1,0 +1,85 @@
+% Research brief for June 2026, Week 4.
+% Date range: Mon 2026-06-22 to Sun 2026-06-28.
+% Focus (research only): the do-no-harm GATE as the contribution, the new v1.8.0 modules, results, paper path.
+% Keep high-level; CMG-RCA appears only as long-context motivation, NOT as a result.
+
+\begin{frame}
+  \titlepage
+  \vspace{-1.0em}
+  \begin{center}
+    \small Research brief: June 2026, Week 4 \\
+    \scriptsize Date range: Mon 2026-06-22 to Sun 2026-06-28
+  \end{center}
+\end{frame}
+
+\begin{frame}{Research Question (current framing)}
+  \begin{block}{Thesis}
+    A frozen base read through a \emph{compressed} context memory is \textbf{capacity-bound} (the memory is lossy /
+    out-of-distribution). So the contribution is \textbf{not a better compressor} but a \textbf{do-no-harm gate}:
+    per input, trust the cheap compressed memory when a robust intrinsic signal says it is safe, otherwise fall back
+    to full context --- so quality is \textbf{never below full} (by construction), at the compressed cost when safe.
+  \end{block}
+  \begin{itemize}
+    \item \textbf{Compressor = carrier; gate = contribution.} (Reframed from "build a better compressor.")
+    \item Motivation (not a claim): real long-evidence tasks exceed the single-GPU full-attention window $\Rightarrow$ you must truncate or compress.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Method: Three Roles on One Frozen Base}
+  \begin{block}{Architecture (adapters only; base never changes)}
+    \[
+      m = G_\phi(\text{ctx}, q)\quad(\text{encoder}),\qquad
+      y = F_\theta(q,\; m \text{ or full})\quad(\text{reader}),
+    \]
+    \[
+      \text{gate: } g\big(\text{signal}(m)\big) \in \{\text{trust } m,\ \text{fall back to full}\}.
+    \]
+  \end{block}
+  \begin{itemize}
+    \item Trained: $K$ memory tokens + projection MLP + read-LoRA (optionally encoder-LoRA). Remove $\Rightarrow$ exact base (do-no-harm by construction).
+    \item \textbf{New modules (v1.8.0):} reconstruction loss (also powers the \texttt{neg\_recon} gate signal); recurrent over-window encode (length-agnostic); contrastive / VAE / deviation / encoder-LoRA / normalization as ablation knobs; the \textbf{gate} now has a \textbf{3-way adaptive} variant (base $\to$ compress $\to$ full) and a \textbf{TARG baseline}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Results: the Gate Holds; the Method is Robust}
+  \small
+  \begin{columns}[T]
+    \begin{column}{0.55\textwidth}
+      \begin{block}{Do-no-harm (gated $\ge$ full)}
+        \scriptsize
+        \begin{tabular}{lccc}
+          \toprule
+          bench & full & compress & \textbf{gated} \\
+          \midrule
+          bfcl tool-use & 0.83 & 0.71 & \textbf{0.86}$\uparrow$ \\
+          hotpot\_qa & 0.58 & 0.34 & 0.66 \\
+          squad\_v2 & 0.64 & 0.24 & 0.66 \\
+          toolace & 0.91 & 0.16 & 0.91 \\
+          \bottomrule
+        \end{tabular}
+        \scriptsize (Qwen3.5-9B; gate F1 0.87 on bfcl)
+      \end{block}
+    \end{column}
+    \begin{column}{0.45\textwidth}
+      \begin{block}{Robust to hyperparameters}
+        \scriptsize Flip-one ablation (both bases): norm / recon / dev / depth / recurrent / $K$ / LoRA / distill each move compress by only $\pm0.03$.
+        \[ \Rightarrow \text{no single knob is load-bearing} \]
+        \textbf{The gate is the contribution}, not a finely-tuned compressor.
+      \end{block}
+    \end{column}
+  \end{columns}
+  \vspace{0.3em}
+  \begin{itemize}\scriptsize
+    \item \textbf{Capacity-bound}: compress $\ll$ full on most benches (lossy memory) $\Rightarrow$ the gate, not a bigger compressor, is the answer.
+    \item On the headroom bench the gate \emph{beats} full (trusts $m$ where $m$ is right, falls back where not).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Paper Path and Honest Scope}
+  \begin{itemize}
+    \item \textbf{Contributions:} (C1) quantify forgetting (SFT) + negative transfer; (C2) in-domain lift + sharp boundary; (C3) \textbf{do-no-harm gate}, cross-model, zero-tuning; (C4) intrinsic gate signal study; (C5) honest negatives.
+    \item \textbf{Baselines (in progress):} SFT-LoRA (forgetting), Cartridge-/Gist-lite (memory), \textbf{TARG} (gate), Transformer-XL (long-ctx, no compression).
+    \item \textbf{Honest:} the specific signal is an \emph{ablation} --- a trivial base-uncertainty (TARG) gate is competitive; we frame the \emph{gating approach} + cross-model robustness, not signal supremacy.
+    \item \textbf{Next:} cost--quality net-win (tokens saved at matched quality) vs gate baselines; cross-model gate table.
+  \end{itemize}
+\end{frame}
