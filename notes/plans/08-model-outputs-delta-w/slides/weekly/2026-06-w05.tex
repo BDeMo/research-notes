@@ -12,123 +12,90 @@
   \end{center}
 \end{frame}
 
-\begin{frame}{Executive Message}
-  \begin{block}{From ``make compression work'' to a long-context research thesis}
-    The v1.8.0 work showed that a learned memory plus a gate can be useful, but
-    it also showed that the carrier itself is not the whole story. This week we
-    shifted to a public long-context fact-base: when do existing black-box
-    methods work, when do they fail, and what gap should the next paper target?
+\begin{frame}{Scientific Question}
+  \small
+  \begin{block}{Main question}
+    When a model faces long evidence, what should it keep, what should it ignore,
+    and how can it know whether its reduced context is still reliable?
+  \end{block}
+  \begin{block}{Why this is scientific, not only engineering}
+    ``Long context'' is not one capability. It decomposes into retrieval,
+    local extraction, distributed semantic reasoning, distractor robustness, and
+    architecture-dependent memory access.
   \end{block}
   \begin{itemize}
-    \item \textbf{Outcome so far:} v1.8.0 has a working memory+gate recipe on high-headroom tasks.
-    \item \textbf{New research lesson:} no fixed long-context baseline wins across length, task, and model architecture.
-    \item \textbf{Decision needed:} whether to invest in a v2.0.0 paper around adaptive, self-verified evidence memory.
+    \item The core object of study is the \textbf{interaction between task type, context length, and reduction method}.
+    \item The scientific goal is to map this interaction, then design a method
+      that adapts instead of assuming one fixed rule.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{What We Did This Week: Public Long-Context Fact-Base}
+\begin{frame}{Experimental Facts We Established}
   \small
   \begin{itemize}
-    \item Ran / organized a broad black-box baseline campaign on public long-context benchmarks.
-    \item Covered window truncation, KV eviction, prompt compression, RAG, full-context, and no-context references.
-    \item Built a failure-mode map instead of only reporting a leaderboard.
-    \item Wrote the fact-base and diagnosis notes that define the next paper's gap.
-  \end{itemize}
-  \begin{block}{Core output}
-    The research artifact is an empirical map: method $\times$ length $\times$
-    task type $\times$ architecture. It tells us where fixed long-context
-    coping mechanisms break.
-  \end{block}
-\end{frame}
-
-\begin{frame}{Problem Statement: Long Context Is Not One Problem}
-  \small
-  \begin{itemize}
-    \item Sometimes full context is needed; sometimes it is expensive; sometimes it actively hurts.
-    \item Sometimes a recent window is enough; sometimes the answer is far away.
-    \item Sometimes retrieval works; sometimes there is no lexical overlap.
-    \item Sometimes KV eviction is available; sometimes the model architecture has no KV lever.
-  \end{itemize}
-  \begin{block}{Goal}
-    Stop treating long context as a single compression problem. Identify the
-    regimes, then design a method that adapts to the regime.
-  \end{block}
-\end{frame}
-
-\begin{frame}{v1.8.0 Outcome: What Worked}
-  \small
-  \begin{itemize}
-    \item Fixed earlier training/eval artifacts: termination supervision and joint answer signal recovered real compression behavior.
-    \item On high-headroom tool-use, the memory path can be strong: bfcl-style results recovered to the expected range.
-    \item The gate is valuable because it can route away from unsafe memory and preserve a safer path.
-    \item Flip-one ablations show the carrier is not fragile: many knobs move compress by only a few points.
-  \end{itemize}
-  \begin{block}{Interpretation}
-    v1.8.0 validates the direction, but it also tells us that polishing the
-    compressor is not enough. The contribution has to be the decision layer:
-    when to trust memory and when to fall back.
-  \end{block}
-\end{frame}
-
-\begin{frame}{v1.8.0 Caveats: What We Should Not Overclaim}
-  \small
-  \begin{itemize}
-    \item ``Gated $\ge$ full'' can be tautological if the fallback is defined as full; the real claim needs held-out or conformal calibration.
-    \item Best gate signal is benchmark-dependent in the current recipe; this is inelegant.
-    \item Some tasks have little headroom, so compression cannot create value there.
-    \item Cross-domain and long-window behavior still need a cleaner public benchmark story.
-  \end{itemize}
-  \begin{block}{Implication}
-    v1.8.0 should be treated as the working prototype. v2.0.0 should sharpen the
-    claim into a self-verified, out-of-sample reliability story.
-  \end{block}
-\end{frame}
-
-\begin{frame}{Fact-Base Question}
-  \small
-  \begin{block}{Question}
-    Which long-context coping method works, when, and why?
-  \end{block}
-  \begin{itemize}
-    \item Baselines: window / truncation, KV eviction, prompt compression, RAG,
-      full-context and no-context references.
-    \item The goal is not to crown one winner, but to map failure modes across
-      length, task type, and model architecture.
-    \item All paper-facing claims should be grounded in public benchmarks.
+    \item \textbf{Fact 1: fixed baselines are regime-specific.} Window, RAG,
+      prompt compression, and KV eviction each work in some regimes and fail in others.
+    \item \textbf{Fact 2: length changes method ranking.} Attention-based KV
+      eviction works around shorter contexts but can collapse at 16k+.
+    \item \textbf{Fact 3: task type changes method ranking.} Retrieval,
+      extractive QA, global reasoning, and literary MC prefer different context
+      reduction behavior.
+    \item \textbf{Fact 4: more context is not always better.} Full context can
+      hurt when the context introduces distractors or exceeds the model's usable reasoning ability.
+    \item \textbf{Fact 5: model architecture matters.} Linear-attention / GDN-style
+      bases do not expose the same KV-cache lever as dense-attention models.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Key Long-Context Facts}
+\begin{frame}{Current Paper Intro: Story We Can Tell}
+  \small
+  \begin{block}{Intro logic}
+    Modern LLMs can accept longer contexts, but long-context use is not solved:
+    full context is costly and sometimes harmful; simple reduction methods are brittle;
+    and different tasks require different evidence-preservation strategies.
+  \end{block}
+  \begin{itemize}
+    \item Start with the field assumption: longer windows and context compression should help.
+    \item Show the contradiction: the same method can win on retrieval and lose on semantic QA; full context can even hurt.
+    \item Therefore the missing piece is not ``one better compressor'' but a
+      mechanism that can \textbf{adapt to the evidence regime}.
+    \item This motivates learned memory plus a reliability decision.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{What v1.8.0 Already Gives Us}
   \small
   \begin{itemize}
-    \item \textbf{Attention-based KV eviction can collapse past 8k--16k} because the observation window mis-ranks far evidence.
-    \item \textbf{Attention-free or reconstruction-style eviction is more length-robust on retrieval,} but not universally semantic-robust.
-    \item \textbf{Ranking flips by task type:} retrieval, extractive QA, global reasoning, and literary MC behave differently.
-    \item \textbf{Full context can hurt} on some tasks with distractor-heavy or capability-limited settings.
-    \item \textbf{RAG is strong with lexical overlap,} but weak for abstractive or global tasks.
-    \item \textbf{Linear-attention / GDN-style models do not expose a KV lever.}
+    \item A working learned-memory path on high-headroom tasks after fixing
+      termination supervision and joint answer signal.
+    \item A gate/fallback formulation that is useful conceptually: use memory when
+      reliable, fall back when unsafe.
+    \item Ablation evidence that the carrier is not fragile: many knobs move the
+      compressed path by only a few points.
+    \item A clearer negative result: the current gate story must become held-out
+      or conformal, not in-sample threshold picking.
   \end{itemize}
-  \begin{block}{Conclusion}
-    A fixed context-reduction method is not enough.
+  \begin{block}{Takeaway}
+    v1.8.0 is the prototype and evidence base. v2.0.0 should sharpen the claim
+    into a cleaner reliability theory and a better necessity regime.
   \end{block}
 \end{frame}
 
-\begin{frame}{v2.0.0 Paper Direction}
+\begin{frame}{Next Paper Initialization Direction}
   \small
-  \begin{block}{High-level thesis}
-    Long-context reasoning needs adaptive evidence memory,
-    not one fixed compression or retrieval rule.
+  \begin{block}{Working title direction}
+    Adaptive Evidence Memory for Long-Context Reasoning
   \end{block}
   \begin{itemize}
-    \item Full context can be too expensive or misleading.
-    \item Truncation only works when the answer is local.
-    \item RAG only works when lexical overlap is available.
-    \item KV eviction is model-architecture dependent and can fail at long length.
+    \item \textbf{Paper role of the fact-base:} establish that fixed black-box
+      context reduction is not enough.
+    \item \textbf{Paper role of the method:} introduce a memory that preserves
+      evidence and a reliability signal that decides when to trust it.
+    \item \textbf{Core novelty target:} self-verified memory + calibrated routing,
+      not just another compressor.
+    \item \textbf{Evaluation target:} public long-context regimes where window,
+      RAG, prompt compression, and KV eviction fail for different reasons.
   \end{itemize}
-  \begin{block}{Method framing}
-    Build a memory that preserves evidence, verify whether it preserved enough,
-    and route to the cheapest reliable path.
-  \end{block}
 \end{frame}
 
 \begin{frame}{v2.0.0 Ideas}
@@ -143,7 +110,7 @@
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{What We Need To Run Next}
+\begin{frame}{Next Experiments To Initialize}
   \small
   \begin{itemize}
     \item \textbf{M1: Hybrid Evidence Memory} --- reader sees raw recent window + compressed global memory.
