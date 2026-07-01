@@ -1,0 +1,213 @@
+% June Week 5 weekly: Mon 2026-06-29 to Sun 2026-07-05.
+% This week: leader-facing summary of v1.8.0 outcome, CMG-RCA foundation demo,
+% public long-context baseline fact-base, and v2.0.0 decision options.
+
+\section{June Week 5 (Mon 2026-06-29 to Sun 2026-07-05)}
+
+\begin{frame}{Reporting Period}
+  \begin{center}
+    \textbf{Plan 08 / Paper B --- June Week 5} \\[0.3em]
+    \small Mon 2026-06-29 to Sun 2026-07-05 \\
+    \scriptsize Leader update: v1.8.0 outcome, v2.0.0 options, and resource ask.
+  \end{center}
+\end{frame}
+
+\begin{frame}{Executive Message}
+  \begin{block}{From CMG-RCA demo to long-context foundation-model research}
+    We packaged a deployable CMG-RCA foundation-model demo, then used public
+    long-context experiments to understand where fixed context-reduction methods
+    fail. The next paper should focus on adaptive knowledge extraction plus a
+    reliability-gated fallback.
+  \end{block}
+  \begin{itemize}
+    \item \textbf{Outcome so far:} extracted knowledge beats truncated context on the CMG-RCA demo.
+    \item \textbf{Research lesson:} no fixed long-context baseline wins across length, task, and model architecture.
+    \item \textbf{Decision needed:} whether to invest in the next phase: compute, data, and public paper experiments.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{What We Built: CMG-RCA Foundation Repo}
+  \small
+  \begin{block}{Deployable handoff package}
+    \texttt{https://gitlabe2.ext.net.nokia.com/s1shi/cmg-rca-foundation}
+  \end{block}
+  \begin{itemize}
+    \item \textbf{Demo/deploy:} \texttt{deploy.sh}, \texttt{server.py}, \texttt{static/index.html}.
+    \item \textbf{Model/code:} \texttt{gcm/}, \texttt{adapters/mt\_all\_distill1\_adapters.pt}.
+    \item \textbf{Data/results:} \texttt{data/cmg\_rca\_cases.jsonl}, \texttt{overall.json}, \texttt{SAMPLES.md}, \texttt{README.md}.
+    \item \textbf{Generated labels:} \texttt{data/generated\_cmg\_rca\_analysis/}.
+  \end{itemize}
+  \begin{block}{Why this matters}
+    The work is now runnable and reviewable, not only a set of experiment scripts.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Problem: CMG-RCA Is a Deployment-Scale Long-Context Task}
+  \small
+  \begin{itemize}
+    \item A CMG-RCA case can contain logs, telemetry, traces, tech-support files,
+      previous reports, and retrieved evidence.
+    \item Full raw evidence can be near or above the practical serving window.
+    \item Full-context inference can hit GPU memory limits; truncation can remove
+      the evidence needed for RCA; no-context has little CMG-specific prior.
+  \end{itemize}
+  \begin{block}{Goal}
+    Extract useful RCA knowledge from long evidence in a deployable way, then
+    decide whether that extracted knowledge is reliable enough to use.
+  \end{block}
+\end{frame}
+
+\begin{frame}{v1.8.0 Outcome: Extracted Knowledge Beats Truncation}
+  \small
+  \begin{table}\centering
+    \begin{tabular}{lc}
+      \toprule
+      setting & CMG module-ID accuracy \\
+      \midrule
+      no context & 0.079 \\
+      truncated full context & 0.105 \\
+      \textbf{extracted knowledge} & \textbf{0.263} \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+  \begin{itemize}
+    \item The absolute number is early-stage.
+    \item The important result is the ordering:
+      \texttt{extracted knowledge > truncated full context > no context}.
+    \item This validates the deployment motivation: under a memory wall, the
+      extracted-knowledge path is more useful than simply truncating raw evidence.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{v1.8.0 Caveats}
+  \small
+  \begin{itemize}
+    \item Internal CMG is used as the demo and product motivation, not as the main
+      paper benchmark.
+    \item Some early CMG numbers may be optimistic if trained before module-name
+      masking; clean paper claims should use public data.
+    \item External generalization is not solved yet.
+    \item The current result is small-scale and mostly single-turn.
+  \end{itemize}
+  \begin{block}{Implication}
+    CMG proves the deployment need. The paper should be validated on public
+    long-context benchmarks.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Public Long-Context Fact-Base}
+  \small
+  \begin{block}{Question}
+    Which long-context coping method works, when, and why?
+  \end{block}
+  \begin{itemize}
+    \item Baselines: window / truncation, KV eviction, prompt compression, RAG,
+      full-context and no-context references.
+    \item The goal is not to crown one winner, but to map failure modes across
+      length, task type, and model architecture.
+    \item Paper claims should be grounded in public benchmarks; CMG remains the
+      internal motivating demo.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Key Long-Context Facts}
+  \small
+  \begin{itemize}
+    \item \textbf{Attention-based KV eviction can collapse past 8k--16k.}
+    \item \textbf{Attention-free or reconstruction-style eviction is more length-robust on retrieval.}
+    \item \textbf{Ranking flips by task type:} retrieval, extractive QA, global reasoning,
+      and literary MC behave differently.
+    \item \textbf{Full context can hurt} when distractors dominate.
+    \item \textbf{RAG is strong with lexical overlap,} but weak for abstractive or global tasks.
+    \item \textbf{Linear-attention / GDN-style models do not expose a KV lever.}
+  \end{itemize}
+  \begin{block}{Conclusion}
+    A fixed context-reduction method is not enough.
+  \end{block}
+\end{frame}
+
+\begin{frame}{v2.0.0 Paper Direction}
+  \small
+  \begin{block}{High-level thesis}
+    Long-context RCA and agentic reasoning need adaptive knowledge extraction,
+    not one fixed compression or retrieval rule.
+  \end{block}
+  \begin{itemize}
+    \item Full context can be too expensive or misleading.
+    \item Truncation only works when the answer is local.
+    \item RAG only works when lexical overlap is available.
+    \item KV eviction is model-architecture dependent and can fail at long length.
+  \end{itemize}
+  \begin{block}{Method framing}
+    Extract useful knowledge from long evidence; verify whether it is reliable;
+    fall back when it is not.
+  \end{block}
+\end{frame}
+
+\begin{frame}{v2.0.0 Ideas}
+  \small
+  \begin{enumerate}
+    \item \textbf{Self-verified extracted memory:} train the memory to preserve evidence;
+      use that preservation/reconstruction signal as the reliability check.
+    \item \textbf{Reliability-gated fallback:} use extracted knowledge when safe;
+      otherwise fall back to raw context, retrieval, or a higher-cost path.
+    \item \textbf{Adaptive budget:} easy contexts get fewer memory tokens; dense or
+      ambiguous contexts get more.
+    \item \textbf{Public benchmark story:} use public long-context tasks for paper
+      claims; keep CMG as the applied internal demo.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Current Resource Bottlenecks}
+  \small
+  \begin{columns}[T]
+    \begin{column}{0.49\textwidth}
+      \textbf{Compute}
+      \begin{itemize}\scriptsize
+        \item Sub-10B experiments already require multiple GPUs.
+        \item Practical training/evaluation is around 4 GPUs.
+        \item Larger models / longer windows likely need 8--32 H100s or more.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \textbf{Data}
+      \begin{itemize}\scriptsize
+        \item Curated CMG distillation data: about 3K examples.
+        \item \texttt{cmg\_distill}: 1,860 train + 1,178 test.
+        \item Location: \texttt{sam-dev-d1525-gpu4:/mnt/persist/datasets/cmg\_distill/}.
+        \item Built with Opus distillation plus human filtering; useful but expensive to scale.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \begin{block}{Open question}
+    Will real RCA reports plus distillation/human filtering remain effective at scale?
+  \end{block}
+\end{frame}
+
+\begin{frame}{What Leaders Need to Decide}
+  \small
+  \begin{description}
+    \item[Option A: Demo / applied path] Focus on CMG-RCA deployability and an internal RCA assistant prototype.
+    \item[Option B: Paper / research path] Focus on public long-context benchmark story and v2.0.0 method.
+    \item[Option C: Both, scoped] Keep CMG as applied demo; use public benchmarks for paper claims.
+  \end{description}
+  \begin{block}{Recommendation}
+    Option C, but with clear scope and explicit GPU / data budget.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Recommended Next Step}
+  \small
+  \begin{itemize}
+    \item Finish CMG gating result for the demo.
+    \item Keep CMG-RCA foundation repo updated as applied deliverable.
+    \item Complete public long-context fact-base and figures.
+    \item Define v2.0.0 method around self-verified extracted memory.
+    \item Run the minimum experiments needed to decide whether the next paper is viable.
+  \end{itemize}
+  \begin{block}{Ask}
+    Approve GPU budget for public long-context sweeps and method experiments;
+    approve data budget / plan for scaling RCA supervision beyond current 3K
+    curated examples.
+  \end{block}
+\end{frame}
