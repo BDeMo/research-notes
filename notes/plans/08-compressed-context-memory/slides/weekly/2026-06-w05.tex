@@ -30,6 +30,39 @@
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Background: What Did We Test?}
+  \scriptsize
+  \begin{columns}[T]
+    \begin{column}{0.49\textwidth}
+      \textbf{Benchmarks = task regimes}
+      \begin{itemize}
+        \item \textbf{RULER / NIAH:} synthetic needle retrieval; controls length.
+        \item \textbf{numerical / categorical / coding NIAH:} exact value, label, or code-style retrieval.
+        \item \textbf{SQuAD v2:} local extractive QA; tests whether a recent window is enough.
+        \item \textbf{HotpotQA:} multi-hop QA; evidence is distributed.
+        \item \textbf{NarrativeQA / QuALITY:} long, abstractive/global reading; tests focus under distractors.
+        \item \textbf{TriviaQA / LoCoMo / MuSR:} noisy evidence, dialogue memory, and reasoning variants.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.49\textwidth}
+      \textbf{Baselines = context-reduction strategies}
+      \begin{itemize}
+        \item \textbf{full / no-context:} ceiling and floor.
+        \item \textbf{window / truncation:} assumes answer is local or recent.
+        \item \textbf{RAG / BM25:} assumes query and evidence share lexical overlap.
+        \item \textbf{Prompt compression (LLMLingua):} assumes token salience predicts usefulness.
+        \item \textbf{KV eviction:} SnapKV/H2O/Expected/TOVA, Streaming, Knorm, KVzip/FastKVzip.
+        \item \textbf{Token merging:} tests whether similar tokens/spans can be merged without losing the answer.
+      \end{itemize}
+    \end{column}
+  \end{columns}
+  \vspace{0.4em}
+  \begin{block}{Readout}
+    The experiment matrix asks which method fails in which task regime, not only
+    which method has the best average score.
+  \end{block}
+\end{frame}
+
 \begin{frame}{Background: Qwen3.5 / 3.6 Hybrid GDN Stack}
   \scriptsize
   \begin{center}
