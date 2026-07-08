@@ -9,9 +9,9 @@
 > where the wrapper helps and where it doesn't.
 >
 > **Settings / provenance:** dataset/result references here predate the final
-> v1 registry. Use [`settings.md`](settings/settings.md) for current setting IDs; final
+> v1 registry. Use [`settings.md`](../settings/settings.md) for current setting IDs; final
 > v1 benchmark cells use
-> [`P08-S2`](settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
+> [`P08-S2`](../settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
 
 ## What we have
 

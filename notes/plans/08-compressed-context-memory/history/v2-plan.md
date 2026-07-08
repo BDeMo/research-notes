@@ -6,7 +6,7 @@
 > **Parent**: Plan 08 v0 / v1 (`v0-learned-memory-wrapper.md`,
 > `v0-paper-target-2026-05-31.md`)
 > **Setting / provenance**: design claims in this file use
-> [`P08-S4`](settings/settings.md#p08-s4--v2-design-setting). No v2 result should be
+> [`P08-S4`](../settings/settings.md#p08-s4--v2-design-setting). No v2 result should be
 > treated as verified until it is added to `settings.md` with a new result
 > setting.
 > **One-liner**: A lightweight wrapper on a *frozen* base LM that writes

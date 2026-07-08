@@ -2,7 +2,7 @@
 
 > Full Related-Work for *adaptive latent memory for LLM agents: a detachable, gated, do-no-harm memory*.
 > Consolidates + supersedes the scattered notes ([`baselines-and-novelty.md`](baselines-and-novelty.md),
-> [`scope-and-compression.md`](scope-and-compression.md), [`../../summary/2026-06-05/v1.5-related-work-2026-06-05.md`](../../summary/2026-06-05/v1.5-related-work-2026-06-05.md),
+> `scope-and-compression.md`, [`../../summary/2026-06-05/v1.5-related-work-2026-06-05.md`](../../summary/2026-06-05/v1.5-related-work-2026-06-05.md),
 > [`../../summary/2026-06-05/two-paper-litreview-2026-06-05.md`](../../summary/2026-06-05/two-paper-litreview-2026-06-05.md)).
 > Six families; each ends with **OUR DELTA**. Honest one-liner: *Cartridges (the module) + TARG (the
 > gate) bracket us; our white space is the **do-no-harm treatment** of a learned latent memory —

@@ -1,0 +1,6 @@
+GCM_TAG=tool_bfclmultiple_q38 GCM_K=128 GCM_DISTILL=0.5 GCM_RECON=0.5 GCM_MAX_STEPS=1500 GCM_MAXCTX=2048 GCM_TRAIN=bfcl_multiple GCM_EVAL=bfcl_multiple ::: Qwen/Qwen3-8B
+GCM_TAG=tool_bfclparallel_q38 GCM_K=128 GCM_DISTILL=0.5 GCM_RECON=0.5 GCM_MAX_STEPS=1500 GCM_MAXCTX=2048 GCM_TRAIN=bfcl_parallel GCM_EVAL=bfcl_parallel ::: Qwen/Qwen3-8B
+GCM_TAG=xtool_glm_hermes GCM_K=128 GCM_DISTILL=0.5 GCM_RECON=0.5 GCM_MAX_STEPS=1500 GCM_MAXCTX=2048 GCM_TRAIN=hermes GCM_EVAL=hermes ::: /mnt/persist/checkpoints/GLM-4-9B-0414
+GCM_TAG=xtool_glm_glaive GCM_K=128 GCM_DISTILL=0.5 GCM_RECON=0.5 GCM_MAX_STEPS=1500 GCM_MAXCTX=2048 GCM_TRAIN=glaive GCM_EVAL=glaive ::: /mnt/persist/checkpoints/GLM-4-9B-0414
+GCM_TAG=xtool_qwen354b_hermes GCM_K=128 GCM_DISTILL=0.5 GCM_RECON=0.5 GCM_MAX_STEPS=1500 GCM_MAXCTX=2048 GCM_TRAIN=hermes GCM_EVAL=hermes ::: /mnt/persist/checkpoints/Qwen3.5-4B
+GCM_TAG=xtool_qwen354b_glaive GCM_K=128 GCM_DISTILL=0.5 GCM_RECON=0.5 GCM_MAX_STEPS=1500 GCM_MAXCTX=2048 GCM_TRAIN=glaive GCM_EVAL=glaive ::: /mnt/persist/checkpoints/Qwen3.5-4B

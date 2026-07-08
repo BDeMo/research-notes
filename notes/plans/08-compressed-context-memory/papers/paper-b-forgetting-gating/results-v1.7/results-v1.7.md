@@ -157,9 +157,9 @@ variance ≈ ±0.04**, so trust large gaps, not small ones.
 
 **QA / reasoning (other domains, used for cross-domain transfer).** `squad_v2` (extractive QA, [Rajpurkar et al. 2018](https://arxiv.org/abs/1806.03822)) · `hotpot_qa` (multi-hop, [Yang et al. 2018](https://arxiv.org/abs/1809.09600)) · `trivia_qa` ([Joshi et al. 2017](https://arxiv.org/abs/1705.03551)) · `narrativeqa` (long-doc, [Kočiský et al. 2018](https://arxiv.org/abs/1712.07040)) · `musr_mm` (multi-step reasoning, MC, [Sprague et al. 2023](https://arxiv.org/abs/2310.16049)) · `quality` (long-doc MC, [Pang et al. 2022](https://arxiv.org/abs/2112.08608)). Metrics: `squad_f1` for extractive, `rouge_l` for narrative, MC accuracy for `musr_mm`/`quality`/`rca_openrca`.
 
-Aggregates: [`evidence/phase2_summary.csv`](evidence/phase2_summary.csv) ·
-[`evidence/sweep_summary.csv`](evidence/sweep_summary.csv). Worker logs:
-[`evidence/phase2_w0.log`](evidence/phase2_w0.log) … `w3`, [`evidence/sweep_w0.log`](evidence/sweep_w0.log) …
+Aggregates: `evidence/phase2_summary.csv` ·
+`evidence/sweep_summary.csv`. Worker logs:
+`evidence/phase2_w0.log` … `w3`, `evidence/sweep_w0.log` …
 
 **Bottom line (honest, 2026-06-11).** On the clean metric, **full context ≫ all compressors ≈ no-context**,
 in- and cross-task; the apparent in-task "win" was a scoring artifact ([Metric correction](#metric-correction)).
@@ -304,8 +304,8 @@ Each compressor number links to its job's per-item records (which also hold `no_
 | synthetic | MuSR | 0.500 | [0.469](evidence/phase2/main_cart_musr_mm/records_musr_mm.jsonl) | [0.479](evidence/phase2/main_gist_musr_mm/records_musr_mm.jsonl) | [0.490](evidence/phase2/main_gcm_musr_mm/records_musr_mm.jsonl) | **0.531** | 0.604 |
 | tool | BFCL (simple) | 0.010 | [0.219](evidence/phase2/tool_cart_bfcl_simple/records_bfcl_simple.jsonl) | [0.271](evidence/phase2/tool_gist_bfcl_simple/records_bfcl_simple.jsonl) | [0.208](evidence/phase2/tool_gcm_bfcl_simple/records_bfcl_simple.jsonl) | **0.990** | 1.000 |
 | tool | API-Bank | 0.000 | [0.010](evidence/phase2/tool_cart_apibank/records_apibank.jsonl) | [0.000](evidence/phase2/tool_gist_apibank/records_apibank.jsonl) | [0.000](evidence/phase2/tool_gcm_apibank/records_apibank.jsonl) | **0.260** | 0.260 |
-| tool | ToolACE | 0.010 | [0.042](evidence/phase2/tool_cart_toolace/records_toolace.jsonl) | [0.062](evidence/phase2/tool_gist_toolace/records_toolace.jsonl) | [0.062](evidence/phase2/tool_gcm_toolace/records_toolace.jsonl) | **0.979** | 0.979 |
-| ops | OpenRCA | 0.135 | [0.135](evidence/phase2/tool_cart_rca_openrca/records_rca_openrca.jsonl) | [0.135](evidence/phase2/tool_gist_rca_openrca/records_rca_openrca.jsonl) | [0.198](evidence/phase2/tool_gcm_rca_openrca/records_rca_openrca.jsonl) | **0.438** | 0.490 |
+| tool | ToolACE | 0.010 | [0.042](evidence/phase2/tool_cart_toolace/records_toolace.jsonl) | 0.062 | [0.062](evidence/phase2/tool_gcm_toolace/records_toolace.jsonl) | **0.979** | 0.979 |
+| ops | OpenRCA | 0.135 | [0.135](evidence/phase2/tool_cart_rca_openrca/records_rca_openrca.jsonl) | 0.135 | [0.198](evidence/phase2/tool_gcm_rca_openrca/records_rca_openrca.jsonl) | **0.438** | 0.490 |
 
 **Read:** compression beats `full` only on TriviaQA (parametric QA); `full` is the ceiling everywhere else, by a
 lot on structured/agentic (BFCL/ToolACE `full`≈0.98) and ops. Gist is the strongest *raw* compressor. → not a
@@ -319,10 +319,10 @@ is what the LaTeX main table uses for QA). Number links to the best-config job r
 
 | benchmark | Cartridge (best) | Gist (best) | GCM (best) | full |
 |---|---|---|---|---|
-| TriviaQA | [0.205](evidence/sweep/cartridge_trivia_qa_s1500_lr0.0001_K64/records_trivia_qa.jsonl) `s1500/lr1e-4/K64` | [**0.370**](evidence/sweep/gist_trivia_qa_s1500_lr0.0001_K64/records_trivia_qa.jsonl) `s1500/lr1e-4/K64` | [0.293](evidence/sweep/gcm_trivia_qa_N24_K64/records_trivia_qa.jsonl) `N24/K64` | 0.218 |
-| HotpotQA | [0.107](evidence/sweep/cartridge_hotpot_qa_s1500_lr0.0003_K128/records_hotpot_qa.jsonl) `s1500/lr3e-4/K128` | [**0.260**](evidence/sweep/gist_hotpot_qa_s1500_lr0.0003_K128/records_hotpot_qa.jsonl) `s1500/lr3e-4/K128` | [0.165](evidence/sweep/gcm_hotpot_qa_N24_K64/records_hotpot_qa.jsonl) `N24/K64` | 0.201 |
-| SQuAD-v2 | [0.136](evidence/sweep/cartridge_squad_v2_s600_lr0.0003_K64/records_squad_v2.jsonl) `s600/lr3e-4/K64` | [0.157](evidence/sweep/gist_squad_v2_s600_lr0.0001_K64/records_squad_v2.jsonl) `s600/lr1e-4/K64` | [0.136](evidence/sweep/gcm_squad_v2_N24_K64/records_squad_v2.jsonl) `N24/K64` | **0.367** |
-| QuALITY | [0.208](evidence/sweep/cartridge_quality_s600_lr0.0001_K128/records_quality.jsonl) `s600/lr1e-4/K128` | [**0.312**](evidence/sweep/gist_quality_s600_lr0.0003_K128/records_quality.jsonl) `s600/lr3e-4/K128` | [0.260](evidence/sweep/gcm_quality_N12_K128/records_quality.jsonl) `N12/K128` | 0.146 |
+| TriviaQA | 0.205 `s1500/lr1e-4/K64` | **0.370** `s1500/lr1e-4/K64` | 0.293 `N24/K64` | 0.218 |
+| HotpotQA | 0.107 `s1500/lr3e-4/K128` | **0.260** `s1500/lr3e-4/K128` | 0.165 `N24/K64` | 0.201 |
+| SQuAD-v2 | 0.136 `s600/lr3e-4/K64` | 0.157 `s600/lr1e-4/K64` | 0.136 `N24/K64` | **0.367** |
+| QuALITY | 0.208 `s600/lr1e-4/K128` | **0.312** `s600/lr3e-4/K128` | 0.260 `N12/K128` | 0.146 |
 
 ---
 
@@ -388,10 +388,10 @@ Compressed accuracy *appears* to rise with encoder depth N (optimum ≈24) — b
 
 | N | comp | full | source |
 |---|---|---|---|
-| 8 | [0.197](evidence/rel_N8/records_trivia_qa.jsonl) | 0.218 | rel_N8 |
-| 12 | [0.208](evidence/rel_N12/records_trivia_qa.jsonl) | 0.218 | rel_N12 |
-| 16 | [0.231](evidence/rel_N16bf16/records_trivia_qa.jsonl) | 0.218 | rel_N16bf16 |
-| 24 | [**0.247**](evidence/rel_N24/records_trivia_qa.jsonl) | 0.218 | rel_N24 |
+| 8 | 0.197 | 0.218 | rel_N8 |
+| 12 | 0.208 | 0.218 | rel_N12 |
+| 16 | 0.231 | 0.218 | rel_N16bf16 |
+| 24 | **0.247** | 0.218 | rel_N24 |
 
 ---
 
@@ -402,8 +402,8 @@ Compressed accuracy *appears* to rise with encoder depth N (optimum ≈24) — b
 | **query conditioning** | agnostic M0 | [0.228](evidence/phase2/abl_agnostic_trivia_qa/records_trivia_qa.jsonl) | conditioned M_q 0.293 | conditioning helps |
 | query conditioning (MC) | agnostic M0 | [0.208](evidence/phase2/abl_agnostic_quality/records_quality.jsonl) | conditioned 0.208 | no effect on QuALITY |
 | **autoencoder** | no L_uncond+min-dev | [0.195](evidence/abl_nae/records_trivia_qa.jsonl) | with-AE 0.231 | AE adds ≈+0.036 |
-| min-dev only off | rec=1,dev=0 | [0.177](evidence/sweep/gcm_trivia_qa_N16_K64_lr1_ld0/records_trivia_qa.jsonl) | with min-dev | min-dev matters |
-| decoder depth | dec=1 / 2 / 4 | [0.218](evidence/sweep/gcm_trivia_qa_N16_K64_dec1/records_trivia_qa.jsonl) / [0.186](evidence/sweep/gcm_trivia_qa_N16_K64/records_trivia_qa.jsonl) / [0.268](evidence/sweep/gcm_trivia_qa_N16_K64_dec4/records_trivia_qa.jsonl) | — | noisy; deeper helps |
+| min-dev only off | rec=1,dev=0 | 0.177 | with min-dev | min-dev matters |
+| decoder depth | dec=1 / 2 / 4 | 0.218 / 0.186 / 0.268 | — | noisy; deeper helps |
 | memory width K | 32 | [0.215](evidence/phase2/abl_K32_trivia_qa/records_trivia_qa.jsonl) | K64 0.293 | wider helps (K256 run errored) |
 | compression ratio (n_chunks) | 2 / 4 / 8 / 12 | [0.190](evidence/phase2/abl_ratio_nc2_trivia_qa/records_trivia_qa.jsonl) / [0.232](evidence/phase2/abl_ratio_nc4_trivia_qa/records_trivia_qa.jsonl) / [0.214](evidence/phase2/abl_ratio_nc8_trivia_qa/records_trivia_qa.jsonl) / [0.183](evidence/phase2/abl_ratio_nc12_trivia_qa/records_trivia_qa.jsonl) | — | capacity wall: more ctx → degrades |
 
@@ -621,8 +621,8 @@ Both: AdamW, grad-clip 1.0. Code: `gcm/methods.py`; GCM trainer `svc/method.py`;
 <a id="see-also"></a>
 ## See also / deeper content
 **Design & rationale** (sibling docs):
-[v1.7 gated-compressor-module design](../v1.7-gated-compressor-module-2026-06-10.md) ·
-[training design (losses, M0/Mq, gate taxonomy, pitfalls)](../training-design-2026-06-10.md) ·
+v1.7 gated-compressor-module design ·
+training design (losses, M0/Mq, gate taxonomy, pitfalls) ·
 [v1.7 central ledger / thesis & queue](../summary-matrix-v1.7.md).
 
 **Honest assessment** (read these with the results):
@@ -638,8 +638,8 @@ clean scorer `gcm/data.py`; sweep runners `svc/{sweep,phase2,phase4}.py`.
 
 **Raw evidence (click any number above):** per-item records [`evidence/phase2/`](evidence/phase2/) (main+tool+ablations),
 [`evidence/sweep/`](evidence/sweep/) (100-run tuning), [`evidence/nsweep/`](evidence/nsweep/) (depth),
-[`evidence/rel_N*`](evidence/) (capacity-relation). CSVs [`evidence/phase2_summary.csv`](evidence/phase2_summary.csv),
-[`evidence/sweep_summary.csv`](evidence/sweep_summary.csv). Logs `evidence/{phase2,sweep}_w*.log`.
+[`evidence/rel_N*`](evidence/) (capacity-relation). CSVs `evidence/phase2_summary.csv`,
+`evidence/sweep_summary.csv`. Logs `evidence/{phase2,sweep}_w*.log`.
 
 **Standing caveats:** single seed (±0.04–0.08); QA baselines tuned per dataset (T2), other domains a single
 config (T1); tool/ops benches ran on the `sam-dev` pod (only one with that data cached); API-Bank/RCA/MC

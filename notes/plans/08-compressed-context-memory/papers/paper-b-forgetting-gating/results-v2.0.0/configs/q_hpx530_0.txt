@@ -1,0 +1,1 @@
+GCM_TAG=hpx_q38_bfcl_k128 GCM_K=128 GCM_RECON=1.0 GCM_DISTILL=0.5 GCM_MAXCTX=4096 GCM_MAX_STEPS=1500 GCM_TRAIN=bfcl_live_multiple GCM_EVAL=bfcl_live_multiple ::: Qwen/Qwen3-8B

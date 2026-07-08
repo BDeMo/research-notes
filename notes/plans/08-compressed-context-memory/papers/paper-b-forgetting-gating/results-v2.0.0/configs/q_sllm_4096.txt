@@ -1,0 +1,1 @@
+GCM_BASELINE=txl GCM_TAG=bl_sllm_w4096_qh GCM_NTRAIN=8 GCM_TXL_WINDOW=4096 GCM_MAXCTX=4096 GCM_TRAIN=quality_hard GCM_EVAL=quality_hard ::: Qwen/Qwen3-8B

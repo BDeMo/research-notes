@@ -16,13 +16,13 @@
 ## Output artifacts
 
 - `memory/instructions.md`
-- `notes/plans/08-model-outputs-delta-w/settings.md`
-- `notes/plans/08-model-outputs-delta-w/README.md`
-- `notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`
-- `notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.tex`
-- `notes/plans/08-model-outputs-delta-w/v1.5-intrinsic-gating-study-2026-06-04.pdf`
-- `notes/plans/08-model-outputs-delta-w/slides/weekly/2026-06-w01.tex`
-- `notes/plans/08-model-outputs-delta-w/slides/main.pdf`
+- `notes/plans/08-compressed-context-memory/settings.md`
+- `notes/plans/08-compressed-context-memory/README.md`
+- `notes/plans/08-compressed-context-memory/history/v1-results-2026-06-03.md`
+- `notes/plans/08-compressed-context-memory/v1.5-intrinsic-gating-study-2026-06-04.tex`
+- `notes/plans/08-compressed-context-memory/v1.5-intrinsic-gating-study-2026-06-04.pdf`
+- `notes/plans/08-compressed-context-memory/slides/weekly/2026-06-w01.tex`
+- `notes/plans/08-compressed-context-memory/slides/main.pdf`
 
 ## Knowledge sources used
 

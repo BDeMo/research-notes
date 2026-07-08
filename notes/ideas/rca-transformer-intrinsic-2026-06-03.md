@@ -4,7 +4,7 @@
 > **Topic**: a **general, data-agnostic, transformers-intrinsic** method targeting **two universal transformer problems** — (1) **long-context inference** and (2) **catastrophic forgetting** at training. The method is the contribution; it is *not* RCA-specific.
 > **Why RCA appears here**: RCA (long logs + SFT on a new domain) is a downstream application where **both** pains coincide, so it is a natural *motivating + evaluation* case — and the Nokia RCA release is the eventual project payoff. **RCA is an application/eval, not the target of the method.** (File kept under its original `rca-...` name for link stability; the scope is now general.)
 > **Status**: 2 brainstorm rounds (dense R1–R12, MoE M1–M9) + full 2022-2026 prior-work audit + prioritization under refined constraints. **Conclusion is in §1 — read that first.** §4 = raw brainstorm, §5 = audit, §6 = surviving direction, §7 = pre-audit material kept for the record.
-> **Relation to other work**: complements / contrasts Plan 08 v0 (mem-X soft-prompt wrapper). The mem-X v1 **3-regime law** is a constraint prior (see [`../plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`](../plans/08-model-outputs-delta-w/v1-results-2026-06-03.md)).
+> **Relation to other work**: complements / contrasts Plan 08 v0 (mem-X soft-prompt wrapper). The mem-X v1 **3-regime law** is a constraint prior (see [`../plans/08-compressed-context-memory/history/v1-results-2026-06-03.md`](../plans/08-compressed-context-memory/history/v1-results-2026-06-03.md)).
 > **Promoted to a plan**: [`../plans/09-intrinsic-site-protection/`](../plans/09-intrinsic-site-protection/) — Phase-1 observation study of the long-ctx↔forgetting coupling, then a targeted anti-forgetting method.
 
 ---

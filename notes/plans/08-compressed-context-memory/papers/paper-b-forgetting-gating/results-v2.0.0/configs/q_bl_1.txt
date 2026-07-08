@@ -1,0 +1,1 @@
+GCM_BASELINE=gist GCM_TAG=bl_gist_qualityhard GCM_K=128 GCM_TRAIN=quality_hard GCM_EVAL=quality_hard GCM_MAXCTX=4096 GCM_MAX_STEPS=1500 ::: Qwen/Qwen3-8B

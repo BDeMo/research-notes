@@ -1,0 +1,6 @@
+GCM_TAG=hpqa2_q38_narr_k64 GCM_K=64 GCM_TRAIN=narrativeqa GCM_EVAL=narrativeqa GCM_MAXCTX=4096 GCM_ENC_MAXCTX=8192 GCM_RECON=0 GCM_DISTILL=0.5 GCM_MAX_STEPS=2000 ::: Qwen/Qwen3-8B
+GCM_TAG=hpqa2_q38_squad_k128 GCM_K=128 GCM_TRAIN=squad_v2 GCM_EVAL=squad_v2 GCM_MAXCTX=4096 GCM_RECON=0.5 GCM_DISTILL=0.5 GCM_MAX_STEPS=2000 ::: Qwen/Qwen3-8B
+GCM_TAG=hpqa2_q35_squad_k128 GCM_K=128 GCM_TRAIN=squad_v2 GCM_EVAL=squad_v2 GCM_MAXCTX=2048 GCM_RECON=0.5 GCM_DISTILL=1.0 GCM_MAX_STEPS=2000 ::: Qwen/Qwen3.5-9B
+GCM_TAG=hpx_xlam_k256 GCM_K=256 GCM_RECON=1.0 GCM_DISTILL=0.5 GCM_MAXCTX=4096 GCM_MAX_STEPS=1500 GCM_TRAIN=bfcl_live_multiple GCM_EVAL=bfcl_live_multiple ::: /mnt/persist/checkpoints/Llama-xLAM-2-8b-fc-r
+GCM_TAG=hpx_ministral_k128 GCM_K=128 GCM_RECON=1.0 GCM_DISTILL=0.5 GCM_MAXCTX=4096 GCM_MAX_STEPS=1500 GCM_TRAIN=bfcl_live_multiple GCM_EVAL=bfcl_live_multiple ::: /mnt/persist/checkpoints/Ministral-8B-Instruct-2410
+GCM_TAG=hpx_ministral_k256 GCM_K=256 GCM_RECON=1.0 GCM_DISTILL=0.5 GCM_MAXCTX=4096 GCM_MAX_STEPS=1500 GCM_TRAIN=bfcl_live_multiple GCM_EVAL=bfcl_live_multiple ::: /mnt/persist/checkpoints/Ministral-8B-Instruct-2410

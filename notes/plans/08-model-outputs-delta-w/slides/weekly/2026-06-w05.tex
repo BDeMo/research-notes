@@ -1,0 +1,298 @@
+% June Week 5 weekly: Mon 2026-06-29 to Sun 2026-07-05.
+% This week: leader-facing research summary of v1.8.0 outcome, public
+% long-context baseline fact-base, and v2.0.0 decision options.
+
+\section{June Week 5 (Mon 2026-06-29 to Sun 2026-07-05)}
+
+\begin{frame}{Reporting Period}
+  \begin{center}
+    \textbf{Plan 08 / Paper B --- June Week 5} \\[0.3em]
+    \small Mon 2026-06-29 to Sun 2026-07-05 \\
+    \scriptsize Leader update: research outcome, long-context facts, v2.0.0 options, and resource ask.
+  \end{center}
+\end{frame}
+
+\begin{frame}{Scientific Question}
+  \small
+  \begin{block}{Main question}
+    When a model faces long evidence, what should it keep, what should it ignore,
+    and how can it know whether its reduced context is still reliable?
+  \end{block}
+  \begin{block}{Why this is scientific, not only engineering}
+    ``Long context'' is not one capability. It decomposes into retrieval,
+    local extraction, distributed semantic reasoning, distractor robustness, and
+    architecture-dependent memory access.
+  \end{block}
+  \begin{itemize}
+    \item The core object of study is the \textbf{interaction between task type, context length, and reduction method}.
+    \item The scientific goal is to map this interaction, then design a method
+      that adapts instead of assuming one fixed rule.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Background 1: Qwen3.5 / 3.6 Hybrid GDN Stack}
+  \scriptsize
+  \begin{center}
+  \begin{tikzpicture}[
+    node distance=0.35cm,
+    box/.style={draw, rounded corners, align=center, minimum height=0.55cm, font=\scriptsize},
+    gdn/.style={box, fill=blue!10, minimum width=1.35cm},
+    attn/.style={box, fill=orange!18, minimum width=1.35cm},
+    state/.style={box, fill=green!12, minimum width=2.2cm},
+    kv/.style={box, fill=red!10, minimum width=2.2cm},
+    note/.style={align=left, font=\scriptsize},
+    arr/.style={-{Latex[length=2mm]}, thick}
+  ]
+    \node[box, fill=gray!10, minimum width=1.6cm] (tok) {input\\tokens};
+    \node[gdn, right=0.65cm of tok] (g1) {GDN\\layer};
+    \node[gdn, right=0.25cm of g1] (g2) {GDN\\layer};
+    \node[gdn, right=0.25cm of g2] (g3) {GDN\\layer};
+    \node[attn, right=0.25cm of g3] (a1) {gated\\attention};
+    \node[gdn, right=0.25cm of a1] (g4) {GDN\\layers};
+    \node[attn, right=0.25cm of g4] (a2) {gated\\attention};
+    \node[box, fill=gray!10, right=0.65cm of a2, minimum width=1.4cm] (out) {reader\\hidden};
+
+    \draw[arr] (tok) -- (g1);
+    \draw[arr] (g1) -- (g2);
+    \draw[arr] (g2) -- (g3);
+    \draw[arr] (g3) -- (a1);
+    \draw[arr] (a1) -- (g4);
+    \draw[arr] (g4) -- (a2);
+    \draw[arr] (a2) -- (out);
+
+    \node[state, below=1.0cm of g2] (s) {bounded recurrent state\\history compressed into state};
+    \node[kv, below=1.0cm of a1] (kv1) {KV cache only for\\attention layers};
+    \node[kv, below=1.0cm of a2] (kv2) {KV cache only for\\attention layers};
+
+    \draw[arr, blue!60] (g1.south) -- (s.north west);
+    \draw[arr, blue!60] (g2.south) -- (s.north);
+    \draw[arr, blue!60] (g3.south) -- (s.north east);
+    \draw[arr, orange!70] (a1.south) -- (kv1.north);
+    \draw[arr, orange!70] (a2.south) -- (kv2.north);
+
+    \node[note, below=1.05cm of s, text width=0.86\textwidth] {
+      \textbf{Prefill dependency:} most layers scan tokens into a GDN recurrent state; periodic attention layers
+      create ordinary K/V for exact lookup. \textbf{KV-cache methods apply only to the attention subset, not to GDN layers.}
+      Qwen3.6 is reported as KV on 16/64 layers, so the KV lever is partial.
+    };
+  \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Background 2: MiniMax-Text-01 / M1 Hybrid Lightning Stack}
+  \scriptsize
+  \begin{center}
+  \begin{tikzpicture}[
+    node distance=0.28cm,
+    box/.style={draw, rounded corners, align=center, minimum height=0.55cm, font=\scriptsize},
+    lin/.style={box, fill=blue!10, minimum width=1.02cm},
+    soft/.style={box, fill=orange!18, minimum width=1.15cm},
+    moe/.style={box, fill=purple!10, minimum width=1.1cm},
+    state/.style={box, fill=green!12, minimum width=2.3cm},
+    kv/.style={box, fill=red!10, minimum width=2.3cm},
+    note/.style={align=left, font=\scriptsize},
+    arr/.style={-{Latex[length=2mm]}, thick}
+  ]
+    \node[box, fill=gray!10, minimum width=1.15cm] (tok) {input};
+    \node[lin, right=0.55cm of tok] (l1) {LA};
+    \node[lin, right=0.12cm of l1] (l2) {LA};
+    \node[lin, right=0.12cm of l2] (l3) {LA};
+    \node[lin, right=0.12cm of l3] (l4) {LA};
+    \node[lin, right=0.12cm of l4] (l5) {LA};
+    \node[lin, right=0.12cm of l5] (l6) {LA};
+    \node[lin, right=0.12cm of l6] (l7) {LA};
+    \node[soft, right=0.2cm of l7] (sa) {softmax\\attn};
+    \node[moe, right=0.32cm of sa] (moe) {MoE\\FFN};
+    \node[box, fill=gray!10, right=0.55cm of moe, minimum width=1.2cm] (out) {next\\block};
+
+    \draw[arr] (tok) -- (l1);
+    \draw[arr] (l1) -- (l2);
+    \draw[arr] (l2) -- (l3);
+    \draw[arr] (l3) -- (l4);
+    \draw[arr] (l4) -- (l5);
+    \draw[arr] (l5) -- (l6);
+    \draw[arr] (l6) -- (l7);
+    \draw[arr] (l7) -- (sa);
+    \draw[arr] (sa) -- (moe);
+    \draw[arr] (moe) -- (out);
+
+    \node[state, below=1.05cm of l4] (s) {Lightning / linear-attention state\\cheap long-range scan};
+    \node[kv, below=1.05cm of sa] (kv) {KV cache only for\\periodic softmax block};
+
+    \draw[arr, blue!60] (l2.south) -- (s.north west);
+    \draw[arr, blue!60] (l4.south) -- (s.north);
+    \draw[arr, blue!60] (l6.south) -- (s.north east);
+    \draw[arr, orange!70] (sa.south) -- (kv.north);
+
+    \node[note, below=1.05cm of s, text width=0.86\textwidth] {
+      \textbf{Prefill dependency:} the published MiniMax-Text-01/M1 pattern is roughly
+      \textbf{7 Lightning/linear-attention blocks + 1 softmax-attention block}, with MoE capacity.
+      Lightning blocks carry cheap long-range state; softmax blocks periodically restore exact token interactions.
+      \textbf{KV eviction applies only to the softmax blocks.}
+    };
+  \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Background 3: MiniMax-M3 Sparse-Attention Stack}
+  \scriptsize
+  \begin{center}
+  \begin{tikzpicture}[
+    node distance=0.35cm,
+    box/.style={draw, rounded corners, align=center, minimum height=0.55cm, font=\scriptsize},
+    dense/.style={box, fill=orange!18, minimum width=1.45cm},
+    sparse/.style={box, fill=cyan!12, minimum width=1.55cm},
+    idx/.style={box, fill=yellow!18, minimum width=2.2cm},
+    kv/.style={box, fill=red!10, minimum width=2.2cm},
+    note/.style={align=left, font=\scriptsize},
+    arr/.style={-{Latex[length=2mm]}, thick}
+  ]
+    \node[box, fill=gray!10, minimum width=1.25cm] (tok) {input};
+    \node[dense, right=0.7cm of tok] (d1) {full\\attention};
+    \node[sparse, right=0.35cm of d1] (sp1) {MSA\\sparse};
+    \node[dense, right=0.35cm of sp1] (d2) {full\\attention};
+    \node[sparse, right=0.35cm of d2] (sp2) {MSA\\sparse};
+    \node[box, fill=gray!10, right=0.7cm of sp2, minimum width=1.25cm] (out) {output};
+
+    \draw[arr] (tok) -- (d1);
+    \draw[arr] (d1) -- (sp1);
+    \draw[arr] (sp1) -- (d2);
+    \draw[arr] (d2) -- (sp2);
+    \draw[arr] (sp2) -- (out);
+
+    \node[kv, below=1.0cm of d1] (kv1) {K/V blocks exist\\for attention layers};
+    \node[idx, below=1.0cm of sp1] (idx1) {indexer scores key blocks\\top blocks + local blocks};
+    \node[kv, below=1.0cm of sp2] (kv2) {sparse access to\\selected KV blocks};
+
+    \draw[arr, orange!70] (d1.south) -- (kv1.north);
+    \draw[arr, cyan!70] (sp1.south) -- (idx1.north);
+    \draw[arr, cyan!70] (idx1.east) -- (kv2.west);
+    \draw[arr, cyan!70] (sp2.south) -- (kv2.north);
+
+    \node[note, below=1.05cm of idx1, text width=0.86\textwidth] {
+      \textbf{Prefill dependency:} M3 is not recurrent/linear. It is a sparse-attention Transformer:
+      sparse layers use an indexer to choose key blocks, then exact attention runs on those selected blocks.
+      \textbf{KV exists, but access is already learned and sparse}; KV eviction methods are possible only as a comparison to MSA, not as the native mechanism.
+    };
+  \end{tikzpicture}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Experimental Facts We Established}
+  \small
+  \begin{itemize}
+    \item \textbf{Fact 1: fixed baselines are regime-specific.} Window, RAG,
+      prompt compression, and KV eviction each work in some regimes and fail in others.
+    \item \textbf{Fact 2: length changes method ranking.} Attention-based KV
+      eviction works around shorter contexts but can collapse at 16k+.
+    \item \textbf{Fact 3: task type changes method ranking.} Retrieval,
+      extractive QA, global reasoning, and literary MC prefer different context
+      reduction behavior.
+    \item \textbf{Fact 4: more context is not always better.} Full context can
+      hurt when the context introduces distractors or exceeds the model's usable reasoning ability.
+    \item \textbf{Fact 5: model architecture matters.} Linear-attention / GDN-style
+      bases do not expose the same KV-cache lever as dense-attention models.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Current Paper Intro: Story We Can Tell}
+  \small
+  \begin{block}{Intro logic}
+    Modern LLMs can accept longer contexts, but long-context use is not solved:
+    full context is costly and sometimes harmful; simple reduction methods are brittle;
+    and different tasks require different evidence-preservation strategies.
+  \end{block}
+  \begin{itemize}
+    \item Start with the field assumption: longer windows and context compression should help.
+    \item Show the contradiction: the same method can win on retrieval and lose on semantic QA; full context can even hurt.
+    \item Therefore the missing piece is not ``one better compressor'' but a
+      mechanism that can \textbf{adapt to the evidence regime}.
+    \item This motivates learned memory plus a reliability decision.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{What v1.8.0 Already Gives Us}
+  \small
+  \begin{itemize}
+    \item A working learned-memory path on high-headroom tasks after fixing
+      termination supervision and joint answer signal.
+    \item A gate/fallback formulation that is useful conceptually: use memory when
+      reliable, fall back when unsafe.
+    \item Ablation evidence that the carrier is not fragile: many knobs move the
+      compressed path by only a few points.
+    \item A clearer negative result: the current gate story must become held-out
+      or conformal, not in-sample threshold picking.
+  \end{itemize}
+  \begin{block}{Takeaway}
+    v1.8.0 is the prototype and evidence base. v2.0.0 should sharpen the claim
+    into a cleaner reliability theory and a better necessity regime.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Next Paper Initialization Direction}
+  \small
+  \begin{block}{Working title direction}
+    Adaptive Evidence Memory for Long-Context Reasoning
+  \end{block}
+  \begin{itemize}
+    \item \textbf{Paper role of the fact-base:} establish that fixed black-box
+      context reduction is not enough.
+    \item \textbf{Paper role of the method:} introduce a memory that preserves
+      evidence and a reliability signal that decides when to trust it.
+    \item \textbf{Core novelty target:} self-verified memory + calibrated routing,
+      not just another compressor.
+    \item \textbf{Evaluation target:} public long-context regimes where window,
+      RAG, prompt compression, and KV eviction fail for different reasons.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{v2.0.0 Ideas}
+  \small
+  \begin{enumerate}
+    \item \textbf{Self-verified evidence memory:} train the memory to preserve evidence;
+      use that preservation/reconstruction signal as the reliability check.
+    \item \textbf{Reliability-gated fallback:} use extracted knowledge when safe;
+      otherwise fall back to raw context, retrieval, or a higher-cost path.
+    \item \textbf{Hybrid evidence memory:} combine a raw recent window with compressed global memory.
+    \item \textbf{Adaptive budget:} easy contexts get fewer memory tokens; dense or ambiguous contexts get more.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}{Next Experiments To Initialize}
+  \small
+  \begin{itemize}
+    \item \textbf{M1: Hybrid Evidence Memory} --- reader sees raw recent window + compressed global memory.
+    \item \textbf{M2: Conformal router} --- held-out reliability calibration instead of in-sample threshold picking.
+    \item \textbf{M3: Long-context necessity wave} --- semantic-spread tasks plus retrieval honest-negative.
+    \item \textbf{M4: Transfer matrix} --- train on one domain, test on another; measure whether memory is domain-invariant.
+    \item \textbf{M5: Figures} --- turn the fact-base into length, task, and method-failure figures.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{What Leaders Need to Decide}
+  \small
+  \begin{description}
+    \item[Option A: Fact-base paper] Publish the long-context baseline map first; method comes later.
+    \item[Option B: Method paper] Build v2.0.0 now around self-verified evidence memory + conformal routing.
+    \item[Option C: Two-stage plan] Fact-base as Section 1 / motivation, then v2.0.0 as the method contribution.
+  \end{description}
+  \begin{block}{Recommendation}
+    Option C: use the fact-base to define the gap, then spend compute only on the
+    minimum v2.0.0 experiments needed to show the gap can be closed.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Recommended Next Step}
+  \small
+  \begin{itemize}
+    \item Freeze the public long-context fact-base and produce the figures.
+    \item Implement Hybrid Evidence Memory: raw window + compressed memory.
+    \item Add conformal reliability routing and report risk--coverage / cost--coverage.
+    \item Run the 5x5 transfer matrix to test cross-domain memory generalization.
+    \item Decide whether v2.0.0 is a full method paper or a fact-base + position paper.
+  \end{itemize}
+  \begin{block}{Ask}
+    Approve GPU budget for the v2.0.0 public benchmark experiments, especially
+    the hybrid-memory and transfer-matrix runs.
+  \end{block}
+\end{frame}

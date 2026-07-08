@@ -21,7 +21,7 @@ M: exp · proto · paper · thesis · prod · side  +  solo · collab · team ·
 |---|---|---|---|---|---|---|---|---|---|
 | 01 | [X-Saturation Curve + Dataset Curator](01-x-saturation-curve/) | [I1](../ideas/README.md) | ★★★ | D | 1/? | paper,solo | ~$6.5K | 3 mo | Does training on the $X$-saturated residual beat baselines per FLOP? |
 | 03 | [W-Space Best-of-N](03-w-space-best-of-n/) | [D1](../ideas/README.md) | ★★ | D | | paper,solo | ~$4.8K | 3 mo | Does test-time search along the *weights* axis beat (or complement) search along the X-axis? |
-| 08 | [Model Outputs ΔW as Part of Generation](08-model-outputs-delta-w/) | [H6](../ideas/README.md) | ★★★ | D | 1/3 | thesis,solo | ~$24K | 12 mo | Can an LLM produce its own weight updates as a first-class output and improve within a session? |
+| 08 | [Model Outputs ΔW as Part of Generation](08-compressed-context-memory/) | [H6](../ideas/README.md) | ★★★ | D | 1/3 | thesis,solo | ~$24K | 12 mo | Can an LLM produce its own weight updates as a first-class output and improve within a session? |
 | 09 | [Intrinsic-Site Protection (long-ctx ↔ forgetting)](09-intrinsic-site-protection/) | [P0](../ideas/rca-transformer-intrinsic-2026-06-03.md) | ★★★ | P | ≈#08 | paper,solo | ~$9.4K | 3–4 mo | Are the transformer sites that carry long-context behavior the *same* sites whose perturbation causes forgetting — and does protecting them fix both? |
 
 ---

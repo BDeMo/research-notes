@@ -1,0 +1,129 @@
+% July Week 1 weekly: Mon 2026-07-06 to Sun 2026-07-12.
+% High-level logic only; all detailed tables / numbers live in linked repo docs.
+% Focus: Paper B (IMP); recall Paper A. Links are relative to slides/weekly/.
+
+\providecommand{\pbref}[2]{\href{../../papers/paper-b-forgetting-gating/#1}{\textcolor{blue}{#2}}}
+
+\section{July Week 1 (Mon 2026-07-06 to Sun 2026-07-12)}
+
+\begin{frame}{Reporting Period}
+  \begin{center}
+    \textbf{Plan 08 / Long-Context Compression --- July Week 1} \\[0.3em]
+    \small Mon 2026-07-06 to Sun 2026-07-12 \\
+    \scriptsize Focus: \textbf{Paper B (IMP)}; recall of Paper A. High-level logic here; details linked. \\
+    \scriptsize Details hub: \pbref{OVERVIEW-both-papers-and-facts.md}{OVERVIEW} · \pbref{baseline-factbase-v2.0.0.md}{fact-base} · \pbref{matrix-facts.md}{matrix-facts}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Recall --- the problem and the two papers}
+  \small
+  \begin{block}{Problem (why it matters)}
+    LLMs accept long inputs, but long context is not solved: full context is costly and sometimes \emph{hurts}; training-free reduction methods are brittle; different tasks need different evidence.
+  \end{block}
+  \begin{description}
+    \item[Paper A] compression \textbf{robustness via per-input validity-detection} — trust a compressed memory only when a self-verification signal says it's safe, else fall back to full (a ``do-no-harm gate'').
+    \item[Paper B] \textbf{observe long-context failures, then attach a lightweight importance-routing structure to a frozen base} (plug-and-play or lightly trained). \emph{This week's focus.}
+  \end{description}
+  \scriptsize Full framing: \pbref{OVERVIEW-both-papers-and-facts.md}{OVERVIEW §2}.
+\end{frame}
+
+\begin{frame}{Preliminaries --- terms (plain language)}
+  \scriptsize
+  \begin{itemize}
+    \item \textbf{Long-context / needle:} long input; the ``needle'' is the small fact that answers the question.
+    \item \textbf{Frozen base:} pretrained LLM, weights unchanged — we add things around it, never retrain.
+    \item \textbf{KV cache} / \textbf{KV-eviction}: attention's per-token memory / dropping cached tokens. \textbf{KV-free compression}: reduce the input itself (prune / merge / retrieve) — works on any architecture incl. cache-free linear models.
+    \item \textbf{full / no\_ctx:} references — whole input vs. no document (ceiling / floor).
+    \item \textbf{Importance routing (IMP):} score token importance, keep the important, drop the rest, before the base reads.
+    \item \textbf{query-relevance / surprisal:} how related to the question / how unexpected a token is.
+    \item \textbf{span vs token:} keep whole contiguous spans vs. isolated tokens. \textbf{do-no-harm gate:} per-input trust-or-fallback.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Paper A --- recall + a clean negative this week}
+  \small
+  \begin{block}{Thesis}
+    Robustness via a validity detector (gate): trust the cheap compressed memory only when safe; else fall back to full.
+  \end{block}
+  \begin{itemize}
+    \item \textbf{Reconstruction-as-gate rejected (honest):} a random-memory control shows the signal $\approx$ noise across a 15-cell ablation and a high-K bracket; the earlier ``+6pt'' was noise.
+    \item \textbf{Root cause:} the learned soft-memory \textbf{can't compress extractive QA} — 4 recipes all give compress $\approx$ no\_ctx ($\le$0.20 vs full 0.69). Nothing to gate on.
+    \item \textbf{Consequence:} ship the \emph{confidence} gate; reconstruction blocked on a better compressor. Effort tilts to Paper B.
+  \end{itemize}
+  \scriptsize Detail: \pbref{decisions-2026-06-24.md}{decisions D24--D26} · \pbref{baseline-factbase-v2.0.0.md}{fact-base §12.3}.
+\end{frame}
+
+\begin{frame}{Paper B --- observation $\rightarrow$ method}
+  \small
+  \begin{block}{Observations driving the design}
+    (1) No universal baseline; (2) naive merging kills the needle (ToMe = 0 on retrieval); (3) a cheap $O(L)$ signal finds the needle (query-relevance / surprisal); (4) attention-free is length-robust.
+  \end{block}
+  \begin{block}{Method (IMP)}
+    Score each token by cheap signals $\Rightarrow$ \textbf{keep the top-$p$ important \emph{spans} verbatim}, drop the rest $\Rightarrow$ frozen base reads the short sequence. Modes: \textbf{plug-and-play} (no training) / \textbf{light-weight} (tiny distilled router + side-cache for linear models).
+  \end{block}
+  \scriptsize Full method + implementation: \pbref{imp-method-and-implementation.md}{imp-method-and-implementation} · spec: \pbref{PAPER-B-v2.1.0-complete.md}{PAPER-B}.
+\end{frame}
+
+\begin{frame}{Paper B --- results (high level)}
+  \small
+  \begin{itemize}
+    \item \textbf{Retrieval $=$ full} at every length incl. 16k (where ToMe $=$ 0, SnapKV collapses).
+    \item \textbf{Token-level shreds coherent QA; span-level rescues it} (squad 0.15$\to$0.46, hotpot 0.21$\to$0.42) while keeping retrieval — the key ablation.
+    \item \textbf{Beats full by denoising} on trivia and categorical; keep-rate curve is monotone.
+    \item \textbf{Real-length LongBench (32k, no truncation):} on real long docs the base scores low and \textbf{compression often beats full} (necessity regime) — stronger than synthetic NIAH.
+  \end{itemize}
+  \scriptsize All numbers (main table, token-vs-span, keep curve, LongBench): \pbref{baseline-factbase-v2.0.0.md}{fact-base §12--§12.3} · figures + narrative: \pbref{OVERVIEW-both-papers-and-facts.md}{OVERVIEW §3.1}.
+\end{frame}
+
+\begin{frame}{Analysis --- who wins where, and IMP's honest standing}
+  \small
+  \begin{itemize}
+    \item \textbf{Retrieval:} kvzip / criticalkv / LLMLingua / RAG / IMP all $\approx$ full; ToMe/SnapKV/H2O fail.
+    \item \textbf{Extractive/multi-hop QA:} \textbf{RAG is the strongest KV-free baseline}; window is a surprisingly strong trivial baseline when the answer is local.
+    \item \textbf{IMP's honest position:} matches full on retrieval and recovers QA, but on \emph{short-context} extractive QA it does \textbf{not yet beat RAG / LLMLingua}. Its distinctive value is \textbf{training-free · architecture-agnostic (incl. cache-free linear) · denoising · real-length wins} — not raw short-context accuracy.
+  \end{itemize}
+  \scriptsize Snapshot main table (all methods $\times$ benchmarks): \pbref{baseline-factbase-v2.0.0.md}{fact-base §12}.
+\end{frame}
+
+\begin{frame}{Limitations \& critical review (honest)}
+  \small
+  \begin{itemize}
+    \item No short-context accuracy win over RAG/LLMLingua yet; the case rests on generality + efficiency + long-context, which we must \emph{show}.
+    \item Prefill-saving is conditional (surprisal needs a full forward on quadratic bases unless a small scorer is used).
+    \item \textbf{Not yet run on a linear/GDN base} — the one setting KV methods can't touch and IMP is uniquely useful.
+    \item Equal-weight signal is sub-optimal; learned router (Mode B) unbuilt. narrativeqa/musr near base ceiling. Paper A blocked on the compressor.
+  \end{itemize}
+  \begin{block}{Critical question}
+    ``Is IMP just a worse RAG?'' — only defensible if we show (a) it works on cache-free linear models, (b) it wins in the necessity regime (input overruns the window), (c) semantic importance helps where lexical BM25-RAG fails. \textbf{These are the make-or-break experiments.}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Status \& Next}
+  \small
+  \begin{description}
+    \item[Running] a 12h / 6-GPU grand grid: full method $\times$ benchmark main table + all ablations (details land in the fact-base tomorrow).
+  \end{description}
+  \begin{block}{Next plan (make-or-break first)}
+    \begin{enumerate}
+      \item \textbf{Linear/GDN base} — IMP where KV methods don't exist (unique territory).
+      \item \textbf{Necessity regime} — inputs overrunning the window (LongBench / $\infty$Bench $>$100k).
+      \item \textbf{Semantic $>$ lexical} — help on abstractive inputs where BM25-RAG fails.
+      \item Then: small draft-LM scorer (real prefill saving) · learned router (Mode B) · harvest grand grid $\to$ full table + figures.
+    \end{enumerate}
+  \end{block}
+  \begin{block}{Ask}
+    Endorse the pivot to \textbf{Paper B (IMP)} as the primary line; keep Paper A's confidence-gate as secondary until a better compressor exists.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Artifacts \& detailed data (all linked)}
+  \small
+  \begin{itemize}
+    \item \pbref{OVERVIEW-both-papers-and-facts.md}{OVERVIEW-both-papers-and-facts.md} — narrative, figures, both papers, §3.1 new experiments.
+    \item \pbref{baseline-factbase-v2.0.0.md}{baseline-factbase-v2.0.0.md} — every number: KV-free family (§10--11), IMP main table + ablations (§12), Paper-A compressor negative (§12.3).
+    \item \pbref{matrix-facts.md}{matrix-facts.md} — one-line facts F1--F26 with evidence pointers.
+    \item \pbref{imp-method-and-implementation.md}{imp-method-and-implementation.md} — IMP algorithm + exact code path.
+    \item \pbref{PAPER-B-v2.1.0-complete.md}{PAPER-B-v2.1.0-complete.md} · \pbref{PAPER-A-v1.8.1-complete.md}{PAPER-A-v1.8.1-complete.md} — paper specs.
+    \item \pbref{decisions-2026-06-24.md}{decisions-2026-06-24.md} — dated decision log (D1--D26).
+  \end{itemize}
+\end{frame}

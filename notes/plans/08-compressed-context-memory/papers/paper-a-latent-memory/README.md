@@ -22,5 +22,5 @@ recurrent frozen-base wrapper + OPD/RL recipe, (iii) the precise bit-entropy cur
 
 ## Links
 - scope + lit: [`../../summary/2026-06-05/two-paper-litreview-2026-06-05.md`](../../summary/2026-06-05/two-paper-litreview-2026-06-05.md) (§Paper A)
-- related work: [`../../v2-related-work.md`](../../v2-related-work.md) · [`../../v0-opd-on-latent-memory-survey-2026-06-01.md`](../../v0-opd-on-latent-memory-survey-2026-06-01.md)
+- related work: [`../../v2-related-work.md`](../../history/v2-related-work.md) · [`../../v0-opd-on-latent-memory-survey-2026-06-01.md`](../../history/v0-opd-on-latent-memory-survey-2026-06-01.md)
 - evidence: `mem-test/mem-embedding/summary/matrix.md` §7 (ceiling), §8 (boundary + mix-train)

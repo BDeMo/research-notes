@@ -18,12 +18,12 @@
 
 - `memory/instructions.md`
 - `notes/plans/README.md`
-- `notes/plans/08-model-outputs-delta-w/README.md`
-- `notes/plans/08-model-outputs-delta-w/slides/README.md`
-- `notes/plans/08-model-outputs-delta-w/slides/main.tex`
-- `notes/plans/08-model-outputs-delta-w/slides/main.pdf`
-- `notes/plans/08-model-outputs-delta-w/slides/weekly/2026-05-w04.tex`
-- `notes/plans/08-model-outputs-delta-w/slides/weekly/2026-06-w01.tex`
+- `notes/plans/08-compressed-context-memory/README.md`
+- `notes/plans/08-compressed-context-memory/slides/README.md`
+- `notes/plans/08-compressed-context-memory/slides/main.tex`
+- `notes/plans/08-compressed-context-memory/slides/main.pdf`
+- `notes/plans/08-compressed-context-memory/slides/weekly/2026-05-w04.tex`
+- `notes/plans/08-compressed-context-memory/slides/weekly/2026-06-w01.tex`
 
 ## Knowledge sources used
 

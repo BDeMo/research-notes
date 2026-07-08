@@ -220,6 +220,6 @@ finishes early enough.
 ## Cross-references
 
 - Critical review: `mem-embedding/summary/critical-review-2026-06-02-v1.md`
-- v1 deferrals: `notes/plans/08-model-outputs-delta-w/v1-followups-2026-06-02.md`
+- v1 deferrals: `notes/plans/08-compressed-context-memory/history/v1-followups-2026-06-02.md`
 - Phase T design: `mem-embedding/k8s/sweep/build_sweep.py` (PHASE_T block)
 - Phase T scorecard (lands tomorrow): `runs/sweep-phaseT-*/report.md`

@@ -1,0 +1,18 @@
+{
+  "id": "failjob",
+  "gpus": [
+    0
+  ],
+  "pid": 40604,
+  "host": "M-D4FLQ6V22M",
+  "start": 1780704638.5767,
+  "log": "/Users/s1shi/workspace/research-notes/tools/gpu-runq/_regtest/logs/failjob.log",
+  "rc": "/Users/s1shi/workspace/research-notes/tools/gpu-runq/_regtest/running/failjob.rc",
+  "cmd": "exit 7",
+  "cwd": "/Users/s1shi/workspace/research-notes/tools/gpu-runq/_regtest",
+  "priority": 100,
+  "end": 1780704639.596972,
+  "status": "failed",
+  "exit": 7,
+  "dur_s": 1.0
+}

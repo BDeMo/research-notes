@@ -50,5 +50,5 @@
 
 ## In this repo
 
-- **Plan 08** ([`notes/plans/08-model-outputs-delta-w/`](../../notes/plans/08-model-outputs-delta-w/)) inherits the *stability* problem from editing — solving it likely requires an [alphaedit]-style constraint on the emitted $\Delta W$. [memit]'s many-edits regime is the deployment scenario.
+- **Plan 08** ([`notes/plans/08-compressed-context-memory/`](../../notes/plans/08-compressed-context-memory/)) inherits the *stability* problem from editing — solving it likely requires an [alphaedit]-style constraint on the emitted $\Delta W$. [memit]'s many-edits regime is the deployment scenario.
 - **Plan 03** ([`notes/plans/03-w-space-best-of-n/`](../../notes/plans/03-w-space-best-of-n/)) borrows the *locality* discipline: each per-request LoRA in WBoN must not corrupt base behavior across requests.

@@ -1,0 +1,18 @@
+{
+  "id": "zfast",
+  "gpus": [
+    0
+  ],
+  "pid": 40558,
+  "host": "M-D4FLQ6V22M",
+  "start": 1780704634.4380438,
+  "log": "/Users/s1shi/workspace/research-notes/tools/gpu-runq/_regtest/logs/zfast.log",
+  "rc": "/Users/s1shi/workspace/research-notes/tools/gpu-runq/_regtest/running/zfast.rc",
+  "cmd": "sleep 1",
+  "cwd": "/Users/s1shi/workspace/research-notes/tools/gpu-runq/_regtest",
+  "priority": 0,
+  "end": 1780704636.4865541,
+  "status": "done",
+  "exit": 0,
+  "dur_s": 2.0
+}

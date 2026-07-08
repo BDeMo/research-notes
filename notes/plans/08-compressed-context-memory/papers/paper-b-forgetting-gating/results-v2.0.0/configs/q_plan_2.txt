@@ -1,0 +1,4 @@
+GCM_TAG=ak2_q35_tl_c512 GCM_K=64 GCM_CHUNK=512 GCM_TRAIN=toolace GCM_EVAL=toolace GCM_MAXCTX=2560 GCM_RECON=0.5 GCM_DISTILL=1.0 GCM_MAX_STEPS=2500 ::: Qwen/Qwen3.5-9B
+GCM_TAG=sh_con_varlen2 GCM_CMG_CASES=/mnt/persist/datasets/cmg_rca_built/cases.jsonl MEM_CMG_DISTILL_DIR=/mnt/persist/datasets/cmg_distill GCM_TRAIN=cmg_distill,cmg_aug,rca_openrca GCM_EVAL=cmg_all GCM_K=256 GCM_MAXCTX=8192 GCM_ENC_MAXCTX=8192 GCM_ENC_VARLEN=1 GCM_RECON=0 GCM_DISTILL=1.0 GCM_CONTRAST=0.5 GCM_MAX_STEPS=2500 ::: Qwen/Qwen3-8B
+GCM_TAG=xm2_ToolACE-2-8B_bfcl GCM_K=64 GCM_RECON=1.0 GCM_DISTILL=0.5 GCM_MAXCTX=4096 GCM_MAX_STEPS=1500 GCM_TRAIN=bfcl_live_multiple GCM_EVAL=bfcl_live_multiple ::: /mnt/persist/checkpoints/ToolACE-2-8B
+GCM_TAG=xm2_ToolACE-2-8B_toolace GCM_K=64 GCM_RECON=1.0 GCM_DISTILL=0.5 GCM_MAXCTX=4096 GCM_MAX_STEPS=1500 GCM_TRAIN=toolace GCM_EVAL=toolace ::: /mnt/persist/checkpoints/ToolACE-2-8B

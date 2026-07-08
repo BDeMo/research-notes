@@ -58,6 +58,7 @@
 | 2026-06-04 | Plan 08 setting management | Added centralized settings/provenance registry and linked v1/v1.5/v2 result cells, slides, PDFs, and summaries to stable setting IDs | [`2026-06-04-plan08-setting-management.md`](2026-06-04-plan08-setting-management.md) |
 | 2026-06-04 | Plan 08 slide organization | Pulled latest main; restored previous weekly slide input, appended new week, removed repeated weekly covers, and updated README folder-organization rules | [`2026-06-04-plan08-slide-organization.md`](2026-06-04-plan08-slide-organization.md) |
 | 2026-06-04 | Plan 08 high-level slides | Added goal/significance framing, comparison slide, TikZ architecture diagram, and evidence chain for wrapper training → forced-memory risk → gate | [`2026-06-04-plan08-high-level-slides.md`](2026-06-04-plan08-high-level-slides.md) |
+| 2026-07-08 | Plan 08 IMP + long-context benchmarks | **Pivot to Paper B (IMP)**: span-level importance routing (retrieval=full, QA rescued, beats full by denoising); Paper A reconstruction-gate rejected (random-M control) + learned compressor can't compress; LongBench integrated at real length; 12h/6-GPU grand grid; Paper B draft; ResearchMeta methodology repo | [`2026-07-08-plan08-imp-and-longcontext-benchmarks.md`](2026-07-08-plan08-imp-and-longcontext-benchmarks.md) |
 
 ---
 
@@ -65,8 +66,10 @@
 
 Topics that span multiple sessions and are still alive:
 
+- **Plan 08 / Paper B — IMP (importance-routing on a frozen base)** — last touched 2026-07-08. **Primary line.** Span-level IMP: retrieval = full, QA rescued, beats full by denoising; not yet > RAG on short QA. Make-or-break next: linear base · necessity regime · semantic > lexical. Draft: `notes/plans/08-compressed-context-memory/papers/paper-b-forgetting-gating/PAPER-B-draft.md`.
+- **Plan 08 / Paper A — do-no-harm gate** — blocked: learned compressor can't compress extractive QA (reconstruction-gate rejected); shipping gate = confidence. Secondary until a better compressor exists.
 - **Inference-time training** — last touched 2026-06-03. Lead ideas: X-saturation curriculum (plan 01), W-space BoN (plan 03), model outputs ΔW (plan 08).
-- **Plan 08 v0 — mem-X soft-prompt wrapper (`mem-test/mem-embedding`)** — **v1 paper submitting (characterization)** as of 2026-06-03. 25 phases A→Y on 8×H100. **3-regime law** is the v1 headline (A: wins on QuALITY · B: at-chance on MuSR · C: collapses on RULER-NIAH). v2 = suffix memory blocked until v1 freeze 2026-06-15. Full harvest: [`../../notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md`](../../notes/plans/08-model-outputs-delta-w/v1-results-2026-06-03.md). Settings registry: [`../../notes/plans/08-model-outputs-delta-w/settings.md`](../../notes/plans/08-model-outputs-delta-w/settings.md). Slide updates append weekly inputs in `slides/main.tex`; do not delete previous week inputs.
+- **Plan 08 v0 — mem-X soft-prompt wrapper (`mem-test/mem-embedding`)** — **v1 paper submitting (characterization)** as of 2026-06-03. 25 phases A→Y on 8×H100. **3-regime law** is the v1 headline (A: wins on QuALITY · B: at-chance on MuSR · C: collapses on RULER-NIAH). v2 = suffix memory blocked until v1 freeze 2026-06-15. Full harvest: [`../../notes/plans/08-compressed-context-memory/history/v1-results-2026-06-03.md`](../../notes/plans/08-compressed-context-memory/history/v1-results-2026-06-03.md). Settings registry: [`../../notes/plans/08-compressed-context-memory/settings.md`](../../notes/plans/08-compressed-context-memory/settings/settings.md). Slide updates append weekly inputs in `slides/main.tex`; do not delete previous week inputs.
 
 ## Archived threads
 

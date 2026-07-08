@@ -52,7 +52,7 @@
 - Three plans drafted (catalog at [`notes/plans/README.md`](../notes/plans/README.md)):
   - **Plan 01** (`notes/plans/01-x-saturation-curve/`) — X-saturation curve curriculum. ~$6.5K. Drafting.
   - **Plan 03** (`notes/plans/03-w-space-best-of-n/`) — test-time search on weights axis. ~$4.8K. Drafting.
-  - **Plan 08** (`notes/plans/08-model-outputs-delta-w/`) — self-modifying LLMs. ~$24K, PhD-scale. Drafting.
+  - **Plan 08** (`notes/plans/08-compressed-context-memory/`) — compressed-context memory (Papers A & B; ΔW self-modifying north-star parked). ~$24K, PhD-scale. Drafting.
 - Next concrete step suggested in the matrix: 1-day Plan 01 pilot on GSM8K + Qwen2.5-7B (≤ 20 GPU-hours).
 
 ### Long-context inference + catastrophic forgetting (started 2026-06-03)

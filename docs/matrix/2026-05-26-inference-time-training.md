@@ -25,7 +25,7 @@
 - [`notes/ideas/inference-time-training.md`](../../notes/ideas/inference-time-training.md) — 50-idea brainstorm (catalog at [`notes/ideas/README.md`](../../notes/ideas/README.md))
 - [`notes/plans/01-x-saturation-curve/`](../../notes/plans/01-x-saturation-curve/) — X-saturation curve plan
 - [`notes/plans/03-w-space-best-of-n/`](../../notes/plans/03-w-space-best-of-n/) — W-space Best-of-N plan
-- [`notes/plans/08-model-outputs-delta-w/`](../../notes/plans/08-model-outputs-delta-w/) — self-modifying LLM plan
+- [`notes/plans/08-compressed-context-memory/`](../../notes/plans/08-compressed-context-memory/) — compressed-context memory plan (ΔW self-modifying = parked north-star)
 - [`docs/workflow.md`](../workflow.md) — research methodology
 - [`docs/matrix/knowledge-sources.md`](knowledge-sources.md) — references gathered today
 

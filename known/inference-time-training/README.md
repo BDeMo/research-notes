@@ -60,6 +60,6 @@ See [the main graph](../README.md#nearness-graph). Closest:
 - Plans:
   - [01 X-saturation curve](../../notes/plans/01-x-saturation-curve/) — data curation by inference-time difficulty.
   - [03 W-space Best-of-N](../../notes/plans/03-w-space-best-of-n/) — search along the W-axis.
-  - [08 Model outputs ΔW](../../notes/plans/08-model-outputs-delta-w/) — self-modifying LLMs (north star); now spawned **v0 Learned Memory Wrapper** sub-project.
+  - [08 Model outputs ΔW](../../notes/plans/08-compressed-context-memory/) — self-modifying LLMs (north star); now spawned **v0 Learned Memory Wrapper** sub-project.
 - Sessions: [2026-05-26 brainstorm](../../docs/matrix/2026-05-26-inference-time-training.md), [2026-05-28 methods reading](../../docs/matrix/2026-05-28-methods-reading-and-new-plans.md).
 - Method comparison table for context-compression family — see [2026-05-28 §Cross-paper synthesis](../../docs/matrix/2026-05-28-methods-reading-and-new-plans.md#cross-paper-synthesis).

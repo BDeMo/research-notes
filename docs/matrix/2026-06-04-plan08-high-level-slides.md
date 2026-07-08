@@ -20,9 +20,9 @@
 
 ## Output artifacts
 
-- `notes/plans/08-model-outputs-delta-w/slides/main.tex`
-- `notes/plans/08-model-outputs-delta-w/slides/weekly/2026-06-w01.tex`
-- `notes/plans/08-model-outputs-delta-w/slides/main.pdf`
+- `notes/plans/08-compressed-context-memory/slides/main.tex`
+- `notes/plans/08-compressed-context-memory/slides/weekly/2026-06-w01.tex`
+- `notes/plans/08-compressed-context-memory/slides/main.pdf`
 
 ## Knowledge sources used
 

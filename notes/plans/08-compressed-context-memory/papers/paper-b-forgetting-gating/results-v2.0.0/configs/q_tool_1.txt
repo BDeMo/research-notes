@@ -1,0 +1,5 @@
+GCM_TAG=tool_hermes_q38 GCM_K=128 GCM_DISTILL=0.5 GCM_RECON=0.5 GCM_MAX_STEPS=1500 GCM_MAXCTX=2048 GCM_TRAIN=hermes GCM_EVAL=hermes ::: Qwen/Qwen3-8B
+GCM_TAG=tool_bfclsimple_q38 GCM_K=128 GCM_DISTILL=0.5 GCM_RECON=0.5 GCM_MAX_STEPS=1500 GCM_MAXCTX=2048 GCM_TRAIN=bfcl_simple GCM_EVAL=bfcl_simple ::: Qwen/Qwen3-8B
+GCM_TAG=xtool_xlam_hermes GCM_K=128 GCM_DISTILL=0.5 GCM_RECON=0.5 GCM_MAX_STEPS=1500 GCM_MAXCTX=2048 GCM_TRAIN=hermes GCM_EVAL=hermes ::: /mnt/persist/checkpoints/Llama-xLAM-2-8b-fc-r
+GCM_TAG=xtool_xlam_glaive GCM_K=128 GCM_DISTILL=0.5 GCM_RECON=0.5 GCM_MAX_STEPS=1500 GCM_MAXCTX=2048 GCM_TRAIN=glaive GCM_EVAL=glaive ::: /mnt/persist/checkpoints/Llama-xLAM-2-8b-fc-r
+GCM_TAG=xtool_xlam_apibank GCM_K=128 GCM_DISTILL=0.5 GCM_RECON=0 GCM_MAX_STEPS=1500 GCM_MAXCTX=4096 GCM_ENC_MAXCTX=8192 GCM_TRAIN=apibank GCM_EVAL=apibank ::: /mnt/persist/checkpoints/Llama-xLAM-2-8b-fc-r

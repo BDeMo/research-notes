@@ -8,7 +8,7 @@
 > of the (now-retracted) v1.7 brief.
 
 > Purpose: single-source brief for the writing agent, **reset for the v1.7 "gated compressor module"
-> reframe**. Read the design first: [`v1.7-gated-compressor-module-2026-06-10.md`](v1.7-gated-compressor-module-2026-06-10.md).
+> reframe**. Read the design first: `v1.7-gated-compressor-module-2026-06-10.md`.
 > The v1.5/v1.6 ledger is archived in [`summary-matrix.md`](summary-matrix.md); still-valid prior evidence is
 > carried in §7 below, flagged to re-validate under the v1.7 protocol.
 >

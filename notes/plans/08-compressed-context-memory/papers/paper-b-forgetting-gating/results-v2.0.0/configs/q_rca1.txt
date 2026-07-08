@@ -1,0 +1,2 @@
+GCM_BASELINE=gist GCM_TAG=gist_rca_q38 GCM_K=64 GCM_MAXCTX=4096 GCM_MAX_STEPS=1500 GCM_TRAIN=rca_openrca GCM_EVAL=rca_openrca ::: Qwen/Qwen3-8B
+GCM_BASELINE=sft GCM_TAG=sft_hotpot_q38 GCM_MAXCTX=4096 GCM_MAX_STEPS=1500 GCM_TRAIN=hotpot_qa GCM_EVAL=hotpot_qa ::: Qwen/Qwen3-8B

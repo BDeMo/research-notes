@@ -14,8 +14,8 @@ We split the work into two papers along its two real contributions:
 > Connection: both papers are about **not degrading a frozen/pretrained model when
 > adapting it**. Paper A = a removable memory module (never touch weights); Paper B =
 > when you *must* touch behavior, gate (read) or protect (write) so you don't forget.
-> Detailed source docs: [`../../v2-related-work.md`](../../v2-related-work.md),
-> [`../../v0-opd-on-latent-memory-survey-2026-06-01.md`](../../v0-opd-on-latent-memory-survey-2026-06-01.md),
+> Detailed source docs: [`../../v2-related-work.md`](../../history/v2-related-work.md),
+> [`../../v0-opd-on-latent-memory-survey-2026-06-01.md`](../../history/v0-opd-on-latent-memory-survey-2026-06-01.md),
 > [`v1.5-related-work-2026-06-05.md`](v1.5-related-work-2026-06-05.md),
 > [`../../../09-intrinsic-site-protection/references.md`](../../../09-intrinsic-site-protection/references.md).
 

@@ -1,0 +1,18 @@
+{
+  "id": "okjob",
+  "gpus": [
+    0
+  ],
+  "pid": 40576,
+  "host": "M-D4FLQ6V22M",
+  "start": 1780704636.515879,
+  "log": "/Users/s1shi/workspace/research-notes/tools/gpu-runq/_regtest/logs/okjob.log",
+  "rc": "/Users/s1shi/workspace/research-notes/tools/gpu-runq/_regtest/running/okjob.rc",
+  "cmd": "sleep 2",
+  "cwd": "/Users/s1shi/workspace/research-notes/tools/gpu-runq/_regtest",
+  "priority": 100,
+  "end": 1780704638.546785,
+  "status": "done",
+  "exit": 0,
+  "dur_s": 2.0
+}

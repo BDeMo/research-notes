@@ -1,0 +1,9 @@
+[2026-06-05 17:10:34] daemon up host=M-D4FLQ6V22M gpus=[0, 1] root=/Users/s1shi/workspace/research-notes/tools/gpu-runq/_regtest free_mem<= 2000.0MB fake=True
+[2026-06-05 17:10:34] START zfast gpu=0 pid=40558
+[2026-06-05 17:10:34] START longjob gpu=1 pid=40561
+[2026-06-05 17:10:36] DONE zfast exit=0 dur=2.0s
+[2026-06-05 17:10:36] START okjob gpu=0 pid=40576
+[2026-06-05 17:10:38] DONE okjob exit=0 dur=2.0s
+[2026-06-05 17:10:38] START failjob gpu=0 pid=40604
+[2026-06-05 17:10:39] FAILED failjob exit=7 dur=1.0s
+[2026-06-05 17:10:45] STOPPED longjob exit=None dur=11.3s

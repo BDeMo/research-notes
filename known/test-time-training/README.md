@@ -45,5 +45,5 @@
 
 ## In this repo
 
-- See plan 08 ([`notes/plans/08-model-outputs-delta-w/`](../../notes/plans/08-model-outputs-delta-w/)) for the most ambitious TTT-descendant work.
+- See plan 08 ([`notes/plans/08-compressed-context-memory/`](../../notes/plans/08-compressed-context-memory/)) for the most ambitious TTT-descendant work.
 - Plan 03's WBoN-Noise is *not* TTT — no backprop. But the discussion of "$\sigma$ swept" calibration mirrors TTT's "step-size" hyper-parameter sweeps.

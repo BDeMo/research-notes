@@ -1,4 +1,6 @@
-# Plan 08 — Model Outputs ΔW as Part of Generation (Self-Modifying LLMs)
+# Plan 08 — Compressed-Context Memory (Papers A & B)
+
+> **What this plan actually is:** a learned **compressed-context / soft-token memory** on a frozen base (v0 wrapper → v1.7/1.8 gated compression → v2.0 necessity + generalization; Papers A & B). The original **ΔW self-modifying-LLM** framing below is a **parked north-star idea**, not what we built.
 
 > **Status**: **Paper B = v1.7.5 (gated context compression, do-no-harm)** — diagnosis + cure; this week cross-model + module ablation + deployable gate **landed**; **net-win Pareto = open gap** · north star (self-modifying ΔW) parked
 > **Created**: 2026-05-26 · **Last updated**: 2026-06-17
@@ -30,9 +32,9 @@
 - Regime B — MuSR-mm: **both wrappers at chance**; full_context wins.
 - Regime C — RULER-NIAH: **OURS = GIST = 0.000 ± 0.000** across 4 seeds; full_context = 0.995.
 
-Full fact-dump at [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md). Source repo: `~/workspace/mem-test/mem-embedding/`. Paper repo: `~/workspace/latent-mem-paper/`.
+Full fact-dump at [`v1-results-2026-06-03.md`](history/v1-results-2026-06-03.md). Source repo: `~/workspace/mem-test/mem-embedding/`. Paper repo: `~/workspace/latent-mem-paper/`.
 
-**Pivot menu**: [`v1-if-wrapper-doesnt-work-2026-06-03.md`](v1-if-wrapper-doesnt-work-2026-06-03.md) — 10 directions, top-3 testable-today: hybrid wrapper+retrieval (B), infilling objective (D), unfreeze last layer (I).
+**Pivot menu**: [`v1-if-wrapper-doesnt-work-2026-06-03.md`](history/v1-if-wrapper-doesnt-work-2026-06-03.md) — 10 directions, top-3 testable-today: hybrid wrapper+retrieval (B), infilling objective (D), unfreeze last layer (I).
 
 **v1.5 gating study**: [`v1.5-intrinsic-gating-study-2026-06-04.tex`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.tex) / [`pdf`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.pdf) studies intrinsic "do-no-harm" signals for suppressing the wrapper when it would hurt a frozen-base model.
 
@@ -46,13 +48,13 @@ Use this section as the main human entry point for Plan 08 deliverables.
 
 ### v1 / wrapper facts and main result
 
-- **Main v1 result summary**: [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md)
+- **Main v1 result summary**: [`v1-results-2026-06-03.md`](history/v1-results-2026-06-03.md)
   — the full `mem-embedding` result harvest and three-regime transfer law.
   Result cells use setting [`P08-S2`](settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
 - **Pivot / lessons after v1**:
-  [`v1-if-wrapper-doesnt-work-2026-06-03.md`](v1-if-wrapper-doesnt-work-2026-06-03.md)
+  [`v1-if-wrapper-doesnt-work-2026-06-03.md`](history/v1-if-wrapper-doesnt-work-2026-06-03.md)
   — why v1 becomes a characterization paper plus v1.5 options.
-- **How v0/v1 got here**: [`v0-how-we-got-here.md`](v0-how-we-got-here.md)
+- **How v0/v1 got here**: [`v0-how-we-got-here.md`](history/v0-how-we-got-here.md)
   — architecture and experimental chronology.
 
 ### v1.5 / signal grid and gating deliverables
@@ -80,13 +82,13 @@ Use this section as the main human entry point for Plan 08 deliverables.
 
 ### v2 / next version
 
-- **v2 plan**: [`v2-plan.md`](v2-plan.md)
+- **v2 plan**: [`v2-plan.md`](history/v2-plan.md)
   — cross-session latent memory with read/write tokens.
   Design claims use setting [`P08-S4`](settings/settings.md#p08-s4--v2-design-setting).
-- **v2 related work**: [`v2-related-work.md`](v2-related-work.md)
+- **v2 related work**: [`v2-related-work.md`](history/v2-related-work.md)
   — crowded latent reasoning / memory-token landscape and differentiation.
 - **Q2 activation-memory probe**:
-  [`q2-activation-memory-probe.md`](q2-activation-memory-probe.md)
+  [`q2-activation-memory-probe.md`](history/q2-activation-memory-probe.md)
   — candidate layer/site selection for later memory interfaces.
 
 ### Idea table
@@ -213,7 +215,7 @@ This plan is organized by artifact type and version line:
 - [`grids-2026-06-04/`](raw/grids-2026-06-04/) contains v1.5 signal-grid CSVs and
   ranking figures. The setting/provenance for these cells is
   [`P08-S3`](settings/settings.md#p08-s3--v15-intrinsic-signal-probe).
-- [`misc/`](misc/) contains supporting notes that are not primary entry points.
+- [`misc/`](assets/) contains supporting notes that are not primary entry points.
   If it grows beyond ad hoc support material, add/update `misc/README.md`.
 
 Rule for child folders: if a folder contains more than one artifact type, its
@@ -224,11 +226,11 @@ parent README must say what the folder is for and link the folder's own
 - [`README.md`](README.md) — this file
 - [`settings.md`](settings/settings.md) — central settings/provenance registry for result cells
 - [`slides/README.md`](slides/README.md) — slide/deck organization and update rules
-- [`v0-learned-memory-wrapper.md`](v0-learned-memory-wrapper.md) — practical v0 scope
-- [`v0-learned-memory-wrapper_zh.md`](v0-learned-memory-wrapper_zh.md) — Chinese v0 scope
-- [`v0-budget.md`](v0-budget.md) — practical v0 budget
-- [`v0-budget_zh.md`](v0-budget_zh.md) — Chinese v0 budget
-- [`v1-results-2026-06-03.md`](v1-results-2026-06-03.md) — v1 empirical state and paper claim
+- [`v0-learned-memory-wrapper.md`](history/v0-learned-memory-wrapper.md) — practical v0 scope
+- [`v0-learned-memory-wrapper_zh.md`](history/v0-learned-memory-wrapper_zh.md) — Chinese v0 scope
+- [`v0-budget.md`](history/v0-budget.md) — practical v0 budget
+- [`v0-budget_zh.md`](history/v0-budget_zh.md) — Chinese v0 budget
+- [`v1-results-2026-06-03.md`](history/v1-results-2026-06-03.md) — v1 empirical state and paper claim
 - [`v1.5-intrinsic-gating-study-2026-06-04.tex`](summary/2026-06-04/v1.5-intrinsic-gating-study-2026-06-04.tex) — v1.5 intrinsic gating note
 - [`validation.md`](validation.md) — experimental protocol, baselines
 - [`channels.md`](channels.md) — benchmarks, datasets

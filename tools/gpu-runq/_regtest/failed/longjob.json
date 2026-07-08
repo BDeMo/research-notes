@@ -1,0 +1,18 @@
+{
+  "id": "longjob",
+  "gpus": [
+    1
+  ],
+  "pid": 40561,
+  "host": "M-D4FLQ6V22M",
+  "start": 1780704634.460029,
+  "log": "/Users/s1shi/workspace/research-notes/tools/gpu-runq/_regtest/logs/longjob.log",
+  "rc": "/Users/s1shi/workspace/research-notes/tools/gpu-runq/_regtest/running/longjob.rc",
+  "cmd": "sleep 300",
+  "cwd": "/Users/s1shi/workspace/research-notes/tools/gpu-runq/_regtest",
+  "priority": 5,
+  "end": 1780704645.711981,
+  "status": "stopped",
+  "exit": null,
+  "dur_s": 11.3
+}

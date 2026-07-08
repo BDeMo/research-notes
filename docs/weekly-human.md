@@ -21,13 +21,13 @@ intrinsic-site protection.
   clear story: the learned soft-prompt wrapper is useful as a lossy context
   compressor when gist-level information is enough, but it should not be used as
   a universal replacement for long context. Setting/provenance:
-  [`P08-S2`](../notes/plans/08-model-outputs-delta-w/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
+  [`P08-S2`](../notes/plans/08-compressed-context-memory/settings/settings.md#p08-s2--v1-phase-y-three-regime-benchmark-cells).
 - **v1.5 do-no-harm gating.** The next step is no longer vague. The wrapper
   should activate when it is likely to help and stay closed when the frozen base
   or full context is safer. Multi-seed probing found practical signals:
   confidence / sequence log probability as positive indicators, and
   wrapper-to-base divergence as a warning sign. Setting/provenance:
-  [`P08-S3`](../notes/plans/08-model-outputs-delta-w/settings.md#p08-s3--v15-intrinsic-signal-probe).
+  [`P08-S3`](../notes/plans/08-compressed-context-memory/settings/settings.md#p08-s3--v15-intrinsic-signal-probe).
 - **Plan 09 / Janus.** A new higher-upside hypothesis is taking shape:
   long-context degradation and fine-tuning forgetting may be coupled through
   intrinsic transformer sites. Early cross-model analysis found positive
@@ -67,6 +67,6 @@ intrinsic-site protection.
 
 ### Pointers
 
-- Plan 08: [`notes/plans/08-model-outputs-delta-w/`](../notes/plans/08-model-outputs-delta-w/)
-- Plan 08 settings registry: [`settings.md`](../notes/plans/08-model-outputs-delta-w/settings.md)
+- Plan 08: [`notes/plans/08-compressed-context-memory/`](../notes/plans/08-compressed-context-memory/)
+- Plan 08 settings registry: [`settings.md`](../notes/plans/08-compressed-context-memory/settings/settings.md)
 - Plan 09 / Janus: [`notes/plans/09-intrinsic-site-protection/`](../notes/plans/09-intrinsic-site-protection/)

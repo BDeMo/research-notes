@@ -46,7 +46,7 @@ research-notes/
         ├── README.md                                # index (TOC with meta per plan)
         ├── 01-x-saturation-curve/                   # data curation by inference-time difficulty
         ├── 03-w-space-best-of-n/                    # test-time search along the weights axis
-        ├── 08-model-outputs-delta-w/                # self-modifying LLMs
+        ├── 08-compressed-context-memory/                # compressed-context memory (Papers A & B; ΔW self-modifying = parked north-star)
         └── 09-intrinsic-site-protection/            # long-ctx ↔ forgetting coupling → anti-forgetting
 ```
 

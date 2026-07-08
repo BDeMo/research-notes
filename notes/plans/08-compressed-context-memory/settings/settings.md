@@ -52,7 +52,7 @@ by the final v1 `mem-X` wrapper recipe.
 | Key hyperparameters | `lambda_div = 0.1`, `lambda_ah ≈ 0.5`, `K = 32`, heads `h = 4`, layers `L = 1` |
 | Seeds used for headline v1 bands | `{42, 7, 11, 13}` |
 | Baselines | `no_context`, `full_context`, `retrieval`, `summary`, matched Gist Tokens |
-| Main facts doc | [`v1-results-2026-06-03.md`](../v1-results-2026-06-03.md) |
+| Main facts doc | [`v1-results-2026-06-03.md`](../history/v1-results-2026-06-03.md) |
 | Caveats | Single-task synthetic SFT; not a universal memory claim; exact-retrieval tasks expose the bit-capacity / lossy-compression limit. |
 
 ## P08-S2 — v1 Phase Y three-regime benchmark cells
@@ -72,7 +72,7 @@ MuSR-mm, or RULER-NIAH headline cells.
 | Seeds | `{42, 7, 11, 13}` |
 | Reported statistic | mean ± std over seeds |
 | Baseline comparison | matched Gist + no-training baselines; `full_context` used as reference where available |
-| Main result doc | [`v1-results-2026-06-03.md#5-the-3-regime-law--headline-result-phase-y-4-seeds`](../v1-results-2026-06-03.md#5-the-3-regime-law--headline-result-phase-y-4-seeds) |
+| Main result doc | [`v1-results-2026-06-03.md#5-the-3-regime-law--headline-result-phase-y-4-seeds`](../history/v1-results-2026-06-03.md#5-the-3-regime-law--headline-result-phase-y-4-seeds) |
 | Caveats | `full_context` is an upper/reference condition, not always available under equal context budget; result is a characterization of regimes, not universal superiority. |
 
 ## P08-S3 — v1.5 intrinsic signal probe
@@ -116,8 +116,8 @@ Use for v2 design claims, not for verified result cells.
 | Persistence | serialize latent memory state and reload across sessions |
 | Target datasets | LongMemEval, LOCOMO; synthetic multi-session smoke first |
 | Main baseline | TokMem; related latent reasoning / memory-token methods in related-work doc |
-| Design doc | [`v2-plan.md`](../v2-plan.md) |
-| Related work | [`v2-related-work.md`](../v2-related-work.md) |
+| Design doc | [`v2-plan.md`](../history/v2-plan.md) |
+| Related work | [`v2-related-work.md`](../history/v2-related-work.md) |
 | Caveats | No v2 benchmark result should be reported as verified until this setting is implemented and evaluated. |
 
 ## P08-S5 — RCA / project motivation setting
@@ -133,7 +133,7 @@ motivation rather than Plan 08 benchmark results.
 | Datasets | Nezha, OpenRCA-500, RCAEval, lincyaw/rca; private Liang DTS only as internal qualitative probe |
 | Role in Plan 08 | motivation: direct SFT can teach RCA behavior but can also regress general capabilities / format / evidence grounding |
 | Public/private boundary | Do not expose raw Nokia DTS prompts or private local paths in public slides |
-| Relevant Plan 08 doc | [`v0-learned-memory-wrapper.md`](../v0-learned-memory-wrapper.md), [`v0-how-we-got-here.md`](../v0-how-we-got-here.md) |
+| Relevant Plan 08 doc | [`v0-learned-memory-wrapper.md`](../history/v0-learned-memory-wrapper.md), [`v0-how-we-got-here.md`](../history/v0-how-we-got-here.md) |
 | Caveats | RCA-demo numbers are not Plan 08 wrapper results unless explicitly labeled as RCA motivation. |
 
 ## P08-S6 — v1.5 cross-model 7-family signal probe (2026-06-05)

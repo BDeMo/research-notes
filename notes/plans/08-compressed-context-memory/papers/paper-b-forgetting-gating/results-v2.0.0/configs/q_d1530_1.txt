@@ -1,0 +1,2 @@
+GCM_TAG=ab_q35_distill0 GCM_DISTILL=0 GCM_TRAIN=bfcl_live_multiple GCM_EVAL=bfcl_live_multiple GCM_MAXCTX=2048 GCM_MAX_STEPS=1500 GCM_RECON=1.0 ::: Qwen/Qwen3.5-9B
+GCM_TAG=ab_q35_depthfull GCM_DEPTH=full GCM_TRAIN=bfcl_live_multiple GCM_EVAL=bfcl_live_multiple GCM_MAXCTX=2048 GCM_MAX_STEPS=1500 GCM_RECON=1.0 GCM_DISTILL=1.0 ::: Qwen/Qwen3.5-9B

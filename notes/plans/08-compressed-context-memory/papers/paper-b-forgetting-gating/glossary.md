@@ -1,7 +1,7 @@
 # Glossary — Paper B (gated parametric memory)
 
 Definitions for the technical / internal terms used across the results docs. Link to a term as
-`[GCM](../glossary.md#gcm)` (from a `results-v1.7.x/` doc) so terms jump here, wiki-style.
+`GCM` (from a `results-v1.7.x/` doc) so terms jump here, wiki-style.
 
 ---
 

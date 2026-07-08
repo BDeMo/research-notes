@@ -107,7 +107,7 @@ M: exp · proto · paper · thesis · prod · side  +  solo · collab · team ·
 | H3 | Reasoning trace → weight delta | ★ | ? | ←#08 | | – | Compile thinking into weights instead of token stream |
 | H4 | TTT as compression | | ? | | | – | Internalize retrieved prompts into LoRA over time |
 | H5 | Multi-model collaborative TTT | | ? | | | – | Small model generates supervision; reverse distillation |
-| H6 | Model outputs ΔW as part of generation | ★★★ | D | 1/3 | thesis,solo | [08](../plans/08-model-outputs-delta-w/) | Output $(y, \Delta W)$ per turn; verifier gates apply |
+| H6 | Model outputs ΔW as part of generation | ★★★ | D | 1/3 | thesis,solo | [08](../plans/08-compressed-context-memory/) | Output $(y, \Delta W)$ per turn; verifier gates apply |
 | H7 | Inference-time ΔW as a tool call | ★ | ? | ←#08 | | – | Model emits `<learn>…</learn>` → D2L-like submodule → temp LoRA |
 
 ### I. X-W exchange framing (latest brainstorm)

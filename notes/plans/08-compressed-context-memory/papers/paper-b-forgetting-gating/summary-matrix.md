@@ -16,7 +16,7 @@
 > [`framing.md`](framing.md) · [`baselines-and-novelty.md`](baselines-and-novelty.md) · [`outline.md`](outline.md).
 >
 > **Two repos:** evidence ledger = `mem-embedding` repo `summary/matrix.md` (sections cited as §N);
-> raw data/figures = `research-notes` repo `notes/plans/08-model-outputs-delta-w/raw/` (cited `raw/…`).
+> raw data/figures = `research-notes` repo `notes/plans/08-compressed-context-memory/raw/` (cited `raw/…`).
 > **Base model for all numbers = Qwen3-8B unless noted.** **HONESTY FIRST: do not exceed the numbers here.**
 
 ---
@@ -39,7 +39,7 @@ limits: a capacity wall on exact recall, and that a trivial base-uncertainty gat
 - **Thesis:** *do-no-harm adaptation* — a detachable, model-agnostic, per-distribution memory module on
   a frozen base; **helps in-domain, never harms** (gate ⇒ falls back to exact base).
 - **Headline framing:** "a pluggable memory that **knows when not to fire**" (agent/reliability angle, not narrow CF). See [`framing.md`](framing.md).
-- **Scope (decided, popular):** **adaptive latent memory for LLM agents** — fast (few latent tokens), safe (cross-model do-no-harm gate), accurate when needed (**falls back to full context**). Community/venue = **agentic memory** (ICLR'26 MemAgents workshop), *not* generic prompt-compression. Full answer to "compress→latent + gate + fallback, novel?" + lit (Gist/Cartridges/ACON; TAAC/ContextPilot; SLT/SeLaR) in [`scope-and-compression.md`](scope-and-compression.md). **Honest:** gate+fallback exists at text-level (TAAC) & reasoning-level (SLT) — our novelty = applying it to a *learned latent* memory + cross-model do-no-harm signal, not the mechanism.
+- **Scope (decided, popular):** **adaptive latent memory for LLM agents** — fast (few latent tokens), safe (cross-model do-no-harm gate), accurate when needed (**falls back to full context**). Community/venue = **agentic memory** (ICLR'26 MemAgents workshop), *not* generic prompt-compression. Full answer to "compress→latent + gate + fallback, novel?" + lit (Gist/Cartridges/ACON; TAAC/ContextPilot; SLT/SeLaR) in `scope-and-compression.md`. **Honest:** gate+fallback exists at text-level (TAAC) & reasoning-level (SLT) — our novelty = applying it to a *learned latent* memory + cross-model do-no-harm signal, not the mechanism.
 - **Scope (declared, not a weakness):** target **in-domain** lift; floor = **in-task / in-dataset no-harm**; cross-domain → gate closes. **Not** fact storage (capacity wall → Paper A).
 - **⚠️ Novelty squeeze (must respect):** two ICLR'26 neighbors — **Cartridges** (frozen-base pluggable KV-cache memory = the *module*) and **TARG** (training-free base-uncertainty gate = the *gate*; ≥ ours, §7d). **Our white space = the do-no-harm *treatment*** (boundary + do-no-harm-by-construction for a *learned* module + cross-model gate + honest negatives). **Complementary to Cartridges; extends TARG from retrieval to learned modules.** Full defense in [`baselines-and-novelty.md`](baselines-and-novelty.md).
 
@@ -162,7 +162,7 @@ Full table + IDs: [`baselines-and-novelty.md`](baselines-and-novelty.md) §1. **
 | 5-seed significance CIs | ✅ DONE 38/38 (folding pending) |
 | Cartridge-lite / Gist-lite columns (all 8 benches) | 🔄 worker (prefix+gist × 8) → fills main table |
 | per-bench SFT matched control + off-diagonal forgetting panel | 🔄 worker (SFT × 5 QA, eval all 8) |
-| **3-way adaptive gate** (mem ↔ full-ctx ↔ base) — the compression/fallback selling point | ⬜ needs `gate3_eval.py` → then queue ([`scope-and-compression.md`](scope-and-compression.md) §3) |
+| **3-way adaptive gate** (mem ↔ full-ctx ↔ base) — the compression/fallback selling point | ⬜ needs `gate3_eval.py` → then queue (`scope-and-compression.md` §3) |
 | 7-family read head-to-head | ⛔ blocked (ray/test pods deleted); 3-family done. (+Qwen3-14B = cheap follow-up) |
 | relevance/agent eval · online gate | ⬜ T2/T3 future |
 

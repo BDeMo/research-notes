@@ -43,7 +43,7 @@
 - `mem-test/mem-embedding/scripts/xmodel_consistency.py` — cross-model consistency analyzer.
 - `mem-test/mem-embedding/xmodel/qwen3_8b/` — pulled Qwen3-8B baseline (6000 items).
 - (pending runs) GLM-4-9B 3-seed + Qwen3.5-9B 4-seed signal jsonls → consistency CSV + chart.
-- [`notes/plans/08-model-outputs-delta-w/summary/2026-06-04/v1.5-metric-candidates-2026-06-04.md`](../../notes/plans/08-model-outputs-delta-w/summary/2026-06-04/v1.5-metric-candidates-2026-06-04.md)
+- [`notes/plans/08-compressed-context-memory/summary/2026-06-04/v1.5-metric-candidates-2026-06-04.md`](../../notes/plans/08-compressed-context-memory/summary/2026-06-04/v1.5-metric-candidates-2026-06-04.md)
   — plan-09-style gate-signal curation (generality × novelty × interest × soundness) + 14 new
   candidates (memory-geometry / counterfactual / 09-bridge structure & attention-routing / stability)
   + code-&-validate shortlist + the facts/grid/analysis location index.

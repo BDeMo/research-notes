@@ -1,0 +1,5 @@
+GCM_TAG=hon_bfcl_q35 GCM_K=128 GCM_RECON=1.0 GCM_DISTILL=1.0 GCM_MAXCTX=2560 GCM_MAX_STEPS=1500 GCM_TRAIN=bfcl_live_multiple GCM_EVAL=bfcl_live_multiple ::: Qwen/Qwen3.5-9B
+GCM_BASELINE=sft GCM_TAG=sft_bfcl_q35 GCM_MAXCTX=2560 GCM_MAX_STEPS=1500 GCM_TRAIN=bfcl_live_multiple GCM_EVAL=bfcl_live_multiple ::: Qwen/Qwen3.5-9B
+GCM_BASELINE=cart GCM_TAG=cart_bfcl_q35 GCM_K=64 GCM_MAXCTX=2560 GCM_MAX_STEPS=1500 GCM_TRAIN=bfcl_live_multiple GCM_EVAL=bfcl_live_multiple ::: Qwen/Qwen3.5-9B
+GCM_BASELINE=gist GCM_TAG=gist_squad_q38 GCM_K=64 GCM_MAXCTX=4096 GCM_MAX_STEPS=1500 GCM_TRAIN=squad_v2 GCM_EVAL=squad_v2 ::: Qwen/Qwen3-8B
+GCM_BASELINE=sft GCM_TAG=sft_squad_q35 GCM_MAXCTX=2560 GCM_MAX_STEPS=1500 GCM_TRAIN=squad_v2 GCM_EVAL=squad_v2 ::: Qwen/Qwen3.5-9B
