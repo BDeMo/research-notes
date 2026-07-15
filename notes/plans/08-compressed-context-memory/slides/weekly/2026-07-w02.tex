@@ -1,0 +1,95 @@
+% July Week 2 weekly: Mon 2026-07-13 to Sun 2026-07-19.
+% High-level logic only; details in linked repo docs. Recall spans the WHOLE project, not just last week.
+% Focus: Paper B rigor pass (bug fix + corrected results + Occam v3.0); Paper C (linear attention) opened; research deck.
+
+\providecommand{\pbref}[2]{\href{../../papers/paper-b-forgetting-gating/#1}{\textcolor{blue}{#2}}}
+\providecommand{\pcref}[2]{\href{../../papers/paper-c-linear-attention/#1}{\textcolor{blue}{#2}}}
+
+\section{July Week 2 (Mon 2026-07-13 to Sun 2026-07-19)}
+
+\begin{frame}{Reporting Period}
+  \begin{center}
+    \textbf{Plan 08 / Long-Context Compression --- July Week 2} \\[0.3em]
+    \small Mon 2026-07-13 to Sun 2026-07-19 \\
+    \scriptsize This week: \textbf{Paper B rigor pass} (bug fix, corrected results, Occam v3.0) · \textbf{Paper C} (linear attention) opened · research deck. \\
+    \scriptsize First: a \textbf{full-project recall} (whole cycle, not just last week).
+  \end{center}
+\end{frame}
+
+% ---------- FULL-PROJECT RECALL ----------
+\begin{frame}{Recall (1/3) --- background: the long-context memory wall}
+  \small
+  \begin{block}{Why the project exists}
+    LLMs accept long inputs, but long context is \emph{not} solved: softmax attention keeps a \textbf{growing KV cache} (memory $\propto$ length), full context is costly and sometimes \emph{hurts} accuracy, and training-free reduction methods are brittle and task-dependent.
+  \end{block}
+  \begin{itemize}
+    \item Two escape routes the field takes: \textbf{shrink the cache} (KV-eviction / prompt-compression / retrieval) vs. \textbf{remove the cache} (\textbf{linear attention} / SSM: a fixed-size recurrent state, $O(L)$ time, $O(1)$ memory).
+    \item Our bases span both: \textbf{Qwen3} (quadratic) and \textbf{Qwen3.5/3.6} (Gated-DeltaNet linear 3:1 hybrid).
+  \end{itemize}
+  \begin{block}{Guiding question (whole project)}
+    On a \emph{frozen} base, how do we feed / hold the \emph{right} context so long-context accuracy survives --- across architectures?
+  \end{block}
+\end{frame}
+
+\begin{frame}{Recall (2/3) --- one thesis, three papers (the whole cycle)}
+  \small
+  \begin{block}{Thesis}
+    Long-context accuracy is a \textbf{keep-the-answer-span} problem. No fixed compressor wins everywhere; the right mechanism is \textbf{input-adaptive} and ideally \textbf{training-free \& architecture-agnostic}.
+  \end{block}
+  \begin{description}
+    \item[Paper A] Learned \textbf{soft-memory} compressor on a frozen base + a do-no-harm gate. $\Rightarrow$ \textbf{honest negative}: compressor is a commodity, gate a non-effect, can't compress extractive QA. \emph{This motivated the pivot.}
+    \item[Paper B] Stop building a compressor; \textbf{diagnose} what works + attach a training-free \textbf{importance-routing prefilter (IMP)} to a frozen base. \emph{Main result line.}
+    \item[Paper C (v3.0)] The diagnosis reproduces on \textbf{cache-free linear} models where KV-methods can't run $\Rightarrow$ new line on \textbf{linear-attention forgetting / memory-state} (Qwen3.5/3.6 GDN family).
+  \end{description}
+  \scriptsize Deck: \href{../main-research.pdf}{\textcolor{blue}{main-research}} · framing: \pbref{OVERVIEW-both-papers-and-facts.md}{OVERVIEW}.
+\end{frame}
+
+\begin{frame}{Recall (3/3) --- what each paper established (to date)}
+  \scriptsize
+  \begin{description}
+    \item[Paper A] Learned compressor $\approx$ no-context on extractive QA (4 recipes); reconstruction-gate $\approx$ chance; \textbf{training-free IMP beats the learned compressor}. $\Rightarrow$ blocked; pivot justified. \pbref{negative-results.md}{negatives}
+    \item[Paper B --- diagnosis] Full-test map over \textbf{9 model families}: (i) no universal compressor; (ii) ``more context can hurt'' (literary-MC full $<$ blind); (iii) retrieval $\gg$ full on ultra-long; (iv) \textbf{model-invariant}, incl. linear GDN. \pbref{matrix-facts.md}{facts F27/F31/F43}
+    \item[Paper B --- method] \textbf{IMP} = training-free, input-side, arch-agnostic router; keeps top spans/chunks verbatim; routes granularity per input. \pbref{method-vNext-2026-07-13.md}{method}
+    \item[Paper C] Landscape mapped (delta-rule family: DeltaNet$\to$GDN$\to$KDA$\to$GDN-2); the linear \textbf{recall/forgetting bottleneck} is the opening. \pcref{PAPER-C-research-line.md}{research line}
+  \end{description}
+\end{frame}
+
+% ---------- THIS WEEK ----------
+\begin{frame}{This week (1/3) --- Paper B: a rigor pass}
+  \small
+  \begin{itemize}
+    \item \textbf{Found \& fixed a bug (F44).} IMP was \emph{truncating} context to 16k \emph{before} selecting, while RAG saw the whole 131k-token doc --- 87\% of RAG's kept content lived beyond 16k. Fix (full-doc retrieval): $\infty$Bench $51 \to \textbf{76}$, the $-19$ gap \emph{reversed} to a win. \pbref{correctness-audit-2026-07-13.md}{audit}
+    \item \textbf{Re-ran the corrected main table} (ours = \texttt{auto}, full-N) + verified RAG reproduces. \pbref{main-table-fulltest.md}{main table}
+    \item \textbf{Compared vs \emph{all} baselines} (not just RAG): honest --- KV-eviction wins literary-MC, full wins dense-reasoning; we own retrieval/extractive/needle/ultra-long \emph{and} linear. \pbref{best-of-all-baselines-2026-07-13.md}{best-of-all}
+    \item \textbf{Code review} (methods/benches/eval) + \textbf{Occam v3.0} (\texttt{IMP-lite}: one mode, one signal, one knob). \pbref{code-review-2026-07-13.md}{review} · \pbref{method-vNext-2026-07-13.md}{v3.0}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{This week (2/3) --- Paper C: linear-attention line opened}
+  \small
+  \begin{itemize}
+    \item \textbf{Research line + references} for linear attention \& variants (Qwen3.5/3.6 GDN family only; no Qwen3 control). Landscape: delta-rule = ``memory as online least-squares''; frontier = \textbf{how to erase vs write} the compressed state (GDN-2's channel-wise erase gate carries most of its gain). \pcref{references-linear-attention.md}{references} · \pcref{gdn-forgetting-exploration.md}{ablation design}
+    \item \textbf{GDN anti-forgetting modules (training-free, real benches):} \textbf{input-side compression rescues GDN on ultra-long} ($\infty$Bench full 55 $\to$ imp-lite 76); recency-reorder modules are marginal/task-dependent. \pcref{gdn-module-results-2026-07-14.md}{module results}
+    \item \textbf{Honesty:} the synthetic single-needle probe was inconclusive (task too easy / a probe bug we caught + reverted); trustworthy evidence is the real-bench grid. 128k probe OOMs (GDN kernel).
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{This week (3/3) --- reporting deck + housekeeping}
+  \small
+  \begin{itemize}
+    \item \textbf{Research deck} (\href{../main-research.pdf}{\textcolor{blue}{main-research}}): A/B/C overview, indexed, all artifacts GitHub-hyperlinked; total$\to$detail structure with the mainline logic up front.
+    \item \textbf{Scale/family directive (Paper C):} headline at \textbf{10--30B}, GDN family (Qwen3.5/3.6) only; secure the in-band \textbf{Qwen3.6-27B} checkpoint.
+    \item \textbf{Cluster hygiene:} reclaimed a GPU held for 5 days by a stale demo server (mis-attributed as external); 6 clean GPUs now available.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Insights \& next steps}
+  \small
+  \begin{block}{Cross-cutting insights}
+    Long-context $=$ keep-the-gold-span (gold-recall predicts accuracy); no universal compressor; retrieval can \emph{denoise above full}; the diagnosis is model-invariant; KV-eviction owns literary-MC but \textbf{can't run on linear} --- that gap is ours.
+  \end{block}
+  \begin{description}
+    \item[Paper B] run the IMP-lite Occam ablation; finalize v3.0; settle the ``$>$RAG or RAG-configured'' question.
+    \item[Paper C] secure Qwen3.6-27B + RULER (HF) access; diagnose GDN forgetting on real long-context; test input-side vs. erase-gate-retrofit fixes.
+  \end{description}
+\end{frame}
