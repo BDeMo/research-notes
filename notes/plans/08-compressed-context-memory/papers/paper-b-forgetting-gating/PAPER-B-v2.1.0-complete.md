@@ -18,6 +18,8 @@ Head-to-head at **16k, 50% budget** (loglik-scored; `hh_*` logs, `matrix-facts` 
 **⇒** No method is universal; the win is **regime-specific**, and the shared failure corner (long + abstractive + distractor-mixed) is the target. The method must **identify importance per input**, not apply a fixed policy.
 
 ## 2. Main method — IMP (Importance-routing structure on a frozen base)
+> **Current version = `IMP-v2.1.0`** (span-level, span=32, keep=0.5, signals={query-relevance, surprisal}). All results in this paper's tables are this version. `IMP-v2.0` = token-level (retrieval-only, superseded, F24).
+
 A lightweight **structural extension** inserted around a **frozen** base — not a text pre-processor and not a base retrain. Same structure, **two deployment modes**:
 
 **Mode A — plug-and-play (no training).** Use the base's OWN cheap signals directly:
@@ -41,7 +43,12 @@ long ctx → **(a) cheap O(L) importance scoring** (attention-free, length-robus
 | E4 distilled router > heuristic + transfers across bases | the checkpoint + generality claim | ⏳ |
 | E5 linear side-cache + R-MeeTo closes the GDN retrieval gap | linear arm | ⏳ |
 | E6 5×5 domain transfer (X-C1) | the compressed importance generalizes across domains | ⏳ (aggregate rows only) |
-**Main table:** rows = benches (RULER-sweep, numerical/categorical NIAH, hotpot, narrativeqa, QuALITY, + ∞Bench/NoCha) × bases (Qwen3-8B quad, Qwen3.5/3.6 GDN, + 1.7B/14B/Qwen2.5/Llama for generality); cols = no_ctx, full, best-per-family baseline (kvzip/RAG/LLMLingua/ToMe), **IMP (ours)**, prefill-tokens. Claim = **IMP ≥ best feasible baseline on accuracy at a fraction of the prefill, across architectures.**
+**Main table (FULL test sets — live in [`main-table-fulltest.md`](main-table-fulltest.md), F27):** 9 method cols (no_ctx, full, window, RAG, LLMLingua-2, ToMe, **IMP**, kvzip, knorm) × 16 benches. Long-context headline benches on the **FULL split** (incl. the two hardest: **LongBench-v2** 503, **∞Bench** ~229); short-context sanity on a disclosed N=500 subset (config: [`experiment-config-and-sampling.md`](experiment-config-and-sampling.md)). Headline reads at keep-0.5:
+- **"more context hurts":** QuALITY `full` 7.2 < blind 17.9; **LongBench-v2 (hardest) `full` 33.6 ≈ blind 33.4** (~0 gain over guessing).
+- **selection beats `full`:** ∞Bench RAG **64.2 > 53.7**, squad 71.5 > 69.0, trivia ll2 71.4 > 69.4, lb_hotpotqa RAG 24.8 > 22.6.
+- **IMP (ours) uniquely lossless on retrieval:** **RULER-16k 96.8 ≈ full 99.0** while **ToMe→0.0, window→6.0** collapse; mid-pack on real long-doc QA (⇒ Mode-B light training).
+
+Remaining axes to add: bases (Qwen3.5/3.6 GDN, 1.7B/14B/Qwen2.5/Llama for generality) and a prefill-tokens column. Claim = **IMP ≥ best feasible baseline on accuracy at a fraction of the prefill, across architectures.**
 
 ## 4. Insights (facts this rests on — `matrix-facts.md`)
 F1 attn-KV collapses ≥16k · F2 attn-free length-robust · F3 ranking flips by task · F4 kvzip=reconstruction-importance, retrieval-only · F6 full-hurts on literary-MC · F9 RAG fails abstractive (lexical) · F11 failures size/family-invariant (⇒ transferable router) · F12 compressor is commodity · F14 naive merge kills needle · F18 head-to-head which-works.

@@ -1,5 +1,7 @@
 # Long-Context Compression: Two Papers, One Fact-Base — an overview for newcomers
 
+> ⚠️ **Terminology:** `full` in every result table = context **TRUNCATED to MAXCTX (16k)**, not the whole document (`embed(ctx[:,:MAXCTX])`). It equals *true full* only when a doc ≤ 16k — true for every bench **except ∞Bench** (131k docs → `full` sees ~12%). Only `rag` and our `auto`(chunk) read the whole doc. See [`correctness-audit-2026-07-13.md`](correctness-audit-2026-07-13.md).
+
 > **Who this is for:** a general AI/ML researcher who has *never* seen this project. It (a) builds the background from
 > scratch with links and examples, (b) summarizes everything we did since the **v2.0.0 brainstorm** and the **v1.8.0
 > elegance** goals, (c) shows the figures (each titled with its **motivation / settings / conclusion**), (d) explains how
@@ -89,6 +91,23 @@ Both sit at the **memory-compression** thread but ask different questions. They 
 ### What is DISTINCT to each
 - **Paper A only:** validity-detection / self-verification for a compressed memory; conformal coverage guarantee; the gate F1/precision/recall machinery; the "gated ≥ full was tautological in-sample → fixed out-of-sample" correction.
 - **Paper B only:** the **observe→structure** contribution — the cheap importance-signal study (F20) → an **importance-routing structure** (router + verbatim side-cache) that plugs onto a **frozen** base (plug-and-play or light-trained); the **linear-arm** side-cache/R-MeeTo; the long-prefill/efficiency win; cross-architecture generality. Does **not** need a learned soft-memory.
+
+---
+
+## 2.5 Current insights (the distilled takeaways)
+
+The 27 facts (§3, [`matrix-facts.md`](matrix-facts.md) F1–F27) collapse into **six insights**; full derivation + per-cluster fact IDs in [`facts-and-insights-summary.md`](facts-and-insights-summary.md).
+
+1. **The bottleneck is *finding/keeping the important info*, not raw capacity.** No fixed compressor is right everywhere — the winner flips by regime (retrieval / multi-hop / abstractive / literary-MC), at every model size & family (F3, F11, F18, F27).
+2. **Each baseline's failure is *structural* and predictable** — it maps to a built-in assumption: attention-KV eviction has a ~16k cliff (F1); window = locality (F5); RAG = lexical overlap (F9); ToMe = mergeability, and merging destroys the needle (F14/F17); kvzip is retrieval-only (F4); LLMLingua denoises but drops needles (F8/F16).
+3. **More context is often a *liability*, and compression *denoises*.** On literary-MC the full context is *worse* than answering blind, as a base-capability ceiling not a distractor effect (F6/F7); on the hardest MC (LongBench-v2) full ≈ blind (~0 gain); and compression/retrieval *beats* full on ∞Bench, squad, trivia, categorical/coding NIAH (F23, F27).
+4. **The failures are architecture-, size-, and family-invariant** — including cache-free linear/GDN models where KV-eviction can't even apply (F10, F11, F15). ⇒ an importance signal transfers across bases → "bolt IMP onto *any* frozen base."
+5. **Cheap O(L) signals locate the important tokens, length-invariantly** (query-relevance 0.95, surprisal 0.84; neither wins both) ⇒ a **training-free multi-signal router is feasible** (F20).
+6. **Select coherent *spans*, not tokens.** Token-level top-p is retrieval-only and shreds QA; **span-level IMP-v2.1.0** keeps the needle's span (retrieval = full: RULER-16k 96.8 vs full 99.0, where ToMe→0/window→6) *and* the answer sentence (QA rescued), and *beats* full where it denoises (F24, F25, F27). — Meanwhile **Paper A's learned soft-memory compressor is blocked** (can't compress extractive QA, F26) and the reconstruction gate is a non-effect (F22), so **training-free IMP already beats the learned memory** → the project tilts to Paper B.
+
+**Update (2026-07-09, F31/F32):** two decisive checks landed. (i) The diagnosis is **model-invariant** — all three signatures reproduce across **10 models** (1.7B→14B, Qwen2.5/3/3.5, GLM-4, Ministral, quadratic + linear-GDN), so it is a property of frozen-LLM+long-context, not a single-model artifact. (ii) **IMP's QA gap to RAG is structural** — a signal×span ablation (15 configs) closes none of it (squad ≤24 vs RAG 71). ⇒ the **robust contribution is the diagnosis fact-base**; IMP is a training-free reference point that wins only on retrieval + cache-free-linear, and is **dominated by free RAG on real QA** (F30). Honest positioning: sell the diagnosis + (pending) query-agnostic/efficiency, **not** SOTA QA accuracy. See [`dive-in-imp-weakness-and-baselines.md`](dive-in-imp-weakness-and-baselines.md).
+
+**One line:** *long-context accuracy is a **keep-the-right-span** problem; cheap signals find that span on any frozen base (and on cache-free linear models) — but a free retrieval baseline already does the QA job better, so the durable contribution is the **diagnosis**, not the router.*
 
 ---
 
@@ -213,5 +232,6 @@ Moved to a standalone doc (GDN full name; how many 2026 flagships are linear; li
 7. **July-w01 (cont.) — IMP method + compressor-fix attempt:**
    - **IMP (Paper B), span-level**: 23-cell sweep → retrieval = full (incl. 16k), coherent QA rescued (squad 0.15→0.46, hotpot 0.21→0.42), beats full on trivia/categorical; monotone keep-rate curve; span-size insensitive (**F24/F25**, §3.1 F, Fig 13).
    - **Compressor-fix sweep (Paper A)**: 4 recipes to make the learned M compress on squad — **all failed** (compress ≈ no_ctx; **F26**, §3.1 G). Training-free IMP (0.46) beats the learned compressor (0.19). Project tilts toward the Paper B line.
+8. **July-08 — FULL-test paper main table (Paper B, F27; method = `IMP-v2.1.0` span-level Mode A):** added the two hardest mainstream long-context benches (**LongBench-v2** 503 MC; **∞Bench** longbook_choice_eng >100k MC) and launched a **112-cell full-test grid** (9 method cols × 16 benches; long-context headline on FULL split, short sanity N=500 disclosed) on idle GPUs — see [`main-table-fulltest.md`](main-table-fulltest.md) + [`experiment-config-and-sampling.md`](experiment-config-and-sampling.md). Live headline: **"more context hurts"** hardened (QuALITY full 7.2 < blind 17.9; **LongBench-v2 full 33.6 ≈ blind 33.4**); **selection beats full** (∞Bench RAG 64.2 > 53.7); **IMP near-lossless on RULER-16k (96.8 ≈ full 99.0)** where ToMe/window collapse.
 
 *Provenance: `decisions-2026-06-24.md` D12–D25; ~850+ `RECIPE_EVAL` cells on the dev pods; figures auto-generated from the result logs.*

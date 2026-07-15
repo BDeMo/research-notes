@@ -2,6 +2,8 @@
 
 *Self-contained empirical reference for the v2.0.0 paper. Everything needed to read this file is defined below — no external context required.*
 
+> **⚠ Sampling disclosure.** Every number in this fact-base is on a **DOWN-SAMPLED test subset (N=48/cell; LongBench-32k N=16; head-to-head N=64–96)** — exploratory, for relative comparison only. The **paper main table will be run on the FULL test split** of each benchmark (sizes and configs in [`experiment-config-and-sampling.md`](experiment-config-and-sampling.md)). Any down-sampled number in the paper will state its `N`.
+
 ---
 
 ## Why this matters (motivation)
@@ -372,6 +374,8 @@ The single diagnostic: **`full` (uncompressed) must be a sane ceiling**; if `ful
 *Provenance: `kvf_*` logs on d1525; faithfulness per `baseline-catalog-faithfulness.md` (all EXACT except ToMe=input-side adapted, RAG=generic). Selective-Context newly reproduced this week (authors' pkg + spaCy `en_core_web_sm` + gpt2 self-info).*
 
 ## 12. IMP (our method, Paper B) — Mode A token-level, keep 0.5
+
+> **Version note:** §12 (token-level) = **`IMP-v2.0`** (retrieval-only, superseded). §12.1–§12.2 (span-level) = **`IMP-v2.1.0`** — the current method behind all headline/full-test/generality tables. Do not mix the two when citing numbers.
 
 *Plug-and-play importance-routing prefilter (frozen base, no training): score each ctx token by `z(query-relevance)+z(surprisal)` (F20), keep top-p verbatim, drop the rest. `imp_*` logs on d1525. This is the **token-level** variant (Mode A); the **span-level** variant (Mode A.2) is under test.*
 

@@ -1,5 +1,7 @@
 # IMP — method spec & implementation details
 
+> **Version: `IMP-v2.1.1`** (span-level, Mode A, span=32, keep=0.5, signals=**{query-relevance, surprisal, IDF-lexical}**, `GCM_IMP_SIGNAL=all`) — adds the IDF-weighted lexical query-match signal (F33) that closes most of the QA gap to RAG. `IMP-v2.1.0` = {query, surprisal} only; `IMP-v2.0` = token-level (retrieval-only), superseded.
+>
 > **IMP = Importance-routing Prefilter.** A lightweight, architecture-agnostic structure that attaches to a **frozen** base LLM: score every context token by cheap O(L) signals, **keep the most-important spans verbatim**, drop/merge the redundant rest, and let the frozen base read the shortened sequence. Two deployment modes: **plug-and-play (no training)** and **light-weight training** (a tiny module; base never retrained).
 >
 > This doc is the precise algorithm + the exact code path (`run_baseline.py`, mode `imp`). Results: fact-base §12 / §12.2, Fig 13, F24/F25.
@@ -24,9 +26,13 @@ Cost: embedding lookup + dot product, **O(L·d), no transformer forward** → tr
 $$\text{surp}(t) = -\log p_F(c_t \mid c_{<t})$$
 Cost: one forward over the context (O(L²) on quadratic attn, O(L) on linear). Best on high-information/numeric needles (AUROC 0.84, F20). *(See §7 for the prefill caveat and the small-scorer fix.)*
 
-**(c) Combination** (default) — z-score each, then sum (no single signal wins across tasks, F3/F20):
-$$s(t) = z(\text{qrel})(t) + z(\text{surp})(t),\qquad z(x)=\frac{x-\mu_x}{\sigma_x+\varepsilon}$$
-Switch via `GCM_IMP_SIGNAL ∈ {query, surprisal, both}` (both = default).
+**(c) Lexical query-match (IDF-weighted, added in `IMP-v2.1.1`)** — the ingredient that made RAG strong (F30/F33). For each token that also appears in the query, weight it by an **inverse-context-frequency** IDF so common boilerplate is down-weighted and rare, discriminative query terms are boosted:
+$$\text{lex}(t) = \mathbb{1}[c_t \in q]\cdot \log\frac{L+1}{\text{tf}(c_t)+0.5}$$
+This directly fixes the CMG/QA failure mode where `qrel` locked onto generic headers and `surp` onto high-entropy noise (diagnostic: [`dive-in-imp-weakness-and-baselines.md`](dive-in-imp-weakness-and-baselines.md)).
+
+**(d) Combination** — z-score each, then sum (no single signal wins across tasks, F3/F20):
+$$s(t) = z(\text{qrel}) + z(\text{surp}) + z(\text{lex})$$
+Switch via `GCM_IMP_SIGNAL ∈ {query, surprisal, both, lex, qlex, all}`. **`all` (query+surprisal+lex) is the recommended default (v2.1.1)** — it closes most of the QA gap to RAG (lb_hotpotqa 17.4→24.1≈RAG; hotpot 42.5→49.6) **without harming retrieval** (ruler 95). `lex`-only is best on high-lexical extractive (squad 51.6) but hurts pure retrieval (ruler 92), so `all` is the robust choice. (F33)
 *(Extensible: add reconstructability (KVzip-style, F4) and redundancy (F16) as extra z-scored terms.)*
 
 ## 4. Selection — token-level vs span-level
@@ -66,6 +72,8 @@ Frozen base (pluggable) · training-free or tiny module (frugal) · O(L) prune b
 - Research vs deployment: current experiments use the **full base** for surprisal to measure the *signal's upper bound*; the deployable version swaps in a small scorer (next experiment: measure accuracy drop under a small-LM scorer).
 
 ## 8. Exact code path (`experiments/run_baseline.py`, `GCM_BASELINE=imp`)
+*Verbatim snapshot + all run configs archived in [`configs/`](configs/) ([`configs/IMP-v2.1.0.code.py`](configs/IMP-v2.1.0.code.py), [`configs/README.md`](configs/README.md)).*
+
 Per item (frozen base `base`, embedding `embed`):
 ```python
 ids = tok(context, add_special_tokens=False, truncation=True, max_length=MAXCTX)   # NOTE: MAXCTX = window; set 32768 for long-context, no artificial 4k cut

@@ -58,7 +58,8 @@
   \begin{block}{Observations driving the design}
     (1) No universal baseline; (2) naive merging kills the needle (ToMe = 0 on retrieval); (3) a cheap $O(L)$ signal finds the needle (query-relevance / surprisal); (4) attention-free is length-robust.
   \end{block}
-  \begin{block}{Method (IMP)}
+  \begin{block}{Method (IMP-v2.1.0, span-level, Mode A)}
+    \scriptsize\emph{All results = \texttt{IMP-v2.1.0} (span-32, keep-0.5, signals query+surprisal); token-level v2.0 superseded.}\\[2pt]
     Score each token by cheap signals $\Rightarrow$ \textbf{keep the top-$p$ important \emph{spans} verbatim}, drop the rest $\Rightarrow$ frozen base reads the short sequence. Modes: \textbf{plug-and-play} (no training) / \textbf{light-weight} (tiny distilled router + side-cache for linear models).
   \end{block}
   \scriptsize Full method + implementation: \pbref{imp-method-and-implementation.md}{imp-method-and-implementation} · spec: \pbref{PAPER-B-v2.1.0-complete.md}{PAPER-B}.

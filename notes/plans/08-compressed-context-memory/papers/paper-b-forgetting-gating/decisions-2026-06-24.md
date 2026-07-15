@@ -170,5 +170,22 @@ Bracket (Qwen3-8B, VAE+slot+repeat, +random-M control), `real-M − random-M` ga
 - **CONFIRMED negative (all 3 done):** the +repeat `real−random` deltas **scatter around 0 (+0.084, −0.093, −0.002; mean ≈ −0.004)** → the lone K256@4k +0.084 was **noise**, not a reversal. **Confound:** compressed accuracy **never exceeds ~0.30 at any K** (M never compresses well) → real-M can't be memory-specific.
 - **Final verdict:** repeat-recon is **not a usable do-no-harm gate**; the bottleneck is the **compressor training recipe, not K**. Ship the **confidence** gate for Paper A; reconstruction = hypothesis blocked on a stronger compressor. Overview §3.1(D) + Fig 12 + Paper A caveat finalized to this reading (I had briefly over-claimed the +0.084 mid-run; corrected).
 
+## 🧪 D27 — paper-grade FULL main table on hardest+core long-context benches (launched 2026-07-08)
+Per user ("上 paper 的表就测全量；下采样要标注 N + settings + config"):
+- **Added the two hardest mainstream long-context benches** to the harness (shared `/mnt/persist`, patched once via `_patch_hardbench.py`): **LongBench-v2** (`longbench_v2`, THUDM/LongBench-v2 `data.json`, 503 hard MC over 8k–2M-word contexts) and **∞Bench** (`infbench_choice` = longbook_choice_eng, >100k-token English-book MC). Both MC ⇒ clean accuracy. Smoke-tested: loaders parse (ctx≈496k / 1M chars/item), and `run_baseline` emits `no_ctx/full/method` end-to-end on `longbench_v2`.
+- **Launched `fulltable_launch.sh` on free1 GPUs 0–3** (idle 96 GB cards; does NOT touch the exploratory grid on d1525/d1530). **112 cells**, output `/mnt/persist/grid_fulltable/ft_*`. 9 method columns (no_ctx, full, window, rag, ll2, tome, **imp**, kvzip, knorm) × 16 benches.
+- **Sampling policy enforced & documented** in [`experiment-config-and-sampling.md`](experiment-config-and-sampling.md) §4: every long-context headline bench = **FULL split** (`nval=100000` caps to dataset size); the 4 short-context sanity benches = **disclosed N=500 subset**. Per-bench n_chunks/max_ctx/metric all tabulated. Fact-base header now carries the ⚠ down-sampling disclosure for all prior (N=48/16) numbers.
+- Next: harvest `ft_*` as cells finish → build the big main table + update overview/matrix/slides.
+
+## 🏷️ D28 — Paper-B method **version registry** (canonical; cite this everywhere)
+To stop version confusion, the Paper-B method (IMP = Importance-routing Prefilter) is versioned as follows. Every result file must state which version produced its numbers.
+| version | what | signals | status |
+|---|---|---|---|
+| `IMP-v2.0` | **token-level** top-p keep (isolated tokens) | z(query-rel)+z(surprisal) | **superseded** — retrieval-only; shreds coherent QA (F24) |
+| **`IMP-v2.1.0`** | **span-level** keep top-p whole 32-tok spans, drop/merge rest; **Mode A (training-free)**; keep=0.5 | z(query-rel)+z(surprisal) | **CURRENT** — behind ALL headline / full-test / generality tables (F25, F27) |
+| `IMP-v2.2` (planned) | **Mode B** light-weight distilled router + linear side-cache | learned combine | not built |
+- **Stamped into:** `main-table-fulltest.md`, `generality-model-matrix.md`, `experiment-config-and-sampling.md`, `baseline-factbase-v2.0.0.md` §12, `matrix-facts.md` (F24/F25/F27), `matrix-paper-design.md`, `PAPER-B-v2.1.0-complete.md`, `PAPER-B-draft.md`, `imp-method-and-implementation.md`, `v2.1.0-paperB-method-designs.md`, `OVERVIEW-both-papers-and-facts.md`, `slides/weekly/2026-07-w01.tex`.
+- **Log tag → version:** `ft_*imp*`, `g_*imp*`, `spf_*`/`sp16_*`/`sp64_*` = v2.1.0 (span); `imp_*` (token, N=48) = v2.0.
+
 ## Standing rule (acknowledged)
 From now on, **any decision I make autonomously (esp. code changes to shared repos, job kills, perms, data publication, anything destructive/sensitive) gets an entry here** before/when I do it. Anything destructive or that publishes data externally → I **ask first** and log the outcome.

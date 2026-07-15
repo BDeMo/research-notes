@@ -1,6 +1,7 @@
 # Keep the Needle, Drop the Rest: Lightweight Importance Routing for Long-Context on Frozen LLMs
 
 > **Paper B working draft (v0.1).** Content-complete skeleton with real numbers (July-w01 grid snapshot). Numbers cite `baseline-factbase-v2.0.0.md` / `matrix-facts.md`; method detail in `imp-method-and-implementation.md`. Draft — to be tightened; some cells are the in-progress grand-grid snapshot.
+> **Method version:** all `imp` numbers here = **`IMP-v2.1.0`** (span-level, Mode A). The FULL-test headline numbers now live in [`main-table-fulltest.md`](main-table-fulltest.md); this draft's inline cells are the earlier N=48 snapshot (superseded — prefer the full-test table).
 
 ---
 

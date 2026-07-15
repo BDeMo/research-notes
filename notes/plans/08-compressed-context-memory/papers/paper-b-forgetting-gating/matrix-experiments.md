@@ -30,7 +30,7 @@
 | X-C5 | **SSM merge + brief re-train** (R-MeeTo style on GDN base) to rebuild key-knowledge | Paper B (linear arm) | med | needs short LoRA retrain on Qwen3.5-GDN |
 | X-C6 | **Gate generality across compressors** (one gate over KV-evict / prompt / merge / RAG) | Paper A headline | high | intrinsic-signal vs trained-gate; robustness metrics |
 | X-C7 | **Intrinsic probes (§K, ~20)**: retrieval-head, attention-entropy, CKA(M,full), OOD score, logit-lens, ECE | Paper B / A | med | down-select 4–6 that predict transfer/failure |
-| X-C8 | ✅ **DONE (signal probe, `run_probe.py`)**: query_dot AUROC 0.95 (word-needle), surprisal 0.84 (numeric), norm-signals useless, length-invariant → **F20**. IMP router inputs decided | Paper B insight | ✅ | remaining 16-metric harvest optional; core signals identified |
+| X-C8 | ✅ **DONE (signal probe, `run_probe.py`)**: query_dot AUROC 0.95 (word-needle), surprisal 0.84 (numeric), norm-signals useless, length-invariant → **F20**. `IMP-v2.1.0` router inputs decided (method version registry: decisions D28) | Paper B insight | ✅ | remaining 16-metric harvest optional; core signals identified |
 | X-C9 | **Selective-Context (exact)** | faithful baseline | low | 🔴 install-blocked (spacy build fails); needs fix or skip |
 | X-C10 | **gist / cartridge EXACT reproduction** (authors' code) OR drop as public baselines | faithful baselines | med | current lite versions are NOT faithful (D21) |
 | X-C11 | **multi_needle_niah scoring fix** | bench hygiene | low | full=0.0 bug; fix then re-enable |

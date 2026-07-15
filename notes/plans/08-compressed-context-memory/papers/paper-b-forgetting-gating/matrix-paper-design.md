@@ -16,6 +16,8 @@
 | **honest caveats** | gist/cart NOT faithful (drop or exact-repro); "gated≥full" only out-of-sample | matrix-facts F13, excluded | ✅ noted | — |
 
 ## Paper B — identify & keep the IMPORTANT information (impactful)
+**Current method version: `IMP-v2.1.0`** (span-level, Mode A training-free, span=32, keep=0.5, signals={query-relevance, surprisal}) — the version behind all current result tables (token-level `IMP-v2.0` superseded).
+
 **Thesis (reframed 2026-07-06):** long-context accuracy is bottlenecked by *finding the important info*; every training-free baseline fails in a characterizable regime (F1–F11). Build **IMP** — a **pluggable importance-router** that uses length-robust signals to keep important tokens & drop redundant ones, **distilled (transferred) from an existing base's own importance** (no base retrain, compute/data-frugal), works on **linear+quadratic**, **solves long-prefill**, and ships as a **fast-reproducible checkpoint**. Focus = **generality · performance · efficient · simple · insightful**. Design: `v2.1.0-paperB-method-designs.md`. **No gate.**
 
 | dimension | plan | supported by | status | gap |
