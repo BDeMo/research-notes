@@ -95,15 +95,20 @@
   Long-context accuracy is a \best{keep-the-answer-span} problem. No fixed compressor wins everywhere;
   the right mechanism is \best{input-adaptive} and, ideally, \best{training-free \& architecture-agnostic}.
   \end{block}
-  \centering
-  \begin{tikzpicture}[node distance=6mm, every node/.style={font=\scriptsize}]
-    \node[draw,rounded corners,fill=blue!8,text width=3.1cm,align=center] (a) {\textbf{Paper A}\\learned soft-memory\\compressor\\\textcolor{red}{(blocked, honest)}};
-    \node[draw,rounded corners,fill=green!10,text width=3.6cm,align=center,right=of a] (b) {\textbf{Paper B}\\diagnosis + IMP router\\\emph{training-free, arch-agnostic}\\\textcolor{green!50!black}{(main result)}};
-    \node[draw,rounded corners,fill=orange!12,text width=3.5cm,align=center,right=of b] (c) {\textbf{Paper C (v3.0)}\\linear attention \& GDN\\forgetting / memory-state\\\textcolor{orange!70!black}{(next line)}};
-    \draw[-{Latex}] (a) -- (b) node[midway,above]{negative $\Rightarrow$ pivot};
-    \draw[-{Latex}] (b) -- (c) node[midway,above]{reproduces on linear};
-  \end{tikzpicture}
-  \vspace{0.4em}
+  \begin{center}
+  \resizebox{\textwidth}{!}{%
+  \begin{tikzpicture}[
+     box/.style={draw, rounded corners, thick, minimum height=1.9cm, text width=3.0cm, align=center, font=\scriptsize},
+     lbl/.style={midway, above, font=\tiny, text=black!70},
+     node distance=2.1cm]
+    \node[box, fill=blue!8]  (a) {\textbf{Paper A}\\[2pt] learned soft-memory\\ compressor\\[2pt] \textcolor{red!80!black}{\tiny blocked (honest)}};
+    \node[box, fill=green!12, right=of a] (b) {\textbf{Paper B}\\[2pt] diagnosis {\small +} IMP router\\ \emph{training-free,}\\ \emph{arch-agnostic}\\[2pt] \textcolor{green!45!black}{\tiny main result}};
+    \node[box, fill=orange!15, right=of b] (c) {\textbf{Paper C}\ (v3.0)\\[2pt] linear attention\\ {\small \&} GDN forgetting\\[2pt] \textcolor{orange!75!black}{\tiny next line}};
+    \draw[-{Latex}, thick] (a) -- (b) node[lbl]{negative $\Rightarrow$ pivot};
+    \draw[-{Latex}, thick] (b) -- (c) node[lbl]{holds on linear};
+  \end{tikzpicture}}
+  \end{center}
+  \vspace{0.2em}
   \footnotesize A learned compressor didn't beat commodity baselines (A) $\Rightarrow$ we shifted to \emph{diagnosing} what actually
   works and built a training-free router (B) $\Rightarrow$ the diagnosis holds on cache-free linear models, opening the linear-attention line (C).
 \end{frame}
