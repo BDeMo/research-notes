@@ -1,6 +1,6 @@
 # Paper A — full benchmark and baseline table
 
-> Snapshot: 2026-07-22 06:33 PT  
+> Snapshot: 2026-07-22 14:29 PT
 > Rule: completed values are reported numerically; incomplete experiments are labeled by status and are not
 > filled with estimated results. SQuAD-v2 is retained only as an exact-text diagnostic and is excluded from
 > the headline tables.
@@ -80,12 +80,13 @@ Current stage totals:
 |---|---:|---:|---:|---:|---:|
 | Core main grid | 88 | 0 | 0 | 0 | 88 |
 | Transfer adapters | 46 | 0 | 2 | 0 | 48 |
-| Real long-context | 50 | 3 | 2 | 63 | 118 |
-| Eight-model generality | 11 | 1 | 0 | 36 | 48 |
-| Budget and length | 0 | 0 | 0 | 23 | 23 |
+| Real long-context | 108 | 1 | 3 | 6 | 118 |
+| Eight-model generality | 12 | 0 | 0 | 36 | 48 |
+| Budget and length | 2 | 1 | 0 | 20 | 23 |
 | Mechanism ablation | 0 | 0 | 0 | 36 | 36 |
 | Reproducibility | 3 | 0 | 0 | 0 | 3 |
 | SFT reaudit | 6 | 0 | 0 | 0 | 6 |
+| Official-baseline local cells | 0 | 0 | 0 | 52 | 52 |
 
 ## 4. Full baseline inventory
 

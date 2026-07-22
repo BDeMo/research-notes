@@ -1,6 +1,6 @@
 # Paper A — all-benchmark manuscript tables (skeleton)
 
-> Snapshot 2026-07-21. Research only (no CMG-RCA / OpenRCA — those are company work).
+> Snapshot 2026-07-22 14:29 PT. Research only (no CMG-RCA / OpenRCA — those are company work).
 > Rule: completed cells carry numbers; unfinished cells are `TBD` placeholders (fill when the run lands,
 > never estimate). Scores are native metrics ×100. Raw and SFT are **references**, not compressed-path
 > competitors. `GCM` names the full framework. `Compressor (w/o gate)` is the compressed path;
@@ -103,9 +103,10 @@ Per-task detail (source adapter in parentheses). Single seed; error bars pending
 
 ---
 
-## Table 4 — Controlled length boundary: RULER-NIAH (PENDING · 0 done)
+## Table 4 — Controlled length boundary: RULER-NIAH (RUNNING)
 
-Exact-retrieval length sweep (fixed K128 recipe, no source adapter).
+Exact-retrieval length sweep (fixed K128 recipe, no source adapter). The budget stage is 2/23 complete;
+the RULER K128 cell is currently running. Numerical values remain `TBD` until harvesting.
 
 | base / method | 4k | 8k | 16k | 32k |
 |---|---:|---:|---:|---:|
@@ -116,9 +117,10 @@ Exact-retrieval length sweep (fixed K128 recipe, no source adapter).
 
 ---
 
-## Table 5 — Budget / capacity ablations (PENDING · 0 done)
+## Table 5 — Budget / capacity ablations (RUNNING / QUEUED)
 
-GCM memory budget K sweep and mechanism ablation (Qwen3-8B × {QuALITY, BFCL}, 3 seeds).
+GCM memory budget K sweep and mechanism ablation (Qwen3-8B × {QuALITY, BFCL}, 3 seeds). Budget/length is
+2/23 complete with one running; mechanism ablation is 0/36 and queued.
 
 | axis | variant | QuALITY | BFCL |
 |---|---|---:|---:|
@@ -138,8 +140,8 @@ GCM memory budget K sweep and mechanism ablation (Qwen3-8B × {QuALITY, BFCL}, 3
 | table | benchmark(s) | produced by | current state |
 |---|---|---|---|
 | 1, 1b | QuALITY, BFCL, HotpotQA, SQuAD-v2 | Core main grid (E1) + gate analysis (E2) | ✅ complete (88/88) |
-| 2, 3 | LongBench-v2, ∞Bench-choice, BABILong, LongBench tasks | transfer adapters (E4A) → long-context eval (E4B) | ✅ q3_8b + q35_9b filled @ s42; remaining manifest = six other bases; multi-seed error-bar extension not yet configured |
-| 4 | RULER-NIAH 4k/8k/16k/32k | budget/length (E6) | ⏳ pending |
-| 5 | K sweep + mechanism ablation | budget (E6) + ablation (E7) | ⏳ pending |
+| 2, 3 | LongBench-v2, ∞Bench-choice, BABILong, LongBench tasks | transfer adapters (E4A) → long-context eval (E4B) | 108/118 done; xLAM/ToolACE tail running; three K32 evaluations need technical repair |
+| 4 | RULER-NIAH 4k/8k/16k/32k | budget/length (E6) | 2/23 budget cells done; one RULER cell running |
+| 5 | K sweep + mechanism ablation | budget (E6) + ablation (E7) | budget 2/23 done, one running; ablation 0/36 queued |
 
 **Blocked / not in tables:** NoLiMa (data access), HELMET, LongMemEval (loaders not implemented).

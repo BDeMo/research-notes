@@ -1,6 +1,6 @@
 # Paper A experiment receipt
 
-> Snapshot: 2026-07-22 06:33 PT. This is the operational source of truth for what is configured, running,
+> Snapshot: 2026-07-22 14:29 PT. This is the operational source of truth for what is configured, running,
 > queued, blocked, or excluded. “Receipt” means exact recipe + evaluation contract + artifact path.
 
 ## 1. Live status
@@ -15,16 +15,22 @@
 | E2 gate/risk analysis | 24 groups × 20 splits | 24 | 0 | 0/24 formal certified | complete negative |
 | E3 reproducibility | 3 duplicate-seed GCM cells | 3 | 0 | 0 | complete |
 | E4A transfer-source adapters | **48** | 46 | 0 | 2 failed / 0 pending | complete except K32 repairs |
-| E4B real-long evaluation | **118** | 50 | 3 | 2 failed / 63 pending | running |
-| E5 fixed-config generality | **48** | 11 | 1 | 36 pending | running |
-| E6 budget/length | **23** | 0 | 0 | 0 | queued |
+| E4B real-long evaluation | **118** | 108 | 1 | 3 failed / 6 pending | running |
+| E5 fixed-config generality | **48** | 12 | 0 | 36 pending | waiting for long-context stage |
+| E6 budget/length | **23** | 2 | 1 | 20 pending | running |
 | E7 mechanism ablation | **36** | 0 | 0 | 0 | queued |
 | E8 measured cost | up to 16 adapter profiles | 0 | 0 | 0 | finalization |
 | E9 official baselines | 52 local cells + native-base runs | 0 | 0 | 52 pending; LCLM/Semi-Dynamic cloned | separate envs |
 
-Current live workers: three Qwen3.5-4B long-context jobs on `sam-dev-d1525-gpu4` and one Qwen3.5-9B
-generality job on `sam-dev-d1530-gpu2`. The second GPU on the generality node is unavailable. K32 repairs
-remain for GLM-4 and Qwen3.5-9B source adapters and for the two main-base InfiniteBench evaluations.
+Current live workers: one xLAM long-context job on primary GPU 1 and one Qwen3-8B RULER budget job on
+secondary GPU 0. Primary GPUs 0 and 2 are temporarily idle because their deterministic long-context shards
+finished before shard 1; the sequencer advances after the remaining shard exits. Primary GPU 3 is reserved
+outside Paper A, and secondary GPU 1 is unavailable.
+
+The five failed cells are technical, not scientific negatives. GLM-4 K32 source training ran out of GPU
+memory while another process occupied most of the device; Qwen3.5-9B K32 source training was killed during
+training; the Qwen3/Qwen3.5/GLM K32 InfiniteBench cells then lacked the required adapter on the evaluating
+pod. These cells require resource-isolated retraining or adapter transfer before rerun.
 
 The earlier `74/112` count was invalid: it summed duplicate cross-pod cells and stale tags. The corrected
 manifest removes the internal Gist smoke baseline. All old Qwen3.5 cells are archived and rerun because the
@@ -97,14 +103,14 @@ tags are technical replicates, not separate methods.
 | no context | none | query only | 0 context tokens | emitted by every cell |
 | feasible raw | none | first B raw tokens | B | emitted by every cell |
 | true raw | none | all audited QuALITY context | up to 16,384 | QuALITY only |
-| full+SFT | rank-64 LoRA, matched data/steps/seeds | raw path | B / true-raw variant | main complete; Q3 QuALITY reaudit running |
+| full+SFT | rank-64 LoRA, matched data/steps/seeds | raw path | B / true-raw variant | main complete; Q3 QuALITY reaudit complete |
 | raw window | none | sink + recent tail | matched realized memory | complete |
 | LLMLingua-2 | official `llmlingua==0.2.2` | full source → token classifier | explicit target token | complete |
 | LongLLMLingua | official Llama-2 compressor LM | list of source chunks + raw question | explicit target token | current rows invalid; isolated-env rerun |
 | original LLMLingua | official Llama-2 compressor LM | list of source chunks | explicit target token | current rows invalid; isolated-env rerun |
 | Compressor (w/o gate) | per-model recipe above | up to encoder cap | actual S×K | complete |
-| Compressor (w/ empirical gate) | no new model training | compressed memory or feasible raw | variable | waits for features |
-| Compressor (w/ formal gate) | calibration only | compressed memory or feasible raw | variable / all-raw | waits for features |
+| Compressor (w/ empirical gate) | no new model training | compressed memory or feasible raw | variable | complete; held-out empirical result |
+| Compressor (w/ formal gate) | calibration only | compressed memory or feasible raw | variable / all-raw | complete negative; 0/24 certified |
 
 The internal Gist cell was removed from E1. It is an **adapted smoke**, not the published Gist baseline.
 The official integration below is the only Gist result allowed in paper claims.
