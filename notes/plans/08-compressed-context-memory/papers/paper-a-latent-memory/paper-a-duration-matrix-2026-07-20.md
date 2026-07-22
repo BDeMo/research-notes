@@ -1,6 +1,6 @@
 # Paper A model, baseline, evaluation, and training duration matrix
 
-> Updated 2026-07-22 14:29 PT. `Observed` values come from completed status JSONs and include both training and full
+> Updated 2026-07-22 15:43 PT. `Observed` values come from completed status JSONs and include both training and full
 > evaluation for a cell unless marked eval-only. `Estimated` values are planning ranges on one H100 NVL.
 > Four healthy experiment GPUs are available.
 
@@ -157,15 +157,15 @@ Total: **206 trainable cells**.
 
 ## 7. Current wall-clock ETA
 
-Live snapshot: 265/422 manifest cells are complete. Two jobs are currently active: one xLAM long-context
+Live snapshot: 268/422 manifest cells are complete. Two jobs are currently active: one xLAM long-context
 evaluation and one Qwen3-8B RULER budget cell. Four GPUs remain available to Paper A, but deterministic
 shard imbalance temporarily leaves two primary GPUs idle until the last long-context shard exits.
 
-| milestone | current state | ETA from 2026-07-22 14:29 PT |
+| milestone | current state | ETA from 2026-07-22 15:43 PT |
 |---|---|---:|
 | core main, audit, SFT reaudit, gate, reproducibility | complete | done |
 | source adapters | 46/48; two K32 technical repairs | 6–12 h after isolated rerun |
-| real long-context evaluation | 108/118; one running, six pending, three K32 repairs | 2–4 h for current tail; repairs separate |
+| real long-context evaluation | 111/118; one running, three pending, three K32 repairs | 1–3 h for current tail; repairs separate |
 | eight-base fixed-config generality | 12/48 | 1–2 additional days |
 | budget and RULER length | 2/23; one running | 1–2 additional days |
 | mechanism ablation | 0/36 | 0.5–1 additional day |

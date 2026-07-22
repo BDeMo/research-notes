@@ -1,6 +1,6 @@
 # Paper A experiment receipt
 
-> Snapshot: 2026-07-22 14:29 PT. This is the operational source of truth for what is configured, running,
+> Snapshot: 2026-07-22 15:43 PT. This is the operational source of truth for what is configured, running,
 > queued, blocked, or excluded. “Receipt” means exact recipe + evaluation contract + artifact path.
 
 ## 1. Live status
@@ -15,14 +15,14 @@
 | E2 gate/risk analysis | 24 groups × 20 splits | 24 | 0 | 0/24 formal certified | complete negative |
 | E3 reproducibility | 3 duplicate-seed GCM cells | 3 | 0 | 0 | complete |
 | E4A transfer-source adapters | **48** | 46 | 0 | 2 failed / 0 pending | complete except K32 repairs |
-| E4B real-long evaluation | **118** | 108 | 1 | 3 failed / 6 pending | running |
+| E4B real-long evaluation | **118** | 111 | 1 | 3 failed / 3 pending | running |
 | E5 fixed-config generality | **48** | 12 | 0 | 36 pending | waiting for long-context stage |
 | E6 budget/length | **23** | 2 | 1 | 20 pending | running |
 | E7 mechanism ablation | **36** | 0 | 0 | 0 | queued |
 | E8 measured cost | up to 16 adapter profiles | 0 | 0 | 0 | finalization |
 | E9 official baselines | 52 local cells + native-base runs | 0 | 0 | 52 pending; LCLM/Semi-Dynamic cloned | separate envs |
 
-Current live workers: one xLAM long-context job on primary GPU 1 and one Qwen3-8B RULER budget job on
+Current live workers: one ToolACE InfiniteBench long-context job on primary GPU 1 and one Qwen3-8B RULER budget job on
 secondary GPU 0. Primary GPUs 0 and 2 are temporarily idle because their deterministic long-context shards
 finished before shard 1; the sequencer advances after the remaining shard exits. Primary GPU 3 is reserved
 outside Paper A, and secondary GPU 1 is unavailable.

@@ -1,6 +1,6 @@
 # Paper A training and resource checklist
 
-> Operational runbook · updated 2026-07-22 14:29 PT. GPU-hour ranges are planning estimates, not measured costs.
+> Operational runbook · updated 2026-07-22 15:43 PT. GPU-hour ranges are planning estimates, not measured costs.
 > Every final table value must point to a status JSON, result JSON, per-item records, adapter when trained,
 > model/checkpoint ID, and scorer.
 
@@ -24,7 +24,7 @@ Current stage:
 - output audit: 28/28 reloadable paths complete; SFT reaudit 6/6 complete;
 - feature rerun: 24/24 canonical adapters complete; corrected gate analysis complete;
 - source adapters: 46/48 complete; two K32 source adapters need technical repair;
-- long-context: 108/118 complete, one running, three failed, six pending;
+- long-context: 111/118 complete, one running, three failed, three pending;
 - generality: 12/48 complete; remaining six bases wait for long-context to finish;
 - budget/length: 2/23 complete, one RULER cell running; ablation: 0/36 queued;
 - official-baseline local cells: 0/52, not yet launched.
@@ -42,7 +42,7 @@ Current stage:
 | E2F | formal gate check | one fixed split/group | 0 | test cluster-valid nonzero coverage | 0/24 certified; all-raw | <2 CPU h | complete negative |
 | E3 | reproducibility | 3 | 3 | rerun Qwen3 QuALITY seeds with new run IDs | quantify hardware/kernel spread | 8–18 | complete |
 | E4A | transfer-source training | 48 | 48 | train each source adapter once, including K32 QuALITY | reusable adapter for each base/source/method/budget | 110–225 | 46 done; 2 failed K32 repairs |
-| E4B | real long-context eval | 118 | 0 | test source-trained transfer without target tuning | find length/task boundary; exact retrieval likely fails | 150–300 | 108 done; 1 running; 3 failed; 6 pending |
+| E4B | real long-context eval | 118 | 0 | test source-trained transfer without target tuning | find length/task boundary; exact retrieval likely fails | 150–300 | 111 done; 1 running; 3 failed; 3 pending |
 | E5 | fixed-config generality | 48 | 48 | test K128 recipe on all eight bases | BFCL remains useful on most; QuALITY may vary | 180–350 | 12 done; 36 pending |
 | E6 | budget/length | 23 | 11 | map memory/raw budgets and RULER length | Pareto curve; RULER exposes exact-retrieval limit | 40–90 | 2 done; 1 running; 20 pending |
 | E7 | mechanism ablation | 36 | 36 | test five method components and K | joint loss required; other effects small/task-dependent | 120–220 | pending |
