@@ -4,6 +4,7 @@
 \usepackage{amsmath}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{multirow}
 \hypersetup{hidelinks}
 \usepackage{xcolor}
 \usepackage{tikz}
@@ -13,7 +14,9 @@
 \newcommand{\ghbase}{https://github.com/BDeMo/research-notes/blob/main/notes/plans/08-compressed-context-memory}
 \newcommand{\ghB}[2]{\href{\ghbase/papers/paper-b-forgetting-gating/#1}{\color{blue}\underline{#2}}}
 \newcommand{\ghC}[2]{\href{\ghbase/papers/paper-c-linear-attention/#1}{\color{blue}\underline{#2}}}
+\newcommand{\ghA}[2]{\href{\ghbase/papers/paper-a-latent-memory/#1}{\color{blue}\underline{#2}}}
 \newcommand{\best}[1]{\textbf{#1}}
+\newcommand{\refm}[1]{\textcolor{black!55}{#1}}
 
 \title[Long-Context Memory]{Long-Context Compression \& Linear-Attention Memory}
 \subtitle{Research progress --- Papers A / B / C}
@@ -38,7 +41,7 @@
     \item One thesis, three papers (the mainline)
   \end{enumerate}
   \vspace{0.6em}
-  \textbf{Part II --- Paper B (main result)}
+  \textbf{Part II --- Paper B (parallel line)}
   \begin{enumerate}\setcounter{enumi}{2}\small
     \item The diagnosis (model-invariant)
     \item The method: IMP router
@@ -49,20 +52,23 @@
   \end{enumerate}
   \end{column}
   \begin{column}{0.5\textwidth}
-  \textbf{Part III --- Paper A (brief)}
+  \textbf{Part III --- Paper A (current focus)}
   \begin{enumerate}\setcounter{enumi}{8}\small
-    \item Learned soft-memory: honest negative
+    \item Story: memory as a routed interface
+    \item Core results
+    \item Real long-context transfer
+    \item Full experiment status
   \end{enumerate}
   \vspace{0.6em}
   \textbf{Part IV --- Paper C (next line)}
-  \begin{enumerate}\setcounter{enumi}{9}\small
+  \begin{enumerate}\setcounter{enumi}{12}\small
     \item Why linear attention; the research line
     \item The landscape (delta-rule family)
     \item GDN forgetting: exploration \& modules
   \end{enumerate}
   \vspace{0.6em}
   \textbf{Part V --- Wrap}
-  \begin{enumerate}\setcounter{enumi}{12}\small
+  \begin{enumerate}\setcounter{enumi}{15}\small
     \item Development logic \& timeline
     \item Cross-cutting insights \& next steps
     \item Artifact index (all links)
@@ -74,26 +80,28 @@
 % ============================ PART I ============================
 \section{Framing}
 \begin{frame}{1. Background: the long-context memory wall}
-  \textbf{Problem.} Softmax attention keeps a \emph{growing} KV cache: memory $\propto$ context length $L$.
-  At 100k+ tokens this is the bottleneck for both cost and quality.
+  \textbf{Problem.} Long inputs carry documents, tools, history, and unfinished agent work, but processing
+  every token requires more compute and memory as context grows.
   \begin{itemize}
-    \item \textbf{Two escape routes the field takes:}
+    \item A larger window does not guarantee that the model uses the needed evidence; position,
+    distractors, and reasoning depth still change the answer.
+    \item \textbf{Two practical responses:}
     \begin{enumerate}
-      \item \emph{Shrink the cache} --- KV-eviction (kvzip, knorm, SnapKV\ldots), prompt compression (LLMLingua), token merging (ToMe), retrieval (RAG).
-      \item \emph{Remove the cache} --- \textbf{linear attention} / SSM (Mamba, RWKV, \textbf{Gated DeltaNet}): a \emph{fixed-size recurrent state}, $O(L)$ time, $O(1)$ memory.
+      \item \emph{Select raw evidence} --- retrieval, prompt compression, or a bounded window.
+      \item \emph{Build a compact state} --- learned soft memory or a recurrent linear-attention state.
     \end{enumerate}
-    \item \textbf{Our base models} live in both worlds: Qwen3 (quadratic) and \textbf{Qwen3.5/3.6} (GDN linear-attention 3:1 hybrid).
+    \item \textbf{System requirement:} preserve a raw path when the compact state is insufficient.
   \end{itemize}
   \vspace{0.4em}
   \begin{block}{Guiding question}
-  On a \emph{frozen} base, how do we feed / hold the \emph{right} context so long-context accuracy survives --- across architectures?
+  On a \emph{frozen} base, what should be kept as compact memory, and when should an agent return to raw evidence?
   \end{block}
 \end{frame}
 
 \begin{frame}{2. One thesis, three papers (the mainline)}
   \begin{block}{Thesis}
-  Long-context accuracy is a \best{keep-the-answer-span} problem. No fixed compressor wins everywhere;
-  the right mechanism is \best{input-adaptive} and, ideally, \best{training-free \& architecture-agnostic}.
+  Long-context memory is an \best{interface and routing} problem: a compact state is useful only where
+  the next decision survives compression, and raw evidence must remain available outside that region.
   \end{block}
   \begin{center}
   \resizebox{\textwidth}{!}{%
@@ -101,16 +109,17 @@
      box/.style={draw, rounded corners, thick, minimum height=1.9cm, text width=3.0cm, align=center, font=\scriptsize},
      lbl/.style={midway, above, font=\tiny, text=black!70},
      node distance=2.1cm]
-    \node[box, fill=blue!8]  (a) {\textbf{Paper A}\\[2pt] learned soft-memory\\ compressor\\[2pt] \textcolor{red!80!black}{\tiny blocked (honest)}};
-    \node[box, fill=green!12, right=of a] (b) {\textbf{Paper B}\\[2pt] diagnosis {\small +} IMP router\\ \emph{training-free,}\\ \emph{arch-agnostic}\\[2pt] \textcolor{green!45!black}{\tiny main result}};
+    \node[box, fill=blue!8]  (a) {\textbf{Paper A}\\[2pt] recurrent soft memory\\ {\small +} raw fallback\\[2pt] \textcolor{blue!65!black}{\tiny current focus}};
+    \node[box, fill=green!12, right=of a] (b) {\textbf{Paper B}\\[2pt] input-side selection\\ {\small +} IMP diagnosis\\[2pt] \textcolor{green!45!black}{\tiny training-free line}};
     \node[box, fill=orange!15, right=of b] (c) {\textbf{Paper C}\ (v3.0)\\[2pt] linear attention\\ {\small \&} GDN forgetting\\[2pt] \textcolor{orange!75!black}{\tiny next line}};
-    \draw[-{Latex}, thick] (a) -- (b) node[lbl]{negative $\Rightarrow$ pivot};
-    \draw[-{Latex}, thick] (b) -- (c) node[lbl]{holds on linear};
+    \draw[-{Latex}, thick] (a) -- (b) node[lbl]{latent state $\to$ raw selection};
+    \draw[-{Latex}, thick] (b) -- (c) node[lbl]{selection on linear};
   \end{tikzpicture}}
   \end{center}
   \vspace{0.2em}
-  \footnotesize A learned compressor didn't beat commodity baselines (A) $\Rightarrow$ we shifted to \emph{diagnosing} what actually
-  works and built a training-free router (B) $\Rightarrow$ the diagnosis holds on cache-free linear models, opening the linear-attention line (C).
+  \footnotesize Paper A asks when a learned short state is usable; Paper B asks which raw evidence should
+  be retained without training; Paper C studies how the same selection problem changes for recurrent
+  linear-attention memory.
 \end{frame}
 
 % ============================ PART II: Paper B ============================
@@ -219,23 +228,150 @@
 
 % ============================ PART III: Paper A ============================
 \section{Paper A}
-\begin{frame}{9. Paper A --- learned soft-memory: an honest negative}
-  \begin{itemize}
-    \item \textbf{Idea:} compress context into a few learned \emph{soft tokens} on a frozen base (+ a do-no-harm gate).
-    \item \textbf{Findings (honest):}
-    \begin{itemize}\small
-      \item The compressor is a \best{commodity} --- flipping any single loss moves accuracy $\pm0.03$.
-      \item Learned soft-memory \best{cannot compress extractive QA} (squad $\approx$ no-context); \emph{training-free IMP beats it on the same task}.
-      \item The reconstruction-based gate was a \best{non-effect} (AUROC $\approx$ chance).
-    \end{itemize}
-    \item \textbf{Outcome:} Paper A's learned compressor is the blocker $\Rightarrow$ this \emph{motivated} the pivot to Paper B's training-free direction.
+\begin{frame}{9. Paper A --- memory is a routed interface}
+  \begin{block}{Question}
+    When can an agent answer from a short learned state, and when should it return to raw evidence?
+  \end{block}
+  \begin{center}
+  \resizebox{0.98\textwidth}{!}{%
+  \begin{tikzpicture}[
+    node distance=0.55cm,
+    box/.style={draw, rounded corners, minimum height=0.9cm, text width=2.15cm, align=center, font=\scriptsize},
+    arr/.style={-{Latex}, thick}]
+    \node[box, fill=black!4] (ctx) {context chunks\\+ query};
+    \node[box, fill=blue!10, right=of ctx] (enc) {frozen LM\\recurrent encoder};
+    \node[box, fill=green!12, right=of enc] (mem) {trainable projection\\soft memory};
+    \node[box, fill=blue!10, right=of mem] (read) {same frozen LM\\read LoRA on};
+    \node[box, fill=purple!10, right=of read] (gate) {confidence router};
+    \node[box, fill=orange!15, right=of gate] (ans) {final answer};
+    \node[box, fill=black!4, below=0.55cm of read] (raw) {bounded raw path\\read LoRA off};
+    \draw[arr] (ctx)--(enc); \draw[arr] (enc)--(mem); \draw[arr] (mem)--(read);
+    \draw[arr] (read)--(gate); \draw[arr] (gate)--(ans);
+    \draw[arr] (ctx.south) |- (raw.west); \draw[arr] (raw.east) -| (gate.south);
+  \end{tikzpicture}
+  }
+  \end{center}
+  \begin{itemize}\small
+    \item One shared backbone supplies encoding, memory reading, confidence, and raw fallback.
+    \item The contribution is the \best{complete compact-versus-raw route}, not compression ratio alone.
+    \item The formal fixed-threshold test currently certifies no nonzero coverage; routing results are held-out empirical analysis.
   \end{itemize}
-  \begin{block}{}\footnotesize \ghB{PAPER-A-v1.8.1-complete.md}{Paper A spec} \; \ghB{negative-results.md}{negative results}\end{block}
+  \begin{block}{}\footnotesize \ghA{PAPER-A-draft-v0.1.md}{paper story} \; \ghA{paper-a-all-benchmarks-skeleton-2026-07-21.md}{all-benchmark tables}\end{block}
+\end{frame}
+
+\begin{frame}{10. Paper A --- core results (three seeds)}
+  \centering\scriptsize
+  \begin{tabular}{llrrr}
+  \toprule
+  base & method & QuALITY & BFCL & HotpotQA \\
+  \midrule
+  \multirow{6}{*}{Qwen3-8B}
+    & \refm{Raw} & 7.2 & 92.4 & 53.7 \\
+    & \refm{SFT} & 81.7$\pm$1.7 & 95.4$\pm$0.3 & 68.8$\pm$0.6 \\
+    & Window & 15.7 & 55.7 & 26.2 \\
+    & LLMLingua-2 & 14.3 & 70.3 & 22.1 \\
+    & GCM & 54.4$\pm$0.2 & 72.3$\pm$0.5 & 28.9$\pm$0.2 \\
+    & \best{Route} & \best{54.6} & \best{88.5} & \best{50.9} \\
+  \midrule
+  \multirow{6}{*}{Qwen3.5-9B}
+    & \refm{Raw} & 7.1 & 84.5 & 53.9 \\
+    & \refm{SFT} & 85.0$\pm$0.4 & 94.9$\pm$1.0 & 71.7$\pm$0.6 \\
+    & Window & 16.7 & 52.8 & 24.8 \\
+    & LLMLingua-2 & 20.3 & 60.8 & 28.9 \\
+    & \best{GCM} & \best{51.5$\pm$1.7} & 72.0$\pm$0.8 & 30.5$\pm$0.3 \\
+    & \best{Route} & 51.4 & \best{80.5} & \best{51.7} \\
+  \bottomrule
+  \end{tabular}
+  \vspace{0.35em}
+  \begin{itemize}\footnotesize
+    \item GCM is the strongest completed compact path across the displayed core tasks; SFT is a full-cost reference.
+    \item Routing recovers much of the raw gap on BFCL and HotpotQA; QuALITY already favors compact memory.
+    \item SQuAD-v2 is retained only as a short-passage exact-text diagnostic, not a headline benchmark.
+  \end{itemize}
+  \begin{block}{}\footnotesize \ghA{current-data-2026-07-19/main-table.md}{audited core table} \; \ghA{current-data-2026-07-19/gate-summary.md}{routing metrics}\end{block}
+\end{frame}
+
+\begin{frame}{11. Paper A --- real long-context transfer (seed 42)}
+  \centering\scriptsize
+  \begin{tabular}{llrrr}
+  \toprule
+  base & method & LongBench-v2 & $\infty$Bench-choice & BABILong \\
+  \midrule
+  \multirow{4}{*}{Qwen3-8B}
+    & \refm{No context} & 33.4 & 41.9 & 2.0 \\
+    & \refm{Raw} & 31.2 & 52.8 & 18.1 \\
+    & GCM & 20.1 & 21.4 & 0.9 \\
+    & \best{Route} & \best{31.4} & \best{52.8} & \best{18.1} \\
+  \midrule
+  \multirow{4}{*}{Qwen3.5-9B}
+    & \refm{No context} & 27.0 & 42.4 & 3.1 \\
+    & \refm{Raw} & 33.0 & 52.4 & 10.5 \\
+    & GCM & 22.5 & 31.9 & 2.2 \\
+    & \best{Route} & \best{33.4} & \best{52.4} & \best{11.9} \\
+  \bottomrule
+  \end{tabular}
+  \vspace{0.35em}
+  \begin{block}{New result: the boundary is task-structured}
+    \footnotesize On multi-hop LongBench transfer, GCM can beat truncated raw
+    (Qwen3 HotpotQA: $19.1\to30.5$; Qwen3.5: $3.9\to26.6$), and Route improves further.
+    On single-document / extractive targets, raw wins and routing falls back. Across the harvested
+    two-base targets, \best{Route $\ge$ Raw in every cell}.
+  \end{block}
+  \footnotesize Single seed; error bars pending. RULER and $\infty$Bench K32 repairs remain.
+  \begin{block}{}\footnotesize \ghA{paper-a-all-benchmarks-skeleton-2026-07-21.md}{full long-context breakdown}\end{block}
+\end{frame}
+
+\begin{frame}{12. Paper A --- full execution status (Wed 2026-07-22 06:33 PT)}
+  \begin{columns}[T]
+  \begin{column}{0.52\textwidth}
+    \centering\scriptsize
+    \begin{tabular}{lrrrr}
+    \toprule
+    stage & done & run & fail & pending \\
+    \midrule
+    core main & 88 & 0 & 0 & 0 \\
+    replicate + SFT audit & 9 & 0 & 0 & 0 \\
+    transfer adapters & 46 & 0 & 2 & 0 \\
+    real long-context & 50 & 3 & 2 & 63 \\
+    8-model generality & 11 & 1 & 0 & 36 \\
+    budget / RULER & 0 & 0 & 0 & 23 \\
+    ablation & 0 & 0 & 0 & 36 \\
+    official baselines & 0 & 0 & 0 & 52 \\
+    \bottomrule
+    \end{tabular}
+    \vspace{0.45em}
+    \begin{block}{Live workers}
+      \scriptsize Three Qwen3.5-4B long-context jobs + one Qwen3.5-9B generality job.
+      One GPU on the generality node is unavailable.
+    \end{block}
+  \end{column}
+  \begin{column}{0.48\textwidth}
+    \textbf{Completed evidence}
+    \begin{itemize}\scriptsize
+      \item Core grid, output audit, gate analysis, replicate, SFT reaudit.
+      \item Two-base long-context harvest: 44 cells.
+    \end{itemize}
+    \textbf{Repairs / blockers}
+    \begin{itemize}\scriptsize
+      \item K32 $\infty$Bench adapters failed on both main bases.
+      \item GLM-4 and Qwen3.5-9B K32 source-adapter repairs remain.
+      \item LCLM / Semi-Dynamic cloned; official execution not started.
+    \end{itemize}
+    \textbf{Execution order}
+    \begin{enumerate}\scriptsize
+      \item continue long-context across the remaining bases;
+      \item complete generality;
+      \item budget/RULER $\to$ ablation/cost;
+      \item official baselines.
+    \end{enumerate}
+  \end{column}
+  \end{columns}
+  \begin{block}{}\footnotesize \ghA{paper-a-full-benchmark-table-2026-07-21.md}{benchmark + baseline inventory} \; \ghA{experiment-receipt-2026-07-16.md}{experiment receipt}\end{block}
 \end{frame}
 
 % ============================ PART IV: Paper C ============================
 \section{Paper C --- linear attention}
-\begin{frame}{10. Paper C (v3.0) --- why linear attention; the research line}
+\begin{frame}{13. Paper C (v3.0) --- why linear attention; the research line}
   \textbf{Focus (next line):} linear attention \& its variants (Qwen3.5/3.6 GDN family; \emph{no} Qwen3 control).
   \begin{itemize}\small
     \item \textbf{The tension:} a \emph{fixed-size state} is efficient but has a structural \best{recall / forgetting bottleneck} (recall--throughput tradeoff; state-tracking limits).
@@ -247,7 +383,7 @@
   \end{block}
 \end{frame}
 
-\begin{frame}{11. Paper C --- the landscape (delta-rule family)}
+\begin{frame}{14. Paper C --- the landscape (delta-rule family)}
   \centering\scriptsize
   \begin{tabular}{lcccc}
   \toprule
@@ -267,7 +403,7 @@
   \begin{block}{}\footnotesize \ghC{references-linear-attention.md}{reference collection (11 categories, arXiv)}\end{block}
 \end{frame}
 
-\begin{frame}{12. Paper C --- GDN forgetting: exploration \& modules}
+\begin{frame}{15. Paper C --- GDN forgetting: exploration \& modules}
   \textbf{Training-free anti-forgetting modules tested on Qwen3.5-GDN (real benches):}
   \centering\scriptsize
   \begin{tabular}{lccccc}
@@ -290,32 +426,32 @@
 
 % ============================ PART V: Wrap ============================
 \section{Wrap}
-\begin{frame}{13. Development logic \& timeline}
+\begin{frame}{16. Development logic \& timeline}
   \begin{enumerate}\small
-    \item \textbf{Paper A} --- learned soft-memory compressor $\to$ honest negatives (commodity compressor, gate a non-effect).
-    \item \textbf{Pivot} --- stop building a compressor; \emph{diagnose} what works on a frozen base.
-    \item \textbf{Paper B} --- full-test diagnosis (model-invariant) + IMP router; iterated token$\to$span$\to$+lexical$\to$5-mode$\to$\texttt{auto}$\to$full-doc.
-    \item \textbf{Rigor pass} --- case-level audit found the truncation bug (F44), fixed it, re-ran the corrected main table, best-of-all-baselines, code review.
-    \item \textbf{Occam} --- ablate to \texttt{IMP-lite} (v3.0); own the honest scope.
-    \item \textbf{Paper C} --- the diagnosis reproduces on linear GDN where KV-methods can't run $\to$ new line on linear-attention forgetting.
+    \item \textbf{Paper A} --- recurrent soft memory + raw fallback: core grid complete; two-base long-context transfer harvested; remaining scale, budget, ablation, and official baselines running.
+    \item \textbf{Paper B} --- complementary input-side diagnosis + IMP selection on a frozen base; full-test audit and Occam simplification completed.
+    \item \textbf{Shared result} --- no representation wins everywhere; task structure determines whether compact memory, selected raw spans, or bounded raw context should answer.
+    \item \textbf{Paper C} --- carry the selection question to recurrent linear-attention memory, where state forgetting replaces raw-window growth as the main bottleneck.
+    \item \textbf{Current priority} --- finish Paper A's remaining grids and lock its complete result tables before expanding Paper C.
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{14. Cross-cutting insights \& next steps}
+\begin{frame}{17. Cross-cutting insights \& next steps}
   \textbf{Insights}
   \begin{itemize}\small
-    \item Long-context = \best{keep-the-gold-span}; \emph{gold-recall predicts accuracy}.
-    \item \best{No universal compressor}; the right granularity is \emph{input-dependent}; retrieval can \emph{denoise above full}.
-    \item Diagnosis is \best{model-invariant}; KV-eviction owns literary-MC but \best{can't run on linear} --- that gap is ours.
+    \item Compact memory has a \best{task-structured operating region}: strong on some decision and multi-hop interfaces, weak on exact planted evidence.
+    \item \best{No universal context path}; the agent should choose among learned memory, selected raw evidence, and bounded raw context.
+    \item Reliability must be evaluated jointly with coverage and total cost, not only average compressed accuracy.
   \end{itemize}
   \textbf{Next steps}
   \begin{itemize}\small
+    \item \textbf{Paper A:} complete transfer / generality; run RULER, budget, ablation, cost, and official-native baselines; then lock tables and figures.
     \item \textbf{Paper B:} run the IMP-lite Occam ablation; finalize v3.0; decide the RAG-delta claim.
     \item \textbf{Paper C:} secure the in-band \best{Qwen3.6-27B} (hybrid) checkpoint; RULER access (HF); diagnose GDN forgetting on real long-context; test input-side vs erase-gate-retrofit fixes.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{15. Artifact index (all links to GitHub)}
+\begin{frame}{18. Artifact index (all links to GitHub)}
   \scriptsize
   \textbf{Paper B} \quad
   \ghB{REPORT-2026-07-13.md}{consolidated report} $\cdot$
@@ -329,7 +465,12 @@
   \ghB{FIVE-DAY-SUMMARY-2026-07-08_13.md}{5-day summary}
   \vspace{0.7em}
 
-  \textbf{Paper A} \quad \ghB{PAPER-A-v1.8.1-complete.md}{spec} $\cdot$ \ghB{negative-results.md}{negatives}
+  \textbf{Paper A} \quad
+  \ghA{PAPER-A-draft-v0.1.md}{paper draft} $\cdot$
+  \ghA{paper-a-all-benchmarks-skeleton-2026-07-21.md}{all tables} $\cdot$
+  \ghA{paper-a-full-benchmark-table-2026-07-21.md}{benchmark inventory} $\cdot$
+  \ghA{paper-baselines-v2-2026-07-19.md}{baseline plan} $\cdot$
+  \ghA{experiment-receipt-2026-07-16.md}{experiment receipt}
   \vspace{0.7em}
 
   \textbf{Paper C} \quad

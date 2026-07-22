@@ -1,0 +1,145 @@
+% July Week 3 weekly: Mon 2026-07-20 to Sun 2026-07-26.
+% Status snapshot: Wed 2026-07-22 06:33 PT.
+
+\providecommand{\paref}[2]{\href{../../papers/paper-a-latent-memory/#1}{\textcolor{blue}{#2}}}
+
+\section{July Week 3 (Mon 2026-07-20 to Sun 2026-07-26)}
+
+\begin{frame}{Reporting Period}
+  \begin{center}
+    \textbf{Plan 08 / Long-Context Compression --- July Week 3} \\[0.3em]
+    \small Mon 2026-07-20 to Sun 2026-07-26 \\
+    \scriptsize Status through Wed 2026-07-22 06:33 PT. \\
+    \scriptsize Current priority: finish \textbf{Paper A} with complete long-context, generality,
+    budget, ablation, cost, and official-baseline evidence.
+  \end{center}
+\end{frame}
+
+\begin{frame}{Paper A --- Introduction logic (six paragraphs)}
+  \begin{columns}[T]
+  \begin{column}{0.49\textwidth}
+    \begin{enumerate}\small
+      \item \textbf{Why long context matters.}\\
+      It is the working state of document, tool, conversation, and agent systems.
+      \vspace{0.5em}
+      \item \textbf{The problem is not only capacity.}\\
+      Long inputs cost more, but even a context that fits may be used unreliably.
+      \vspace{0.5em}
+      \item \textbf{Compression is not automatically robust.}\\
+      A shorter state may remove the fact or relation required by the next decision.
+    \end{enumerate}
+  \end{column}
+  \begin{column}{0.51\textwidth}
+    \begin{enumerate}\setcounter{enumi}{3}\small
+      \item \textbf{The overlooked question is failure detection.}\\
+      Average compressed accuracy does not say whether memory is sufficient for this input.
+      \vspace{0.5em}
+      \item \textbf{Agent design should preserve two paths.}\\
+      Use compact memory when trusted; let a gate return to raw evidence otherwise.
+      \vspace{0.5em}
+      \item \textbf{GCM implements the interface.}\\
+      One frozen backbone builds recurrent memory, reads it, estimates confidence, and provides raw fallback.
+    \end{enumerate}
+  \end{column}
+  \end{columns}
+  \begin{block}{Paper focus}
+    \footnotesize \textbf{Robust long-context compression}: map where soft memory works, detect where it does
+    not, and measure how much a shared-backbone fallback recovers.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Paper A --- story and completed core evidence}
+  \small
+  \begin{block}{Story}
+    Gated Context Memory (GCM) treats soft memory as a \textbf{routed interface}: use a recurrent
+    short state when it is sufficient, and preserve a bounded raw path when the needed evidence does not
+    survive compression.
+  \end{block}
+  \centering\scriptsize
+  \begin{tabular}{llrrr}
+  \toprule
+  base & method & QuALITY & BFCL & HotpotQA \\
+  \midrule
+  Qwen3-8B & Raw ref. & 7.2 & 92.4 & 53.7 \\
+            & LLMLingua-2 & 14.3 & 70.3 & 22.1 \\
+            & GCM & 54.4 & 72.3 & 28.9 \\
+            & \textbf{Route} & \textbf{54.6} & \textbf{88.5} & \textbf{50.9} \\
+  Qwen3.5-9B & Raw ref. & 7.1 & 84.5 & 53.9 \\
+              & LLMLingua-2 & 20.3 & 60.8 & 28.9 \\
+              & GCM & \textbf{51.5} & 72.0 & 30.5 \\
+              & \textbf{Route} & 51.4 & \textbf{80.5} & \textbf{51.7} \\
+  \bottomrule
+  \end{tabular}
+  \vspace{0.35em}
+  \begin{itemize}\footnotesize
+    \item Core main grid, output audit, gate analysis, replicate, and SFT reaudit are complete.
+    \item Formal fixed-family test certifies no nonzero coverage; routing remains held-out empirical analysis.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Paper A --- real long-context result}
+  \centering\scriptsize
+  \begin{tabular}{llrrr}
+  \toprule
+  base & method & LongBench-v2 & $\infty$Bench-choice & BABILong \\
+  \midrule
+  Qwen3-8B & Raw ref. & 31.2 & 52.8 & 18.1 \\
+            & GCM & 20.1 & 21.4 & 0.9 \\
+            & \textbf{Route} & \textbf{31.4} & \textbf{52.8} & \textbf{18.1} \\
+  Qwen3.5-9B & Raw ref. & 33.0 & 52.4 & 10.5 \\
+              & GCM & 22.5 & 31.9 & 2.2 \\
+              & \textbf{Route} & \textbf{33.4} & \textbf{52.4} & \textbf{11.9} \\
+  \bottomrule
+  \end{tabular}
+  \vspace{0.4em}
+  \begin{block}{Finding}
+    \footnotesize On multi-hop transfer, GCM can beat truncated raw
+    (Qwen3 HotpotQA $19.1\to30.5$; Qwen3.5 $3.9\to26.6$).
+    On single-document / extractive targets, routing falls back.
+    Across the harvested two-base targets, \textbf{Route $\ge$ Raw in every cell}.
+  \end{block}
+  \footnotesize Single seed; error bars pending. \paref{paper-a-all-benchmarks-skeleton-2026-07-21.md}{all-benchmark tables}
+\end{frame}
+
+\begin{frame}{Paper A --- full status and execution order}
+  \begin{columns}[T]
+  \begin{column}{0.56\textwidth}
+    \centering\scriptsize
+    \begin{tabular}{lrrrr}
+    \toprule
+    stage & done & run & fail & pending \\
+    \midrule
+    core main & 88 & 0 & 0 & 0 \\
+    replicate + SFT audit & 9 & 0 & 0 & 0 \\
+    transfer adapters & 46 & 0 & 2 & 0 \\
+    real long-context & 50 & 3 & 2 & 63 \\
+    8-model generality & 11 & 1 & 0 & 36 \\
+    budget / RULER & 0 & 0 & 0 & 23 \\
+    ablation & 0 & 0 & 0 & 36 \\
+    official baselines & 0 & 0 & 0 & 52 \\
+    \bottomrule
+    \end{tabular}
+  \end{column}
+  \begin{column}{0.44\textwidth}
+    \textbf{Live}
+    \begin{itemize}\scriptsize
+      \item 3 long-context workers;
+      \item 1 generality worker;
+      \item 1 GPU unavailable on that node.
+    \end{itemize}
+    \textbf{Next}
+    \begin{enumerate}\scriptsize
+      \item continue long-context;
+      \item complete generality;
+      \item RULER / budget;
+      \item ablation + cost;
+      \item official baselines.
+    \end{enumerate}
+  \end{column}
+  \end{columns}
+  \vspace{0.4em}
+  \centering\footnotesize
+  \paref{paper-a-full-benchmark-table-2026-07-21.md}{benchmark + baseline inventory}
+  \quad
+  \paref{experiment-receipt-2026-07-16.md}{experiment receipt}
+\end{frame}
