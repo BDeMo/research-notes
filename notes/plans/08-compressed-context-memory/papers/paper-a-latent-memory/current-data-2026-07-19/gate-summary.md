@@ -3,7 +3,7 @@
 > 24 model/task/seed groups · 20 exact-context-disjoint repeated holdouts per group · primary signal fixed
 > to compressed-path confidence. Values below average test results over seeds and splits.
 
-| model | task | mem. use | FB rate | FB AUC | route | Δ raw |
+| model | task | mem. use | FB rate | FB AUC | Compressor (w/ gate) | Δ raw |
 |---|---|---:|---:|---:|---:|---:|
 | Qwen3-8B | QuALITY | 99.8% | 0.2% | 57.2 | 54.6 | +47.4 |
 | Qwen3-8B | BFCL | 53.4% | 46.6% | 82.8 | 88.5 | -3.5 |
@@ -14,8 +14,8 @@
 | Qwen3.5-9B | SQuAD-v2 | 5.8% | 94.2% | 62.4 | 64.7 | -2.1 |
 | Qwen3.5-9B | HotpotQA | 47.9% | 52.1% | 67.4 | 51.7 | -2.2 |
 
-Fallback AUROC treats `raw score > memory score` as the positive label and uses negative GCM confidence as
-the fallback score. It is computed over the full validation records; thresholded route values use held-out
+Fallback AUROC treats `raw score > memory score` as the positive label and uses negative compressor confidence as
+the fallback score. It is computed over the full validation records; thresholded gated-policy values use held-out
 calibration/test splits.
 
 ## Interpretation
@@ -30,12 +30,12 @@ calibration/test splits.
 ## Formal test
 
 The corrected document-level, fixed-threshold-family test certified **0 of 24** model/task/seed groups at
-\(\epsilon=0.02\), family-wise \(\delta=0.10\). Every formal route returns all-raw.
+\(\epsilon=0.02\), family-wise \(\delta=0.10\). Every formally tested gated policy returns all-raw.
 
 Paper wording:
 
 - use **held-out empirical routing**;
-- do not use **finite-sample risk-controlled GCM**;
+- do not use **finite-sample risk-controlled compressor with gate**;
 - report the formal all-raw result as a negative finding;
 - keep the title and contribution centered on mapping the reliability boundary, not proving a safe gate.
 

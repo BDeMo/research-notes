@@ -270,22 +270,22 @@
     & \refm{SFT} & 81.7$\pm$1.7 & 95.4$\pm$0.3 & 68.8$\pm$0.6 \\
     & Window & 15.7 & 55.7 & 26.2 \\
     & LLMLingua-2 & 14.3 & 70.3 & 22.1 \\
-    & GCM & 54.4$\pm$0.2 & 72.3$\pm$0.5 & 28.9$\pm$0.2 \\
-    & \best{Route} & \best{54.6} & \best{88.5} & \best{50.9} \\
+    & Compressor (w/o gate) & 54.4$\pm$0.2 & 72.3$\pm$0.5 & 28.9$\pm$0.2 \\
+    & \best{Compressor (w/ gate)} & \best{54.6} & \best{88.5} & \best{50.9} \\
   \midrule
   \multirow{6}{*}{Qwen3.5-9B}
     & \refm{Raw} & 7.1 & 84.5 & 53.9 \\
     & \refm{SFT} & 85.0$\pm$0.4 & 94.9$\pm$1.0 & 71.7$\pm$0.6 \\
     & Window & 16.7 & 52.8 & 24.8 \\
     & LLMLingua-2 & 20.3 & 60.8 & 28.9 \\
-    & \best{GCM} & \best{51.5$\pm$1.7} & 72.0$\pm$0.8 & 30.5$\pm$0.3 \\
-    & \best{Route} & 51.4 & \best{80.5} & \best{51.7} \\
+    & \best{Compressor (w/o gate)} & \best{51.5$\pm$1.7} & 72.0$\pm$0.8 & 30.5$\pm$0.3 \\
+    & \best{Compressor (w/ gate)} & 51.4 & \best{80.5} & \best{51.7} \\
   \bottomrule
   \end{tabular}
   \vspace{0.35em}
   \begin{itemize}\footnotesize
-    \item GCM is the strongest completed compact path across the displayed core tasks; SFT is a full-cost reference.
-    \item Routing recovers much of the raw gap on BFCL and HotpotQA; QuALITY already favors compact memory.
+    \item The compressor without the gate is the strongest completed compact path across the displayed core tasks; SFT is a full-cost reference.
+    \item The compressor with the gate recovers much of the raw gap on BFCL and HotpotQA; QuALITY already favors compact memory.
     \item SQuAD-v2 is retained only as a short-passage exact-text diagnostic, not a headline benchmark.
   \end{itemize}
   \begin{block}{}\footnotesize \ghA{current-data-2026-07-19/main-table.md}{audited core table} \; \ghA{current-data-2026-07-19/gate-summary.md}{routing metrics}\end{block}
@@ -300,22 +300,22 @@
   \multirow{4}{*}{Qwen3-8B}
     & \refm{No context} & 33.4 & 41.9 & 2.0 \\
     & \refm{Raw} & 31.2 & 52.8 & 18.1 \\
-    & GCM & 20.1 & 21.4 & 0.9 \\
-    & \best{Route} & \best{31.4} & \best{52.8} & \best{18.1} \\
+    & Compressor (w/o gate) & 20.1 & 21.4 & 0.9 \\
+    & \best{Compressor (w/ gate)} & \best{31.4} & \best{52.8} & \best{18.1} \\
   \midrule
   \multirow{4}{*}{Qwen3.5-9B}
     & \refm{No context} & 27.0 & 42.4 & 3.1 \\
     & \refm{Raw} & 33.0 & 52.4 & 10.5 \\
-    & GCM & 22.5 & 31.9 & 2.2 \\
-    & \best{Route} & \best{33.4} & \best{52.4} & \best{11.9} \\
+    & Compressor (w/o gate) & 22.5 & 31.9 & 2.2 \\
+    & \best{Compressor (w/ gate)} & \best{33.4} & \best{52.4} & \best{11.9} \\
   \bottomrule
   \end{tabular}
   \vspace{0.35em}
   \begin{block}{New result: the boundary is task-structured}
-    \footnotesize On multi-hop LongBench transfer, GCM can beat truncated raw
-    (Qwen3 HotpotQA: $19.1\to30.5$; Qwen3.5: $3.9\to26.6$), and Route improves further.
-    On single-document / extractive targets, raw wins and routing falls back. Across the harvested
-    two-base targets, \best{Route $\ge$ Raw in every cell}.
+    \footnotesize On multi-hop LongBench transfer, the compressor without the gate can beat truncated raw
+    (Qwen3 HotpotQA: $19.1\to30.5$; Qwen3.5: $3.9\to26.6$), and the gate improves it further.
+    On single-document / extractive targets, raw wins and the gated variant falls back. Across the harvested
+    two-base targets, \best{Compressor (w/ gate) $\ge$ Raw in every cell}.
   \end{block}
   \footnotesize Single seed; error bars pending. RULER and $\infty$Bench K32 repairs remain.
   \begin{block}{}\footnotesize \ghA{paper-a-all-benchmarks-skeleton-2026-07-21.md}{full long-context breakdown}\end{block}

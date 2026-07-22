@@ -13,7 +13,7 @@ GCM and the matched-state controls use a short context state during answering. T
 full-cost adaptation reference: it reads raw context and is not a same-cost compression competitor.
 In the paper table, raw and SFT references share the same gray column shading.
 
-| model | task | raw | SFT | window | LLMLingua | GCM |
+| model | task | raw | SFT | window | LLMLingua | Compressor (w/o gate) |
 |---|---|---:|---:|---:|---:|---:|
 | Qwen3-8B | QuALITY | 7.2 | 81.7±1.7§ | 15.7 | 14.3 | **54.4±0.2** |
 | Qwen3-8B | BFCL | 92.4 | 95.4±0.3‡ | 55.7 | 70.3 | **72.3±0.5** |
@@ -24,13 +24,13 @@ In the paper table, raw and SFT references share the same gray column shading.
 | Qwen3.5-9B | SQuAD-v2 | 66.8 | 93.8±0.3 | 49.6 | **58.8** | 26.9±0.6‡ |
 | Qwen3.5-9B | HotpotQA | 53.9 | 71.7±0.6 | 24.8 | 28.9 | **30.5±0.3** |
 
-## Panel B — GCM compressor + shared-backbone fallback
+## Panel B — GCM compressor with and without the gate
 
 The memory and raw paths use the same pretrained model. The memory path turns on the read adapter and reads
 GCM vectors; the fallback path turns the adapter off and reads bounded raw tokens. No second model copy is
 needed.
 
-| model | task | GCM | route | gain | FB AUC | FB rate | Δ raw |
+| model | task | Compressor (w/o gate) | Compressor (w/ gate) | gain | FB AUC | FB rate | Δ raw |
 |---|---|---:|---:|---:|---:|---:|---:|
 | Qwen3-8B | QuALITY | 54.4 | **54.6** | +0.2 | 57.2 | 0.2% | +47.4 |
 | Qwen3-8B | BFCL | 72.3 | **88.5** | +16.2 | 82.8 | 46.6% | -3.5 |
@@ -41,7 +41,7 @@ needed.
 | Qwen3.5-9B | SQuAD-v2 | 26.9 | **64.7** | +37.8 | 62.4 | 94.2% | -2.1 |
 | Qwen3.5-9B | HotpotQA | 30.5 | **51.7** | +21.2 | 67.4 | 52.1% | -2.2 |
 
-Fallback AUROC uses low memory confidence to rank examples where bounded raw scores higher than GCM.
+Fallback AUROC uses low memory confidence to rank examples where bounded raw scores higher than the compressor without the gate.
 Fallback rate is measured on held-out empirical routing. The formal test certifies 0/24 groups and therefore
 uses 100% fallback.
 

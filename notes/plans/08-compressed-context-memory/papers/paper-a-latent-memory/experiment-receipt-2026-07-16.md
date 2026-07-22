@@ -102,9 +102,9 @@ tags are technical replicates, not separate methods.
 | LLMLingua-2 | official `llmlingua==0.2.2` | full source → token classifier | explicit target token | complete |
 | LongLLMLingua | official Llama-2 compressor LM | list of source chunks + raw question | explicit target token | current rows invalid; isolated-env rerun |
 | original LLMLingua | official Llama-2 compressor LM | list of source chunks | explicit target token | current rows invalid; isolated-env rerun |
-| GCM memory | per-model recipe above | up to encoder cap | actual S×K | complete |
-| empirically calibrated route | no new model training | GCM or feasible raw | variable | waits for features |
-| LTT-certified route | calibration only | GCM or feasible raw | variable / all-raw | waits for features |
+| Compressor (w/o gate) | per-model recipe above | up to encoder cap | actual S×K | complete |
+| Compressor (w/ empirical gate) | no new model training | compressed memory or feasible raw | variable | waits for features |
+| Compressor (w/ formal gate) | calibration only | compressed memory or feasible raw | variable / all-raw | waits for features |
 
 The internal Gist cell was removed from E1. It is an **adapted smoke**, not the published Gist baseline.
 The official integration below is the only Gist result allowed in paper claims.
@@ -118,8 +118,8 @@ The official integration below is the only Gist result allowed in paper claims.
 | learned baselines | Belikova-style joint query–memory probe; PoC-style gap regressor |
 | split | document-disjoint 25% calibration / 75% test |
 | repeats | 20 |
-| empirical route | maximum coverage under calibration signed policy excess ≤0.02 |
-| finite-sample route | cluster-level fixed-family analysis under correction; no current positive claim |
+| empirical gate | maximum coverage under calibration signed policy excess ≤0.02 |
+| finite-sample gate | cluster-level fixed-family analysis under correction; no current positive claim |
 | controlled loss | accepted-set positive compression harm |
 | epsilon | 0.02 |
 | family-wise delta | 0.10 |

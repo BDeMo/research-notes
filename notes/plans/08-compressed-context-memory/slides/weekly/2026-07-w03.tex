@@ -62,12 +62,12 @@
   \midrule
   Qwen3-8B & Raw ref. & 7.2 & 92.4 & 53.7 \\
             & LLMLingua-2 & 14.3 & 70.3 & 22.1 \\
-            & GCM & 54.4 & 72.3 & 28.9 \\
-            & \textbf{Route} & \textbf{54.6} & \textbf{88.5} & \textbf{50.9} \\
+            & Compressor (w/o gate) & 54.4 & 72.3 & 28.9 \\
+            & \textbf{Compressor (w/ gate)} & \textbf{54.6} & \textbf{88.5} & \textbf{50.9} \\
   Qwen3.5-9B & Raw ref. & 7.1 & 84.5 & 53.9 \\
               & LLMLingua-2 & 20.3 & 60.8 & 28.9 \\
-              & GCM & \textbf{51.5} & 72.0 & 30.5 \\
-              & \textbf{Route} & 51.4 & \textbf{80.5} & \textbf{51.7} \\
+              & Compressor (w/o gate) & \textbf{51.5} & 72.0 & 30.5 \\
+              & \textbf{Compressor (w/ gate)} & 51.4 & \textbf{80.5} & \textbf{51.7} \\
   \bottomrule
   \end{tabular}
   \vspace{0.35em}
@@ -84,19 +84,19 @@
   base & method & LongBench-v2 & $\infty$Bench-choice & BABILong \\
   \midrule
   Qwen3-8B & Raw ref. & 31.2 & 52.8 & 18.1 \\
-            & GCM & 20.1 & 21.4 & 0.9 \\
-            & \textbf{Route} & \textbf{31.4} & \textbf{52.8} & \textbf{18.1} \\
+            & Compressor (w/o gate) & 20.1 & 21.4 & 0.9 \\
+            & \textbf{Compressor (w/ gate)} & \textbf{31.4} & \textbf{52.8} & \textbf{18.1} \\
   Qwen3.5-9B & Raw ref. & 33.0 & 52.4 & 10.5 \\
-              & GCM & 22.5 & 31.9 & 2.2 \\
-              & \textbf{Route} & \textbf{33.4} & \textbf{52.4} & \textbf{11.9} \\
+              & Compressor (w/o gate) & 22.5 & 31.9 & 2.2 \\
+              & \textbf{Compressor (w/ gate)} & \textbf{33.4} & \textbf{52.4} & \textbf{11.9} \\
   \bottomrule
   \end{tabular}
   \vspace{0.4em}
   \begin{block}{Finding}
-    \footnotesize On multi-hop transfer, GCM can beat truncated raw
+    \footnotesize On multi-hop transfer, the compressor without the gate can beat truncated raw
     (Qwen3 HotpotQA $19.1\to30.5$; Qwen3.5 $3.9\to26.6$).
-    On single-document / extractive targets, routing falls back.
-    Across the harvested two-base targets, \textbf{Route $\ge$ Raw in every cell}.
+    On single-document / extractive targets, the gated variant falls back.
+    Across the harvested two-base targets, \textbf{Compressor (w/ gate) $\ge$ Raw in every cell}.
   \end{block}
   \footnotesize Single seed; error bars pending. \paref{paper-a-all-benchmarks-skeleton-2026-07-21.md}{all-benchmark tables}
 \end{frame}

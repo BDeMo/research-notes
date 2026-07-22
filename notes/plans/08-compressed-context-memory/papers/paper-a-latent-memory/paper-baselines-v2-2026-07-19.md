@@ -70,7 +70,7 @@ a 16k–100k long-context result because the released training range is short.
 | [500xCompressor](https://github.com/ZongqianLi/500xCompressor) | 1 / 4 / 16 per 500 tokens | no weights | learned extreme KV state | blocked row |
 | [Cramming 1568](https://github.com/yurakuratov/hidden_capacity) | 1 vector | yes | optimizes a new vector per text | capacity only |
 | [Semi-Dynamic](https://github.com/yuyijiong/semi-dynamic-context-compress) | input-dependent, ≤32x | yes | predicts one of five ratios | adaptive table |
-| GCM | 128 per 4,096 tokens | yes | recurrent soft memory | proposed method |
+| Compressor (w/o gate) | 128 per 4,096 tokens | yes | recurrent soft memory | proposed method |
 | [LCLM](https://github.com/LeonLixyz/LCLM) | 1 per 4/8/16 tokens | yes | general encoder–decoder | long table |
 
 **Conclusion:** no public method currently compresses arbitrary 16k–100k input into one or a few soft
@@ -92,7 +92,7 @@ These methods run on our Qwen3-8B and Qwen3.5-9B bases.
 | [LongLLMLingua](https://github.com/microsoft/LLMLingua) | question-aware compression | matched tokens | current rows invalid; isolated-env rerun |
 | original [LLMLingua](https://github.com/microsoft/LLMLingua) | perplexity compression | matched tokens | current rows invalid; isolated-env rerun |
 | exact mean pooling | simple latent control | same base/state budget | queued |
-| GCM | proposed method | K128/chunk | one final cell |
+| Compressor (w/o gate) | proposed method | K128/chunk | one final cell |
 
 ## 5. Official soft/recurrent methods
 
@@ -113,7 +113,7 @@ These methods run on our Qwen3-8B and Qwen3.5-9B bases.
 
 | rows | columns |
 |---|---|
-| QuALITY, BFCL, SQuAD, Hotpot × two main bases | no-context, bounded raw, true raw, SFT, window, LL2, GCM, empirical route |
+| QuALITY, BFCL, SQuAD, Hotpot × two main bases | no-context, bounded raw, true raw, SFT, window, LL2, Compressor (w/o gate), Compressor (w/ gate) |
 
 Only directly comparable Qwen rows appear here.
 
@@ -128,7 +128,7 @@ Only directly comparable Qwen rows appear here.
 | CCM | concat-2, merge-8 |
 | Activation Beacon | `adapt-1024` |
 | xRAG | 1 token/document |
-| GCM | K128/chunk, K32 long control |
+| Compressor (w/o gate) | K128/chunk, K32 long control |
 
 Required columns: base, checkpoint, source tokens, realized state tokens, raw score, no-context score,
 compressed score, retention, encoder latency, reader latency, peak memory.
@@ -143,7 +143,7 @@ compressed score, retention, encoder latency, reader latency, peak memory.
 | Activation Beacon | `adapt-1024` |
 | AutoCompressor | 30k checkpoint |
 | CCM | streaming state |
-| GCM | K128/chunk and K32/chunk |
+| Compressor (w/o gate) | K128/chunk and K32/chunk |
 
 Tasks: RULER 4k/8k/16k/32k, LongBench-v2, InfiniteBench, NarrativeQA, Qasper, MultiFieldQA, HotpotQA,
 2WikiMQA, MuSiQue, BABILong QA1–3.

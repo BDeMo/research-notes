@@ -62,7 +62,7 @@ adapter recovers a bounded raw-context path, while answer confidence supports he
 two. In the same-backbone evaluation, GCM substantially improves over matched window and text-compression
 controls on long-document multiple choice and remains stable on tool use. Across tasks, the results identify
 where compact memory is useful and where the raw path remains necessary. In zero-shot long-context transfer,
-GCM improves over bounded raw input on multi-hop targets, while the empirical route returns to raw context
+the compressor without the gate improves over bounded raw input on multi-hop targets, while the gated variant returns to raw context
 on single-document and extractive targets. The result is a task-structured reliability boundary rather than
 one universal compression setting.
 
@@ -519,26 +519,26 @@ repeated holdouts per group. The table averages test results over seeds and spli
 
 | model | metric | QuALITY | BFCL | Hotpot |
 |---|---|---:|---:|---:|
-| Qwen3-8B | GCM | 54.4% | 72.3% | 28.9% |
-|  | route | **54.6%** | **88.5%** | **50.9%** |
+| Qwen3-8B | Compressor (w/o gate) | 54.4% | 72.3% | 28.9% |
+|  | Compressor (w/ gate) | **54.6%** | **88.5%** | **50.9%** |
 |  | gain | +0.2 pp | +16.2 pp | +22.0 pp |
 |  | FB AUC | 57.2 | 82.8 | 63.9 |
 |  | FB rate | 0.2% | 46.6% | 68.3% |
 |  | Δ raw | +47.4 pp | -3.5 pp | -2.4 pp |
-| Qwen3.5-9B | GCM | **51.5%** | 72.0% | 30.5% |
-|  | route | 51.4% | **80.5%** | **51.7%** |
+| Qwen3.5-9B | Compressor (w/o gate) | **51.5%** | 72.0% | 30.5% |
+|  | Compressor (w/ gate) | 51.4% | **80.5%** | **51.7%** |
 |  | gain | -0.1 pp | +8.5 pp | +21.2 pp |
 |  | FB AUC | 54.9 | 84.1 | 67.4 |
 |  | FB rate | 0.3% | 22.0% | 52.1% |
 |  | Δ raw | +44.4 pp | -3.8 pp | -2.2 pp |
 
-Fallback AUROC measures whether low GCM confidence ranks examples where bounded raw scores higher than GCM.
+Fallback AUROC measures whether low compressor confidence ranks examples where bounded raw scores higher than the compressor without the gate.
 QuALITY is an easy routing case because memory is much stronger than the bounded frozen raw path, so the
 gate uses memory almost always. On BFCL and HotpotQA, empirical routing remains below raw. Confidence is
 therefore an analysis signal, not a safe deployment rule on these tasks.
 
 The corrected document-level fixed-family test certifies 0/24 groups at
-a 2% harm target and 10% family-wise error level. Every formal route is all-raw. The paper makes no realized finite-sample
+a 2% harm target and 10% family-wise error level. Every formally tested gated policy is all-raw. The paper makes no realized finite-sample
 risk-control claim.
 
 ### 8.4 Existing Cross-Model Result
@@ -572,7 +572,7 @@ is itself valuable and when the evidence can be represented by the latent carrie
 
 The 88-cell clean main grid is complete. The main result has two panels. Panel A asks whether the compressor
 itself learns a useful short state. Panel B in Section 8.3 asks how much a shared-backbone raw fallback adds
-at inference. Scores are native metrics; GCM and SFT show mean ± sample standard deviation over three seeds.
+at inference. Scores are native metrics; the compressor and SFT show mean ± sample standard deviation over three seeds.
 
 Benchmarks are columns and methods are rows. Raw and SFT use the same gray text color because both are
 references rather than compressed-path competitors.
@@ -583,12 +583,12 @@ references rather than compressed-path competitors.
 |  | SFT | 81.7 ± 1.7%§ | 95.4 ± 0.3% | 68.8 ± 0.6% |
 |  | Window | 15.7% | 55.7% | 26.2% |
 |  | LLMLingua | 14.3% | 70.3% | 22.1% |
-|  | GCM | **54.4 ± 0.2%** | **72.3 ± 0.5%** | **28.9 ± 0.2%** |
+|  | Compressor (w/o gate) | **54.4 ± 0.2%** | **72.3 ± 0.5%** | **28.9 ± 0.2%** |
 | Qwen3.5-9B | Raw | 7.1% | 84.5% | 53.9% |
 |  | SFT | 85.0 ± 0.4% | 94.9 ± 1.0% | 71.7 ± 0.6% |
 |  | Window | 16.7% | 52.8% | 24.8% |
 |  | LLMLingua | 20.3% | 60.8% | 28.9% |
-|  | GCM | **51.5 ± 1.7%** | **72.0 ± 0.8%** | **30.5 ± 0.3%** |
+|  | Compressor (w/o gate) | **51.5 ± 1.7%** | **72.0 ± 0.8%** | **30.5 ± 0.3%** |
 
 § The six-cell same-config SFT reaudit saves outputs and adapters. Bounded SFT scores are 32.8/79.4/81.3%;
 true-input SFT scores are 83.7/80.6/80.9%.
@@ -597,9 +597,9 @@ Three conclusions are stable. First, BFCL memory accuracy is about 72% on both m
 variation, close to LLMLingua-2 but below raw context and SFT. Second, the Qwen3-8B QuALITY main-grid score
 is \(54.4\pm0.2\)% , but independent reruns are run-sensitive: \(44.2\pm11.2\)% in the fixed-config grid
 and \(48.7\pm15.1\)% in the replicate grid. Reaudited SFT reaches \(64.5\pm27.5\)% at the bounded input and
-\(81.7\pm1.7\)% with true input. On Qwen3.5, GCM reaches \(51.5\pm1.7\)% while SFT reaches 84.7%.
+\(81.7\pm1.7\)% with true input. On Qwen3.5, the compressor without the gate reaches \(51.5\pm1.7\)% while SFT reaches 84.7%.
 The valid QuALITY claim is positive compressed competence with material run variance, not an accuracy
-advantage over matched adaptation. Third, GCM is not a replacement for raw evidence on HotpotQA.
+advantage over matched adaptation. Third, the compressor without the gate is not a replacement for raw evidence on HotpotQA.
 
 All 88 cells contain the expected number of validation records. Ten LongLLMLingua/original-LLMLingua cells
 are excluded because the compressor raised legacy KV-cache errors and silently used fallback text. They will
@@ -703,15 +703,15 @@ what information survives, whether the model can use it, and which path should a
 | claim | current status | source / replacement |
 |---|---|---|
 | BFCL compresses to 65--75% across bases | Established pilot | v1.8 cross-model table |
-| Gate preserves strong raw context | Rejected | held-out route remains below raw on BFCL and Hotpot |
+| Gate preserves strong raw context | Rejected | the compressor with the held-out gate remains below raw on BFCL and Hotpot |
 | Formal nonzero risk-controlled coverage | Rejected at current setting | 0/24 groups certified; all-raw |
 | Gate rescues degraded raw path | Established pilot | Qwen3.5-4B BFCL +52.3 points |
-| QuALITY compression beats matched SFT | Rejected | GCM is stable but reaudited SFT is stronger |
+| QuALITY compression beats matched SFT | Rejected | Compressor (w/o gate) is stable but reaudited SFT is stronger |
 | QuALITY generally exceeds 8k | Rejected | only 1.9% / 5.2% exceed 8,192 |
 | Fixed 128-token document memory | Rejected | current method uses S×128 |
 | Reconstruction is the best gate | Rejected | repeat-reconstruction follow-up is null |
 | One embedding space transfers across models | Rejected | model-specific dimensions and geometry |
-| GCM replaces raw evidence on multi-hop QA | Rejected | Hotpot raw and SFT are stronger |
+| Compressor (w/o gate) replaces raw evidence on multi-hop QA | Rejected | Hotpot raw and SFT are stronger |
 | Cost savings at matched quality | Pending | measured latency + risk/coverage grid |
 
 ## Appendix B. Current Main Configuration
@@ -756,7 +756,7 @@ length is \(S K\), not a fixed \(K\), and encoding still scans the available inp
 the query, reuse across unrelated questions is limited. Continuous states can lose exact identifiers and do
 not preserve original token positions. Every base model needs its own adapter and latent space.
 
-The current confidence route is empirical, and the formal test returns all-raw. Future work should combine
+The current confidence gate is empirical, and the formal test returns all-raw. Future work should combine
 the reliability signal with adaptive memory budgets, raw-span retrieval, and step-level recovery. Some
 official baselines require a different architecture or unavailable checkpoints; these rows are reported as
 unavailable rather than replaced by internal replicas.

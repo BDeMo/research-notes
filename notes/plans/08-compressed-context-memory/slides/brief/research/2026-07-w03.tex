@@ -1,0 +1,116 @@
+% Paper A research brief for July 2026, Week 3.
+% Date range: Mon 2026-07-20 to Sun 2026-07-26.
+% Status snapshot: Wed 2026-07-22 06:33 PT.
+
+\begin{frame}
+  \titlepage
+  \vspace{-1.0em}
+  \begin{center}
+    \small Paper A research brief: July 2026, Week 3 \\
+    \scriptsize Status through Wed 2026-07-22 06:33 PT
+  \end{center}
+\end{frame}
+
+\begin{frame}{Research question and method}
+  \begin{block}{Question}
+    When can an agent answer from a short learned state, and when should it return to raw evidence?
+  \end{block}
+  \begin{enumerate}\small
+    \item Recurrently encode context chunks into soft memory while carrying earlier memory forward.
+    \item Read memory through a small LoRA adapter on the same frozen language model.
+    \item Keep an adapter-free bounded raw path on the same backbone.
+    \item Use held-out confidence to study routing between the two paths.
+  \end{enumerate}
+  \begin{block}{Positioning}
+    \footnotesize Compression ratio alone is not the contribution. Paper A studies the complete
+    \textbf{compact-memory versus raw-evidence interface}, including paired failure, coverage, and cost.
+  \end{block}
+\end{frame}
+
+\begin{frame}{Core result: useful compact state, clear boundary}
+  \centering\scriptsize
+  \begin{tabular}{llrrr}
+  \toprule
+  base & method & QuALITY & BFCL & HotpotQA \\
+  \midrule
+  Qwen3-8B & \textcolor{gray}{Raw ref.} & 7.2 & 92.4 & 53.7 \\
+            & \textcolor{gray}{SFT ref.} & 81.7 & 95.4 & 68.8 \\
+            & LLMLingua-2 & 14.3 & 70.3 & 22.1 \\
+            & Compressor (w/o gate) & 54.4 & 72.3 & 28.9 \\
+            & \textbf{Compressor (w/ gate)} & \textbf{54.6} & \textbf{88.5} & \textbf{50.9} \\
+  \midrule
+  Qwen3.5-9B & \textcolor{gray}{Raw ref.} & 7.1 & 84.5 & 53.9 \\
+              & \textcolor{gray}{SFT ref.} & 85.0 & 94.9 & 71.7 \\
+              & LLMLingua-2 & 20.3 & 60.8 & 28.9 \\
+              & Compressor (w/o gate) & \textbf{51.5} & 72.0 & 30.5 \\
+              & \textbf{Compressor (w/ gate)} & 51.4 & \textbf{80.5} & \textbf{51.7} \\
+  \bottomrule
+  \end{tabular}
+  \vspace{0.45em}
+  \begin{itemize}\footnotesize
+    \item The compressor without the gate is the strongest completed compact path in the core table.
+    \item SFT is a full-cost adaptation reference, not a compression competitor.
+    \item Formal testing certifies no nonzero coverage; routing is reported as held-out empirical analysis.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Real long-context transfer}
+  \centering\scriptsize
+  \begin{tabular}{llrrr}
+  \toprule
+  base & method & LongBench-v2 & $\infty$Bench-choice & BABILong \\
+  \midrule
+  Qwen3-8B & \textcolor{gray}{Raw ref.} & 31.2 & 52.8 & 18.1 \\
+            & Compressor (w/o gate) & 20.1 & 21.4 & 0.9 \\
+            & \textbf{Compressor (w/ gate)} & \textbf{31.4} & \textbf{52.8} & \textbf{18.1} \\
+  Qwen3.5-9B & \textcolor{gray}{Raw ref.} & 33.0 & 52.4 & 10.5 \\
+              & Compressor (w/o gate) & 22.5 & 31.9 & 2.2 \\
+              & \textbf{Compressor (w/ gate)} & \textbf{33.4} & \textbf{52.4} & \textbf{11.9} \\
+  \bottomrule
+  \end{tabular}
+  \vspace{0.45em}
+  \begin{block}{Task-structured operating region}
+    \footnotesize The compressor without the gate can beat truncated raw on multi-hop LongBench transfer, while raw wins on
+    single-document / extractive targets. The gate selects between the two paths:
+    \textbf{Compressor (w/ gate) $\ge$ Raw on every harvested two-base target}.
+  \end{block}
+  \footnotesize Single seed; error bars, RULER, and K32 repairs remain.
+\end{frame}
+
+\begin{frame}{Execution status and next steps}
+  \begin{columns}[T]
+  \begin{column}{0.56\textwidth}
+    \centering\scriptsize
+    \begin{tabular}{lrrrr}
+    \toprule
+    stage & done & run & fail & pending \\
+    \midrule
+    core main & 88 & 0 & 0 & 0 \\
+    replicate + SFT audit & 9 & 0 & 0 & 0 \\
+    transfer adapters & 46 & 0 & 2 & 0 \\
+    real long-context & 50 & 3 & 2 & 63 \\
+    generality & 11 & 1 & 0 & 36 \\
+    budget / RULER & 0 & 0 & 0 & 23 \\
+    ablation & 0 & 0 & 0 & 36 \\
+    official baselines & 0 & 0 & 0 & 52 \\
+    \bottomrule
+    \end{tabular}
+  \end{column}
+  \begin{column}{0.44\textwidth}
+    \textbf{Current workers}
+    \begin{itemize}\scriptsize
+      \item 3 long-context runs;
+      \item 1 generality run;
+      \item 1 unavailable GPU.
+    \end{itemize}
+    \textbf{Order to completion}
+    \begin{enumerate}\scriptsize
+      \item continue long-context;
+      \item generality;
+      \item RULER / budget;
+      \item ablation + cost;
+      \item official baselines.
+    \end{enumerate}
+  \end{column}
+  \end{columns}
+\end{frame}

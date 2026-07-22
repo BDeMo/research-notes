@@ -16,12 +16,12 @@ Bold marks the best completed compressed path.
 |  | SFT | reference | 81.7 ± 1.7% | 95.4 ± 0.3% | 68.8 ± 0.6% |
 |  | Window | control | 15.7% | 55.7% | 26.2% |
 |  | LLMLingua | baseline | 14.3% | 70.3% | 22.1% |
-|  | GCM | ours | **54.4 ± 0.2%** | **72.3 ± 0.5%** | **28.9 ± 0.2%** |
+|  | Compressor (w/o gate) | ours | **54.4 ± 0.2%** | **72.3 ± 0.5%** | **28.9 ± 0.2%** |
 | Qwen3.5-9B | Raw | reference | 7.1% | 84.5% | 53.9% |
 |  | SFT | reference | 85.0 ± 0.4% | 94.9 ± 1.0% | 71.7 ± 0.6% |
 |  | Window | control | 16.7% | 52.8% | 24.8% |
 |  | LLMLingua | baseline | 20.3% | 60.8% | 28.9% |
-|  | GCM | ours | **51.5 ± 1.7%** | **72.0 ± 0.8%** | **30.5 ± 0.3%** |
+|  | Compressor (w/o gate) | ours | **51.5 ± 1.7%** | **72.0 ± 0.8%** | **30.5 ± 0.3%** |
 
 `Window` is a budget-matched control. LLMLingua is currently the only completed published compression
 baseline in the same-base table. Official soft-memory methods use different released backbones and therefore
@@ -29,19 +29,19 @@ belong in the native-base table below.
 
 ## 2. Shared-backbone routing
 
-`Route` combines GCM with bounded raw fallback. `FB AUC` measures whether low GCM confidence ranks
+`Compressor (w/ gate)` combines the compressor with bounded raw fallback. `FB AUC` measures whether low compressor confidence ranks
 raw-better examples. All values are percentages or percentage points.
 
 | base | metric | QuALITY | BFCL | HotpotQA |
 |---|---|---:|---:|---:|
-| Qwen3-8B | GCM | 54.4% | 72.3% | 28.9% |
-|  | Route | **54.6%** | **88.5%** | **50.9%** |
+| Qwen3-8B | Compressor (w/o gate) | 54.4% | 72.3% | 28.9% |
+|  | Compressor (w/ gate) | **54.6%** | **88.5%** | **50.9%** |
 |  | Gain | +0.2 pp | +16.2 pp | +22.0 pp |
 |  | FB AUC | 57.2% | 82.8% | 63.9% |
 |  | FB rate | 0.2% | 46.6% | 68.3% |
 |  | Δ Raw | +47.4 pp | -3.5 pp | -2.4 pp |
-| Qwen3.5-9B | GCM | **51.5%** | 72.0% | 30.5% |
-|  | Route | 51.4% | **80.5%** | **51.7%** |
+| Qwen3.5-9B | Compressor (w/o gate) | **51.5%** | 72.0% | 30.5% |
+|  | Compressor (w/ gate) | 51.4% | **80.5%** | **51.7%** |
 |  | Gain | -0.1 pp | +8.5 pp | +21.2 pp |
 |  | FB AUC | 54.9% | 84.1% | 67.4% |
 |  | FB rate | 0.3% | 22.0% | 52.1% |
