@@ -44,6 +44,7 @@ Benchmarks = columns, methods = rows.
 ### Qwen3-8B
 | method | QuALITY | BFCL | HotpotQA | SQuAD-v2 (diag) |
 |---|---:|---:|---:|---:|
+| no context · ref | 17.8 | 1.3 | 19.8 | 16.1 |
 | Raw (bounded) · ref | 7.2 | 92.4 | 53.7 | 65.5 |
 | SFT · ref | 81.7±1.7 | 95.4±0.3 | 68.8±0.6 | 93.1±0.3 |
 | Window · control | 15.7 | 55.7 | 26.2 | 49.6 |
@@ -54,6 +55,7 @@ Benchmarks = columns, methods = rows.
 ### Qwen3.5-9B
 | method | QuALITY | BFCL | HotpotQA | SQuAD-v2 (diag) |
 |---|---:|---:|---:|---:|
+| no context · ref | 22.0 | 1.3 | 26.7 | 20.7 |
 | Raw (bounded) · ref | 7.1 | 84.5 | 53.9 | 66.8 |
 | SFT · ref | 85.0±0.4 | 94.9±1.0 | 71.7±0.6 | 93.8±0.3 |
 | Window · control | 16.7 | 52.8 | 24.8 | 49.6 |

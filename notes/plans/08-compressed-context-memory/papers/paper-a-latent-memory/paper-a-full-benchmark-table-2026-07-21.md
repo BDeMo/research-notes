@@ -12,11 +12,13 @@ Bold marks the best completed compressed path.
 
 | base | method | role | QuALITY | BFCL | HotpotQA |
 |---|---|---|---:|---:|---:|
+| Qwen3-8B | no context | reference | 17.8% | 1.3% | 19.8% |
 | Qwen3-8B | Raw | reference | 7.2% | 92.4% | 53.7% |
 |  | SFT | reference | 81.7 ± 1.7% | 95.4 ± 0.3% | 68.8 ± 0.6% |
 |  | Window | control | 15.7% | 55.7% | 26.2% |
 |  | LLMLingua | baseline | 14.3% | 70.3% | 22.1% |
 |  | Compressor (w/o gate) | ours | **54.4 ± 0.2%** | **72.3 ± 0.5%** | **28.9 ± 0.2%** |
+| Qwen3.5-9B | no context | reference | 22.0% | 1.3% | 26.7% |
 | Qwen3.5-9B | Raw | reference | 7.1% | 84.5% | 53.9% |
 |  | SFT | reference | 85.0 ± 0.4% | 94.9 ± 1.0% | 71.7 ± 0.6% |
 |  | Window | control | 16.7% | 52.8% | 24.8% |
