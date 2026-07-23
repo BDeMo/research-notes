@@ -1,5 +1,5 @@
 % July Week 3 weekly: Mon 2026-07-20 to Sun 2026-07-26.
-% Status snapshot: Wed 2026-07-22 20:34 PT.
+% Status snapshot: Thu 2026-07-23 10:59 PT.
 
 \providecommand{\paref}[2]{\href{../../papers/paper-a-latent-memory/#1}{\textcolor{blue}{#2}}}
 
@@ -9,7 +9,7 @@
   \begin{center}
     \textbf{Plan 08 / Long-Context Compression --- July Week 3} \\[0.3em]
     \small Mon 2026-07-20 to Sun 2026-07-26 \\
-    \scriptsize Status through Wed 2026-07-22 20:34 PT. \\
+    \scriptsize Status through Thu 2026-07-23 10:59 PT. \\
     \scriptsize Current priority: finish \textbf{Paper A} with complete long-context, generality,
     budget, ablation, cost, and official-baseline evidence.
   \end{center}
@@ -60,19 +60,19 @@
   \toprule
   base & method & QuALITY & BFCL & HotpotQA \\
   \midrule
-  Qwen3-8B & Raw ref. & 7.2 & 92.4 & 53.7 \\
-            & LLMLingua-2 & 14.3 & 70.3 & 22.1 \\
-            & Compressor (w/o gate) & 54.4 & 72.3 & 28.9 \\
-            & \textbf{Compressor (w/ gate)} & \textbf{54.6} & \textbf{88.5} & \textbf{50.9} \\
-  Qwen3.5-9B & Raw ref. & 7.1 & 84.5 & 53.9 \\
-              & LLMLingua-2 & 20.3 & 60.8 & 28.9 \\
-              & Compressor (w/o gate) & \textbf{51.5} & 72.0 & 30.5 \\
-              & \textbf{Compressor (w/ gate)} & 51.4 & \textbf{80.5} & \textbf{51.7} \\
+  Qwen3-8B & Raw ref. & --$^\dagger$ & 92.4 & 53.7 \\
+            & LLMLingua-2 & --$^\dagger$ & 70.3 & 22.1 \\
+            & Compressor (w/o gate) & --$^\dagger$ & 72.3 & 28.9 \\
+            & \textbf{Compressor (w/ gate)} & --$^\dagger$ & \textbf{88.5} & \textbf{50.9} \\
+  Qwen3.5-9B & Raw ref. & --$^\dagger$ & 84.5 & 53.9 \\
+              & LLMLingua-2 & --$^\dagger$ & 60.8 & 28.9 \\
+              & Compressor (w/o gate) & --$^\dagger$ & 72.0 & 30.5 \\
+              & \textbf{Compressor (w/ gate)} & --$^\dagger$ & \textbf{80.5} & \textbf{51.7} \\
   \bottomrule
   \end{tabular}
   \vspace{0.35em}
   \begin{itemize}\footnotesize
-    \item Core main grid, output audit, gate analysis, replicate, and SFT reaudit are complete.
+    \item $^\dagger$QuALITY is quarantined after a zero-based label-index bug; BFCL/Hotpot remain valid.
     \item Formal fixed-family test certifies no nonzero coverage; routing remains held-out empirical analysis.
   \end{itemize}
 \end{frame}
@@ -84,11 +84,11 @@
   base & method & LongBench-v2 & $\infty$Bench-choice & BABILong \\
   \midrule
   Qwen3-8B & Raw ref. & 31.2 & 52.8 & 18.1 \\
-            & Compressor (w/o gate) & 20.1 & 21.4 & 0.9 \\
-            & \textbf{Compressor (w/ gate)} & \textbf{31.4} & \textbf{52.8} & \textbf{18.1} \\
+            & Compressor (w/o gate) & --$^\dagger$ & --$^\dagger$ & --$^\ddagger$ \\
+            & \textbf{Compressor (w/ gate)} & --$^\dagger$ & --$^\dagger$ & \textbf{18.1} \\
   Qwen3.5-9B & Raw ref. & 33.0 & 52.4 & 10.5 \\
-              & Compressor (w/o gate) & 22.5 & 31.9 & 2.2 \\
-              & \textbf{Compressor (w/ gate)} & \textbf{33.4} & \textbf{52.4} & \textbf{11.9} \\
+              & Compressor (w/o gate) & --$^\dagger$ & --$^\dagger$ & --$^\ddagger$ \\
+              & \textbf{Compressor (w/ gate)} & --$^\dagger$ & --$^\dagger$ & \textbf{11.9} \\
   \bottomrule
   \end{tabular}
   \vspace{0.4em}
@@ -98,7 +98,8 @@
     On single-document / extractive targets, the gated variant falls back.
     Across the harvested two-base targets, \textbf{Compressor (w/ gate) $\ge$ Raw in every cell}.
   \end{block}
-  \footnotesize Single seed; error bars pending. \paref{paper-a-all-benchmarks-skeleton-2026-07-21.md}{all-benchmark tables}
+  \footnotesize $^\dagger$QuALITY-source invalid; $^\ddagger$Hotpot$\to$BABILong collapse.
+  \paref{paper-a-all-benchmarks-skeleton-2026-07-21.md}{all-benchmark tables}
 \end{frame}
 
 \begin{frame}{Paper A --- full status and execution order}
@@ -109,12 +110,12 @@
     \toprule
     stage & done & run & fail & pending \\
     \midrule
-    core main & 88 & 0 & 0 & 0 \\
-    replicate + SFT audit & 9 & 0 & 0 & 0 \\
-    transfer adapters & 41 & 0 & 2 & 0 \\
-    real long-context & 103 & 0 & 3 & 0 \\
-    7-model generality & 12 & 3 & 0 & 27 \\
-    budget / RULER & 2 & 1 & 0 & 20 \\
+    core main & 60 valid & 0 & 28 invalid & 0 \\
+    replicate + SFT audit & 0 valid & 0 & 9 invalid & 0 \\
+    transfer adapters & 27 valid & 0 & 16 invalid & 0 \\
+    real long-context & 81 valid & 0 & 25 affected & 0 \\
+    7-model generality & 13 valid & 2 invalid & 8 & 6 \\
+    budget / RULER & 0 valid & 1 window & 2 fail & 18 \\
     ablation & 0 & 0 & 0 & 36 \\
     official baselines & 0 & 0 & 0 & 52 \\
     \bottomrule
@@ -123,17 +124,17 @@
   \begin{column}{0.44\textwidth}
     \textbf{Live}
     \begin{itemize}\scriptsize
-      \item 3 generality workers;
-      \item 1 RULER / budget worker;
-      \item 1 GPU unavailable on that node.
+      \item 2 stale-loader xLAM QuALITY workers;
+      \item RULER raw window-8192 is running;
+      \item primary GPU 1 is memory-contended.
     \end{itemize}
     \textbf{Next}
     \begin{enumerate}\scriptsize
-      \item complete generality;
-      \item repair three K32 transfer cells;
-      \item complete RULER / budget;
-      \item ablation + cost;
-      \item official baselines.
+      \item stop stale/OOM workers;
+      \item sync corrected loader and code;
+      \item validate one clean QuALITY cell;
+      \item rerun quarantined cells;
+      \item repair RULER, then ablation/baselines.
     \end{enumerate}
   \end{column}
   \end{columns}

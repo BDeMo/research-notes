@@ -1,15 +1,19 @@
 # Corrected held-out gate results
 
+> [!WARNING]
+> “Corrected” here refers to held-out splitting, not dataset labels. Both QuALITY rows are invalid
+> because their source predictions used the zero-based label-index bug.
+
 > 24 model/task/seed groups · 20 exact-context-disjoint repeated holdouts per group · primary signal fixed
 > to compressed-path confidence. Values below average test results over seeds and splits.
 
 | model | task | mem. use | FB rate | FB AUC | Compressor (w/ gate) | Δ raw |
 |---|---|---:|---:|---:|---:|---:|
-| Qwen3-8B | QuALITY | 99.8% | 0.2% | 57.2 | 54.6 | +47.4 |
+| Qwen3-8B | QuALITY | INVALID | INVALID | INVALID | INVALID | INVALID |
 | Qwen3-8B | BFCL | 53.4% | 46.6% | 82.8 | 88.5 | -3.5 |
 | Qwen3-8B | SQuAD-v2 | 6.6% | 93.4% | 66.6 | 62.8 | -2.0 |
 | Qwen3-8B | HotpotQA | 31.7% | 68.3% | 63.9 | 50.9 | -2.4 |
-| Qwen3.5-9B | QuALITY | 99.7% | 0.3% | 54.9 | 51.4 | +44.4 |
+| Qwen3.5-9B | QuALITY | INVALID | INVALID | INVALID | INVALID | INVALID |
 | Qwen3.5-9B | BFCL | 78.0% | 22.0% | 84.1 | 80.5 | -3.8 |
 | Qwen3.5-9B | SQuAD-v2 | 5.8% | 94.2% | 62.4 | 64.7 | -2.1 |
 | Qwen3.5-9B | HotpotQA | 47.9% | 52.1% | 67.4 | 51.7 | -2.2 |

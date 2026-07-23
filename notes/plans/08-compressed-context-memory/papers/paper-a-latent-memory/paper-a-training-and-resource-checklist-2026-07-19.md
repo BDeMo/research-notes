@@ -1,6 +1,6 @@
 # Paper A training and resource checklist
 
-> Operational runbook · updated 2026-07-22 20:34 PT. GPU-hour ranges are planning estimates, not measured costs.
+> Operational runbook · updated 2026-07-23 10:59 PT. GPU-hour ranges are planning estimates, not measured costs.
 > Every final table value must point to a status JSON, result JSON, per-item records, adapter when trained,
 > model/checkpoint ID, and scorer.
 
@@ -8,7 +8,8 @@
 
 | resource | available now | use |
 |---|---:|---|
-| healthy experiment GPUs | 4× NVIDIA H100 NVL, 95.8 GiB each | primary GPU 0–2; secondary GPU 0 |
+| usable experiment GPUs now | 3× NVIDIA H100 NVL, 95.8 GiB each | primary GPU 0/2; secondary GPU 0 |
+| memory-contended GPU | primary GPU 1, ~68 GiB occupied | caused two Ministral OOMs; isolate before reuse |
 | CMG demo GPU | 1× H100 NVL, ~69.5 GiB occupied | excluded from Paper A scheduling |
 | unavailable GPU | secondary GPU 1 | disappeared from CUDA; never schedule |
 | primary host RAM | 2.0 TiB, 1.9 TiB available | model loading, CPU caches |
@@ -20,13 +21,14 @@
 
 Current stage:
 
-- main: 88/88 complete;
-- output audit: 28/28 reloadable paths complete; SFT reaudit 6/6 complete;
-- feature rerun: 24/24 canonical adapters complete; corrected gate analysis complete;
-- source adapters: 41/43 complete; two K32 source adapters need technical repair;
-- long-context: 103/106 complete; three K32 evaluations need technical repair;
-- generality: 12/42 complete, three running, 27 pending;
-- budget/length: 2/23 complete, one RULER cell running; ablation: 0/36 queued;
+- raw process count: 269/399 done, 3 running, 15 failed, 112 pending;
+- scientifically usable now: 160/399; 88 completed QuALITY-affected cells are quarantined;
+- main: 60/88 valid; all 28 QuALITY cells require corrected reruns;
+- source adapters: 27/43 valid; 16 QuALITY-source cells require reruns;
+- long-context: 81/106 unaffected; 25 QuALITY-source cells require reruns;
+- generality: 13 valid BFCL cells, 13 invalid QuALITY cells done, 2 invalid QuALITY cells running, 8 technical failures;
+- budget/length: two completed QuALITY cells invalid; RULER K128 and window-512 failed; window-8192 runs;
+- ablation: 0/36 queued; the QuALITY half must use the corrected loader;
 - official-baseline local cells: 0/52, not yet launched.
 
 ## 1. Master experiment ledger
@@ -34,17 +36,17 @@ Current stage:
 | ID | stage | cells | training cells | purpose | expected outcome | planned GPU hours | state |
 |---|---|---:|---:|---|---|---:|---|
 | E0 | evidence audit | — | 0 | verify lengths, splits, overlap, scorers, access | remove false/full-context claims | <1 CPU h | complete |
-| E1 | fair main | 88 | 54 | compare GCM with matched adaptation and text/raw controls | stable BFCL; task/model-dependent QuALITY; QA boundary | 250–400 | complete |
+| E1 | fair main | 88 | 54 | compare GCM with matched adaptation and text/raw controls | stable BFCL; task/model-dependent QuALITY; QA boundary | 250–400 | 60 valid; 28 rerun |
 | E1Q | output/truncation audit | 28×256 items | 0 | detect fixed outputs, empty outputs, hidden caps, compressor fallback | every reloadable path has inspectable predictions and lengths | 8–20 | complete |
-| E1R | QuALITY SFT reaudit | 6 | 6 | reproduce score-only SFT cells whose adapters were not saved | full outputs, saved adapters, explain seed variance | 5–8 | complete |
+| E1R | QuALITY SFT reaudit | 6 | 6 | reproduce score-only SFT cells whose adapters were not saved | full outputs, saved adapters, explain seed variance | 5–8 | invalid; rerun |
 | E1F | feature rerun | 24 | 0 | add document IDs and gate probe features | one complete per-item record set per GCM adapter | 20–50 | complete |
 | E2 | empirical gate | 24 groups ×20 splits | 0 | test compress-or-raw routing without test-selected threshold | empirical risk–coverage curves; gate demoted on strong-raw tasks | <4 CPU h | complete |
 | E2F | formal gate check | one fixed split/group | 0 | test cluster-valid nonzero coverage | 0/24 certified; all-raw | <2 CPU h | complete negative |
-| E3 | reproducibility | 3 | 3 | rerun Qwen3 QuALITY seeds with new run IDs | quantify hardware/kernel spread | 8–18 | complete |
-| E4A | transfer-source training | 43 | 43 | train each source adapter once, including K32 QuALITY | reusable adapter for each base/source/method/budget | 100–200 | 41 done; 2 failed K32 repairs |
-| E4B | real long-context eval | 106 | 0 | test source-trained transfer without target tuning | find length/task boundary; exact retrieval likely fails | 135–270 | 103 done; 3 failed K32 repairs |
-| E5 | fixed-config generality | 42 | 42 | test K128 recipe on all seven bases | BFCL remains useful on most; QuALITY may vary | 160–310 | 12 done; 3 running; 27 pending |
-| E6 | budget/length | 23 | 11 | map memory/raw budgets and RULER length | Pareto curve; RULER exposes exact-retrieval limit | 40–90 | 2 done; 1 running; 20 pending |
+| E3 | reproducibility | 3 | 3 | rerun Qwen3 QuALITY seeds with new run IDs | quantify hardware/kernel spread | 8–18 | invalid; rerun |
+| E4A | transfer-source training | 43 | 43 | train each source adapter once, including K32 QuALITY | reusable adapter for each base/source/method/budget | 100–200 | 27 valid; 16 rerun |
+| E4B | real long-context eval | 106 | 0 | test source-trained transfer without target tuning | find length/task boundary; exact retrieval likely fails | 135–270 | 81 unaffected; 25 rerun |
+| E5 | fixed-config generality | 42 | 42 | test K128 recipe on all seven bases | BFCL remains useful on most; QuALITY may vary | 160–310 | 26 done (13 invalid); 2 running invalid; 8 failed |
+| E6 | budget/length | 23 | 11 | map memory/raw budgets and RULER length | Pareto curve; RULER exposes exact-retrieval limit | 40–90 | 2 invalid; 2 RULER failed; 1 running |
 | E7 | mechanism ablation | 36 | 36 | test five method components and K | joint loss required; other effects small/task-dependent | 120–220 | pending |
 | E8 | measured cost | ≤16 profiles | 0 | measure encoder, memory read, raw read, fallback | honest end-to-end cost, not ratio alone | 10–25 | pending |
 | E9 | official baselines | variable | mostly 0 | compare author checkpoints on native bases/tasks | native-base retention and long-context frontier | 80–200 | preparation |

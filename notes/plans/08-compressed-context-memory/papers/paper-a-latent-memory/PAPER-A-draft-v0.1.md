@@ -12,6 +12,14 @@
 > Evidence labels: **Established** = usable now; **Provisional** = existing v1.8 result under fair re-evaluation;
 > **Pending** = new paper-grade experiment currently running.
 
+> [!WARNING]
+> **Integrity quarantine (2026-07-22).** Every direct QuALITY result and every downstream
+> compressed-path result using a QuALITY-trained adapter is invalid. The loader subtracted one
+> from zero-based labels, dropping all A-labelled examples and shifting the other targets.
+> LongBench-v2 and InfiniteBench-choice compressed paths are therefore also affected.
+> Hotpot→BABILong shows a separate transfer collapse. Use the marked manuscript tables, not
+> unmarked numbers elsewhere in this historical draft.
+
 ## Abstract
 
 Long context is becoming the working memory of language-model systems: it holds documents, code, tool
@@ -440,7 +448,7 @@ never used to train the adapter. All seven bases run source-trained GCM, feasibl
 primary bases additionally run source-trained full+SFT on every target. ∞Bench also tests a smaller K per
 chunk because a fixed per-chunk K otherwise grows to thousands of final memory tokens on 100k-token books.
 
-Full public validation sizes are 1,595 (QuALITY), 316 (BFCL-live-multiple), 5,928 (SQuAD-v2), and 7,405
+Full public validation sizes are 2,086 (QuALITY, corrected), 316 (BFCL-live-multiple), 5,928 (SQuAD-v2), and 7,405
 (HotpotQA). SQuAD and Hotpot training are capped at 2,000 examples for matched-cost experiments. One exact
 BFCL train/validation duplicate is removed before training.
 
@@ -487,7 +495,8 @@ mean, standard deviation, paired bootstrap intervals, and per-item gate records.
 
 ### 8.1 Evidence Audit
 
-The audit changes the interpretation of the original QuALITY result. Qwen3-8B QuALITY contexts have median
+The audit invalidates the original QuALITY result because the loader shifted zero-based answer labels and
+dropped every A-labelled example. The length audit itself remains valid: Qwen3-8B QuALITY contexts have median
 length 6,511 tokens, p95 8,017, and maximum 8,413. Only 1.9% exceed 8,192 tokens. For Qwen3.5-9B, 5.2% exceed
 8,192. Thus the earlier statement that QuALITY generally overruns an 8k window is false.
 
@@ -515,22 +524,22 @@ repeated holdouts per group. The table averages test results over seeds and spli
 
 | model | metric | QuALITY | BFCL | Hotpot |
 |---|---|---:|---:|---:|
-| Qwen3-8B | Compressor (w/o gate) | 54.4% | 72.3% | 28.9% |
-|  | Compressor (w/ gate) | **54.6%** | **88.5%** | **50.9%** |
-|  | gain | +0.2 pp | +16.2 pp | +22.0 pp |
+| Qwen3-8B | Compressor (w/o gate) | ~~54.4%~~ ⚠ INVALID | 72.3% | 28.9% |
+|  | Compressor (w/ gate) | ~~54.6%~~ ⚠ INVALID | **88.5%** | **50.9%** |
+|  | gain | ~~+0.2 pp~~ ⚠ INVALID | +16.2 pp | +22.0 pp |
 |  | FB AUC | 57.2 | 82.8 | 63.9 |
-|  | FB rate | 0.2% | 46.6% | 68.3% |
-|  | Δ raw | +47.4 pp | -3.5 pp | -2.4 pp |
-| Qwen3.5-9B | Compressor (w/o gate) | **51.5%** | 72.0% | 30.5% |
-|  | Compressor (w/ gate) | 51.4% | **80.5%** | **51.7%** |
-|  | gain | -0.1 pp | +8.5 pp | +21.2 pp |
+|  | FB rate | ~~0.2%~~ ⚠ INVALID | 46.6% | 68.3% |
+|  | Δ raw | ~~+47.4 pp~~ ⚠ INVALID | -3.5 pp | -2.4 pp |
+| Qwen3.5-9B | Compressor (w/o gate) | ~~51.5%~~ ⚠ INVALID | 72.0% | 30.5% |
+|  | Compressor (w/ gate) | ~~51.4%~~ ⚠ INVALID | **80.5%** | **51.7%** |
+|  | gain | ~~-0.1 pp~~ ⚠ INVALID | +8.5 pp | +21.2 pp |
 |  | FB AUC | 54.9 | 84.1 | 67.4 |
 |  | FB rate | 0.3% | 22.0% | 52.1% |
 |  | Δ raw | +44.4 pp | -3.8 pp | -2.2 pp |
 
 Fallback AUROC measures whether low compressor confidence ranks examples where bounded raw scores higher than the compressor without the gate.
-QuALITY is an easy routing case because memory is much stronger than the bounded frozen raw path, so the
-gate uses memory almost always. On BFCL and HotpotQA, empirical routing remains below raw. Confidence is
+The QuALITY routing interpretation is suspended pending corrected reruns. On BFCL and HotpotQA,
+empirical routing remains below raw. Confidence is
 therefore an analysis signal, not a safe deployment rule on these tasks.
 
 The corrected document-level fixed-family test certifies 0/24 groups at
@@ -574,29 +583,27 @@ references rather than compressed-path competitors.
 
 | model | method | QuALITY | BFCL | Hotpot |
 |---|---|---:|---:|---:|
-| Qwen3-8B | Raw | 7.2% | 92.4% | 53.7% |
-|  | SFT | 81.7 ± 1.7%§ | 95.4 ± 0.3% | 68.8 ± 0.6% |
-|  | Window | 15.7% | 55.7% | 26.2% |
-|  | LLMLingua | 14.3% | 70.3% | 22.1% |
-|  | Compressor (w/o gate) | **54.4 ± 0.2%** | **72.3 ± 0.5%** | **28.9 ± 0.2%** |
-| Qwen3.5-9B | Raw | 7.1% | 84.5% | 53.9% |
-|  | SFT | 85.0 ± 0.4% | 94.9 ± 1.0% | 71.7 ± 0.6% |
-|  | Window | 16.7% | 52.8% | 24.8% |
-|  | LLMLingua | 20.3% | 60.8% | 28.9% |
-|  | Compressor (w/o gate) | **51.5 ± 1.7%** | **72.0 ± 0.8%** | **30.5 ± 0.3%** |
+| Qwen3-8B | Raw | ~~7.2%~~ ⚠ INVALID | 92.4% | 53.7% |
+|  | SFT | ~~81.7 ± 1.7%~~ ⚠ INVALID | 95.4 ± 0.3% | 68.8 ± 0.6% |
+|  | Window | ~~15.7%~~ ⚠ INVALID | 55.7% | 26.2% |
+|  | LLMLingua | ~~14.3%~~ ⚠ INVALID | 70.3% | 22.1% |
+|  | Compressor (w/o gate) | ~~54.4 ± 0.2%~~ ⚠ INVALID | **72.3 ± 0.5%** | **28.9 ± 0.2%** |
+| Qwen3.5-9B | Raw | ~~7.1%~~ ⚠ INVALID | 84.5% | 53.9% |
+|  | SFT | ~~85.0 ± 0.4%~~ ⚠ INVALID | 94.9 ± 1.0% | 71.7 ± 0.6% |
+|  | Window | ~~16.7%~~ ⚠ INVALID | 52.8% | 24.8% |
+|  | LLMLingua | ~~20.3%~~ ⚠ INVALID | 60.8% | 28.9% |
+|  | Compressor (w/o gate) | ~~51.5 ± 1.7%~~ ⚠ INVALID | **72.0 ± 0.8%** | **30.5 ± 0.3%** |
 
 § The six-cell same-config SFT reaudit saves outputs and adapters. Bounded SFT scores are 32.8/79.4/81.3%;
 true-input SFT scores are 83.7/80.6/80.9%.
 
-Three conclusions are stable. First, BFCL memory accuracy is about 72% on both main bases with small seed
-variation, close to LLMLingua-2 but below raw context and SFT. Second, the Qwen3-8B QuALITY main-grid score
-is \(54.4\pm0.2\)% , but independent reruns are run-sensitive: \(44.2\pm11.2\)% in the fixed-config grid
-and \(48.7\pm15.1\)% in the replicate grid. Reaudited SFT reaches \(64.5\pm27.5\)% at the bounded input and
-\(81.7\pm1.7\)% with true input. On Qwen3.5, the compressor without the gate reaches \(51.5\pm1.7\)% while SFT reaches 84.7%.
-The valid QuALITY claim is positive compressed competence with material run variance, not an accuracy
-advantage over matched adaptation. Third, the compressor without the gate is not a replacement for raw evidence on HotpotQA.
+Two conclusions remain stable. First, BFCL memory accuracy is about 72% on both main bases with small seed
+variation, close to LLMLingua-2 but below raw context and SFT. Second, the compressor without the gate is
+not a replacement for raw evidence on HotpotQA. No QuALITY accuracy or routing claim remains valid until
+the corrected full-split rerun completes.
 
-All 88 cells contain the expected number of validation records. Ten LongLLMLingua/original-LLMLingua cells
+All 60 non-QuALITY main cells contain the expected validation records. The 28 QuALITY cells used a corrupted
+1,595-row subset instead of the corrected 2,086-row validation split. Ten LongLLMLingua/original-LLMLingua cells
 are excluded because the compressor raised legacy KV-cache errors and silently used fallback text. They will
 be rerun in a compatible official environment with fallback disabled. Eight duplicate tags are treated as
 technical repeats within seed; the largest same-tag spread is 0.95 percentage points.

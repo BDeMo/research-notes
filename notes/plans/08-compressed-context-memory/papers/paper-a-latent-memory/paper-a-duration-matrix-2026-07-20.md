@@ -1,8 +1,12 @@
 # Paper A model, baseline, evaluation, and training duration matrix
 
-> Updated 2026-07-22 20:34 PT. `Observed` values come from completed status JSONs and include both training and full
+> Updated 2026-07-23 10:59 PT. `Observed` values come from completed status JSONs and include both training and full
 > evaluation for a cell unless marked eval-only. `Estimated` values are planning ranges on one H100 NVL.
-> Four healthy experiment GPUs are available.
+> Three GPUs are currently usable without known contention.
+
+> [!WARNING]
+> Historical QuALITY timings remain useful for resource planning, but all resulting scores are invalid.
+> Corrected reruns use 2,000 training and 2,086 validation examples, so evaluation will be longer.
 
 ## 1. Base models
 
@@ -91,7 +95,7 @@ Required runnable official methods: **8**. Appendix/blocked methods: **3**.
 
 | evaluation | public validation size | metric | typical eval-only time Qwen3 | typical eval-only time Qwen3.5 |
 |---|---:|---|---:|---:|
-| QuALITY | 1,595 | answer-letter accuracy | 0.2–0.4 h | 1–2 h |
+| QuALITY | 2,086 corrected | answer-letter accuracy | 0.3–0.6 h | 1.5–3 h |
 | BFCL-live-multiple | 316 | tool accuracy | 0.03–0.1 h | 0.3–0.5 h |
 | SQuAD-v2 | 5,928 | token F1 | 0.2–0.6 h | 1–4 h |
 | HotpotQA | 7,405 | token F1 | 0.4–1 h | 1–5 h |
@@ -132,7 +136,7 @@ There are **6 training datasets/families** in the GCM grid.
 
 | training set | examples used per cell | models/stages | observed Qwen3 training-cell time | estimated Qwen3.5 time |
 |---|---:|---|---:|---:|
-| QuALITY | 1,899 | main, source, generality, budget, ablation | GCM source 0.61 h; SFT source 0.66 h | GCM 7–9 h; SFT 6–8 h |
+| QuALITY | 2,000 corrected | main, source, generality, budget, ablation | historical GCM source 0.61 h; rerun estimate 0.7–1.0 h | GCM 8–11 h; SFT 7–10 h |
 | BFCL-live-multiple | 736 after dedup | main, generality, ablation | GCM full cell 0.62–0.70 h; SFT 0.09–0.10 h | GCM 2–4 h; SFT 0.7–1.6 h |
 | SQuAD-v2 | 2,000 cap | main, source | GCM source 0.18 h; SFT source 0.16 h | GCM 3–5 h; SFT 2–4 h |
 | HotpotQA | 2,000 cap | main, source | GCM source 0.23 h; SFT source 0.16 h | GCM 4–6 h; SFT 3–5 h |
@@ -156,20 +160,20 @@ Total: **195 trainable cells**.
 
 ## 7. Current wall-clock ETA
 
-Live snapshot: 255/399 manifest cells are complete. Four jobs are active: three Qwen3.5-4B generality
-cells and one Qwen3-8B RULER budget cell.
+Live process snapshot: 269/399 manifest cells are done, but only 160 are currently usable.
+Two stale-loader xLAM QuALITY jobs and one RULER 8,192-token raw-window job are active.
 
-| milestone | current state | ETA from 2026-07-22 20:34 PT |
+| milestone | current state | ETA from 2026-07-23 10:59 PT |
 |---|---|---:|
-| core main, audit, SFT reaudit, gate, reproducibility | complete | done |
-| source adapters | 41/43; two K32 technical repairs | 6–12 h after isolated rerun |
-| real long-context evaluation | 103/106; three K32 repairs | repairs separate |
-| seven-base fixed-config generality | 12/42; three running | 1–2 additional days |
-| budget and RULER length | 2/23; one running | 1–2 additional days |
-| mechanism ablation | 0/36 | 0.5–1 additional day |
+| corrected core QuALITY + gate | 28 main + audits/replicates require rerun | 1.5–2.5 days after restart |
+| source adapters | 16 QuALITY-source cells require rerun | 1–2 additional days |
+| real long-context evaluation | 25 QuALITY-source cells require rerun | 0.5–1.5 additional days |
+| seven-base fixed-config generality | 13 valid BFCL done; QuALITY invalid | 0.5–1 additional day |
+| budget and RULER length | QuALITY invalid; K128 and window-512 failed | blocked for compressor result |
+| mechanism ablation | 0/36 | 0.5–1 additional day after loader sync |
 | official baselines | 0/52 local cells; separate environments | 2–4 days after launch |
 | cost profiling and final harvest | not started | 0.5–1 day |
-| full Paper A package | includes repairs, official baselines, cost, and harvest | **5–7 days (July 27–29)** |
+| full Paper A package | corrected reruns, repairs, official baselines, cost, harvest | **7–10 days (July 30–August 2)** |
 
-The immediate scheduled critical path is long-context → generality → budget → ablation. The full-package
-critical path is the not-yet-launched official-baseline suite plus K32 resource-isolated repairs.
+The immediate critical path is: stop stale jobs → sync corrected loader/code → validate one clean
+QuALITY run → restart quarantined cells → repair RULER. Official baselines remain the final long pole.

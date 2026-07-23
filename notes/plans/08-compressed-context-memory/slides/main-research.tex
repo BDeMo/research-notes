@@ -266,26 +266,26 @@
   base & method & QuALITY & BFCL & HotpotQA \\
   \midrule
   \multirow{6}{*}{Qwen3-8B}
-    & \refm{Raw} & 7.2 & 92.4 & 53.7 \\
-    & \refm{SFT} & 81.7$\pm$1.7 & 95.4$\pm$0.3 & 68.8$\pm$0.6 \\
-    & Window & 15.7 & 55.7 & 26.2 \\
-    & LLMLingua-2 & 14.3 & 70.3 & 22.1 \\
-    & Compressor (w/o gate) & 54.4$\pm$0.2 & 72.3$\pm$0.5 & 28.9$\pm$0.2 \\
-    & \best{Compressor (w/ gate)} & \best{54.6} & \best{88.5} & \best{50.9} \\
+    & \refm{Raw} & --$^\dagger$ & 92.4 & 53.7 \\
+    & \refm{SFT} & --$^\dagger$ & 95.4$\pm$0.3 & 68.8$\pm$0.6 \\
+    & Window & --$^\dagger$ & 55.7 & 26.2 \\
+    & LLMLingua-2 & --$^\dagger$ & 70.3 & 22.1 \\
+    & Compressor (w/o gate) & --$^\dagger$ & 72.3$\pm$0.5 & 28.9$\pm$0.2 \\
+    & \best{Compressor (w/ gate)} & --$^\dagger$ & \best{88.5} & \best{50.9} \\
   \midrule
   \multirow{6}{*}{Qwen3.5-9B}
-    & \refm{Raw} & 7.1 & 84.5 & 53.9 \\
-    & \refm{SFT} & 85.0$\pm$0.4 & 94.9$\pm$1.0 & 71.7$\pm$0.6 \\
-    & Window & 16.7 & 52.8 & 24.8 \\
-    & LLMLingua-2 & 20.3 & 60.8 & 28.9 \\
-    & \best{Compressor (w/o gate)} & \best{51.5$\pm$1.7} & 72.0$\pm$0.8 & 30.5$\pm$0.3 \\
-    & \best{Compressor (w/ gate)} & 51.4 & \best{80.5} & \best{51.7} \\
+    & \refm{Raw} & --$^\dagger$ & 84.5 & 53.9 \\
+    & \refm{SFT} & --$^\dagger$ & 94.9$\pm$1.0 & 71.7$\pm$0.6 \\
+    & Window & --$^\dagger$ & 52.8 & 24.8 \\
+    & LLMLingua-2 & --$^\dagger$ & 60.8 & 28.9 \\
+    & \best{Compressor (w/o gate)} & --$^\dagger$ & 72.0$\pm$0.8 & 30.5$\pm$0.3 \\
+    & \best{Compressor (w/ gate)} & --$^\dagger$ & \best{80.5} & \best{51.7} \\
   \bottomrule
   \end{tabular}
   \vspace{0.35em}
   \begin{itemize}\footnotesize
-    \item The compressor without the gate is the strongest completed compact path across the displayed core tasks; SFT is a full-cost reference.
-    \item The compressor with the gate recovers much of the raw gap on BFCL and HotpotQA; QuALITY already favors compact memory.
+    \item $^\dagger$QuALITY is quarantined after a zero-based label-index bug.
+    \item The compressor with the gate recovers much of the raw gap on unaffected BFCL and HotpotQA.
     \item SQuAD-v2 is retained only as a short-passage exact-text diagnostic, not a headline benchmark.
   \end{itemize}
   \begin{block}{}\footnotesize \ghA{current-data-2026-07-19/main-table.md}{audited core table} \; \ghA{current-data-2026-07-19/gate-summary.md}{routing metrics}\end{block}
@@ -300,14 +300,14 @@
   \multirow{4}{*}{Qwen3-8B}
     & \refm{No context} & 33.4 & 41.9 & 2.0 \\
     & \refm{Raw} & 31.2 & 52.8 & 18.1 \\
-    & Compressor (w/o gate) & 20.1 & 21.4 & 0.9 \\
-    & \best{Compressor (w/ gate)} & \best{31.4} & \best{52.8} & \best{18.1} \\
+    & Compressor (w/o gate) & --$^\dagger$ & --$^\dagger$ & --$^\ddagger$ \\
+    & \best{Compressor (w/ gate)} & --$^\dagger$ & --$^\dagger$ & \best{18.1} \\
   \midrule
   \multirow{4}{*}{Qwen3.5-9B}
     & \refm{No context} & 27.0 & 42.4 & 3.1 \\
     & \refm{Raw} & 33.0 & 52.4 & 10.5 \\
-    & Compressor (w/o gate) & 22.5 & 31.9 & 2.2 \\
-    & \best{Compressor (w/ gate)} & \best{33.4} & \best{52.4} & \best{11.9} \\
+    & Compressor (w/o gate) & --$^\dagger$ & --$^\dagger$ & --$^\ddagger$ \\
+    & \best{Compressor (w/ gate)} & --$^\dagger$ & --$^\dagger$ & \best{11.9} \\
   \bottomrule
   \end{tabular}
   \vspace{0.35em}
@@ -317,53 +317,49 @@
     On single-document / extractive targets, raw wins and the gated variant falls back. Across the harvested
     two-base targets, \best{Compressor (w/ gate) $\ge$ Raw in every cell}.
   \end{block}
-  \footnotesize Single seed; error bars pending. RULER and $\infty$Bench K32 repairs remain.
+  \footnotesize $^\dagger$QuALITY-source invalid; $^\ddagger$Hotpot$\to$BABILong collapse. RULER is in an OOM loop.
   \begin{block}{}\footnotesize \ghA{paper-a-all-benchmarks-skeleton-2026-07-21.md}{full long-context breakdown}\end{block}
 \end{frame}
 
-\begin{frame}{12. Paper A --- full execution status (Wed 2026-07-22 20:34 PT)}
+\begin{frame}{12. Paper A --- integrity-aware status (Thu 2026-07-23 10:59 PT)}
   \begin{columns}[T]
   \begin{column}{0.52\textwidth}
     \centering\scriptsize
     \begin{tabular}{lrrrr}
     \toprule
-    stage & done & run & fail & pending \\
+    stage & valid & run & bad & wait \\
     \midrule
-    core main & 88 & 0 & 0 & 0 \\
-    replicate + SFT audit & 9 & 0 & 0 & 0 \\
-    transfer adapters & 41 & 0 & 2 & 0 \\
-    real long-context & 103 & 0 & 3 & 0 \\
-    7-model generality & 12 & 3 & 0 & 27 \\
-    budget / RULER & 2 & 1 & 0 & 20 \\
+    core main & 60 & 0 & 28 & 0 \\
+    replicate + SFT audit & 0 & 0 & 9 & 0 \\
+    transfer adapters & 27 & 0 & 16 & 0 \\
+    real long-context & 81 & 0 & 25 & 0 \\
+    7-model generality & 13 & 2 & 8 & 6 \\
+    budget / RULER & 0 & 1 & 2 & 18 \\
     ablation & 0 & 0 & 0 & 36 \\
     official baselines & 0 & 0 & 0 & 52 \\
     \bottomrule
     \end{tabular}
-    \vspace{0.45em}
+    \vspace{0.2em}
     \begin{block}{Live workers}
-      \scriptsize Three Qwen3.5-4B generality jobs + one Qwen3-8B RULER budget job.
-      One GPU on the generality node is unavailable.
+      \scriptsize Two stale-loader xLAM QuALITY jobs; one RULER
+      raw-window job. GPU 1 is memory-contended.
     \end{block}
   \end{column}
   \begin{column}{0.48\textwidth}
     \textbf{Completed evidence}
     \begin{itemize}\scriptsize
-      \item Core grid, output audit, gate analysis, replicate, SFT reaudit.
-      \item Two-base long-context harvest: 44 cells.
+      \item 160/399 cells currently usable; raw process count is 269/399.
+      \item New valid BFCL: GLM-4 $72.9\pm0.7$, Ministral $72.0\pm0.7$.
+      \item BFCL, Hotpot, SQuAD, and LongBench remain usable.
     \end{itemize}
     \textbf{Repairs / blockers}
     \begin{itemize}\scriptsize
-      \item K32 $\infty$Bench adapters failed on both main bases.
-      \item GLM-4 and Qwen3.5-9B K32 source-adapter repairs remain.
-      \item LCLM / Semi-Dynamic cloned; official execution not started.
+      \item 88 completed QuALITY-affected cells are quarantined.
+      \item 21 Hotpot$\to$BABILong compressed cells collapse.
+      \item K32, RULER, and official baselines remain.
     \end{itemize}
-    \textbf{Execution order}
-    \begin{enumerate}\scriptsize
-      \item complete generality;
-      \item repair three K32 transfer cells;
-      \item budget/RULER $\to$ ablation/cost;
-      \item official baselines.
-    \end{enumerate}
+    \textbf{Next:} \scriptsize stop stale jobs, sync fixes, validate one
+    corrected QuALITY cell, then rerun the quarantine.
   \end{column}
   \end{columns}
   \begin{block}{}\footnotesize \ghA{paper-a-full-benchmark-table-2026-07-21.md}{benchmark + baseline inventory} \; \ghA{experiment-receipt-2026-07-16.md}{experiment receipt}\end{block}

@@ -1,9 +1,16 @@
 # Paper A — full benchmark and baseline table
 
-> Snapshot: 2026-07-22 20:46 PT
+> Snapshot: 2026-07-23 10:59 PT
 > Rule: completed values are reported numerically; incomplete experiments are labeled by status and are not
 > filled with estimated results. SQuAD-v2 is retained only as an exact-text diagnostic and is excluded from
 > the headline tables.
+
+> [!WARNING]
+> **Integrity quarantine (2026-07-22).** `⚠ INVALID` marks direct QuALITY results and
+> results from QuALITY-trained adapters. The loader treated zero-based labels as one-based,
+> dropped all A-labelled examples, and shifted the remaining targets. LongBench-v2 and
+> InfiniteBench-choice compressed-path values are affected because their source adapter is
+> trained on QuALITY. Hotpot→BABILong is separately marked as an observed transfer collapse.
 
 ## 1. Headline compressor results
 
@@ -12,18 +19,18 @@ Bold marks the best completed compressed path.
 
 | base | method | role | QuALITY | BFCL | HotpotQA |
 |---|---|---|---:|---:|---:|
-| Qwen3-8B | no context | reference | 17.8% | 1.3% | 19.8% |
-| Qwen3-8B | Raw | reference | 7.2% | 92.4% | 53.7% |
-|  | SFT | reference | 81.7 ± 1.7% | 95.4 ± 0.3% | 68.8 ± 0.6% |
-|  | Window | control | 15.7% | 55.7% | 26.2% |
-|  | LLMLingua | baseline | 14.3% | 70.3% | 22.1% |
-|  | Compressor (w/o gate) | ours | **54.4 ± 0.2%** | **72.3 ± 0.5%** | **28.9 ± 0.2%** |
-| Qwen3.5-9B | no context | reference | 22.0% | 1.3% | 26.7% |
-| Qwen3.5-9B | Raw | reference | 7.1% | 84.5% | 53.9% |
-|  | SFT | reference | 85.0 ± 0.4% | 94.9 ± 1.0% | 71.7 ± 0.6% |
-|  | Window | control | 16.7% | 52.8% | 24.8% |
-|  | LLMLingua | baseline | 20.3% | 60.8% | 28.9% |
-|  | Compressor (w/o gate) | ours | **51.5 ± 1.7%** | **72.0 ± 0.8%** | **30.5 ± 0.3%** |
+| Qwen3-8B | no context | reference | ~~17.8%~~ ⚠ INVALID | 1.3% | 19.8% |
+| Qwen3-8B | Raw | reference | ~~7.2%~~ ⚠ INVALID | 92.4% | 53.7% |
+|  | SFT | reference | ~~81.7 ± 1.7%~~ ⚠ INVALID | 95.4 ± 0.3% | 68.8 ± 0.6% |
+|  | Window | control | ~~15.7%~~ ⚠ INVALID | 55.7% | 26.2% |
+|  | LLMLingua | baseline | ~~14.3%~~ ⚠ INVALID | 70.3% | 22.1% |
+|  | Compressor (w/o gate) | ours | ~~54.4 ± 0.2%~~ ⚠ INVALID | **72.3 ± 0.5%** | **28.9 ± 0.2%** |
+| Qwen3.5-9B | no context | reference | ~~22.0%~~ ⚠ INVALID | 1.3% | 26.7% |
+| Qwen3.5-9B | Raw | reference | ~~7.1%~~ ⚠ INVALID | 84.5% | 53.9% |
+|  | SFT | reference | ~~85.0 ± 0.4%~~ ⚠ INVALID | 94.9 ± 1.0% | 71.7 ± 0.6% |
+|  | Window | control | ~~16.7%~~ ⚠ INVALID | 52.8% | 24.8% |
+|  | LLMLingua | baseline | ~~20.3%~~ ⚠ INVALID | 60.8% | 28.9% |
+|  | Compressor (w/o gate) | ours | ~~51.5 ± 1.7%~~ ⚠ INVALID | **72.0 ± 0.8%** | **30.5 ± 0.3%** |
 
 `Window` is a budget-matched control. LLMLingua is currently the only completed published compression
 baseline in the same-base table. Official soft-memory methods use different released backbones and therefore
@@ -36,38 +43,38 @@ raw-better examples. All values are percentages or percentage points.
 
 | base | metric | QuALITY | BFCL | HotpotQA |
 |---|---|---:|---:|---:|
-| Qwen3-8B | Compressor (w/o gate) | 54.4% | 72.3% | 28.9% |
-|  | Compressor (w/ gate) | **54.6%** | **88.5%** | **50.9%** |
-|  | Gain | +0.2 pp | +16.2 pp | +22.0 pp |
-|  | FB AUC | 57.2% | 82.8% | 63.9% |
-|  | FB rate | 0.2% | 46.6% | 68.3% |
-|  | Δ Raw | +47.4 pp | -3.5 pp | -2.4 pp |
-| Qwen3.5-9B | Compressor (w/o gate) | **51.5%** | 72.0% | 30.5% |
-|  | Compressor (w/ gate) | 51.4% | **80.5%** | **51.7%** |
-|  | Gain | -0.1 pp | +8.5 pp | +21.2 pp |
-|  | FB AUC | 54.9% | 84.1% | 67.4% |
-|  | FB rate | 0.3% | 22.0% | 52.1% |
-|  | Δ Raw | +44.4 pp | -3.8 pp | -2.2 pp |
+| Qwen3-8B | Compressor (w/o gate) | ~~54.4%~~ ⚠ INVALID | 72.3% | 28.9% |
+|  | Compressor (w/ gate) | ~~54.6%~~ ⚠ INVALID | **88.5%** | **50.9%** |
+|  | Gain | ~~+0.2 pp~~ ⚠ INVALID | +16.2 pp | +22.0 pp |
+|  | FB AUC | ~~57.2%~~ ⚠ INVALID | 82.8% | 63.9% |
+|  | FB rate | ~~0.2%~~ ⚠ INVALID | 46.6% | 68.3% |
+|  | Δ Raw | ~~+47.4 pp~~ ⚠ INVALID | -3.5 pp | -2.4 pp |
+| Qwen3.5-9B | Compressor (w/o gate) | ~~51.5%~~ ⚠ INVALID | 72.0% | 30.5% |
+|  | Compressor (w/ gate) | ~~51.4%~~ ⚠ INVALID | **80.5%** | **51.7%** |
+|  | Gain | ~~-0.1 pp~~ ⚠ INVALID | +8.5 pp | +21.2 pp |
+|  | FB AUC | ~~54.9%~~ ⚠ INVALID | 84.1% | 67.4% |
+|  | FB rate | ~~0.3%~~ ⚠ INVALID | 22.0% | 52.1% |
+|  | Δ Raw | ~~+44.4 pp~~ ⚠ INVALID | -3.8 pp | -2.2 pp |
 
 ## 3. Complete benchmark inventory
 
 | panel | benchmark | task type | source adapter | paper role | current state |
 |---|---|---|---|---|---|
-| Core | QuALITY | long-document multiple choice | QuALITY | headline competence | complete |
+| Core | QuALITY | long-document multiple choice | QuALITY | headline competence | ⚠ INVALID; full rerun required |
 | Core | BFCL-live-multiple | tool selection | BFCL | headline tool use | complete |
 | Core | HotpotQA | multi-hop QA | HotpotQA | raw-evidence boundary | complete |
 | Diagnostic | SQuAD-v2 | short-passage extractive QA | SQuAD | exact-text diagnostic only | complete; removed from headline |
-| Long | LongBench-v2 | mixed long-context reasoning | QuALITY | main long-context transfer | partial |
-| Long | InfiniteBench-choice | very-long multiple choice | QuALITY | main very-long transfer | partial; K32 repairs remain |
+| Long | LongBench-v2 | mixed long-context reasoning | QuALITY | main long-context transfer | ⚠ compressed paths invalid |
+| Long | InfiniteBench-choice | very-long multiple choice | QuALITY | main very-long transfer | ⚠ compressed paths invalid |
 | Long | MultiFieldQA | long multi-document QA | SQuAD | extractive transfer | partial |
 | Long | Qasper | long scientific-document QA | SQuAD | document QA transfer | partial |
 | Long | LongBench HotpotQA | long multi-hop QA | HotpotQA | multi-hop transfer | partial |
 | Long | 2WikiMQA | multi-hop QA | HotpotQA | multi-hop transfer | partial |
 | Long | MuSiQue | compositional multi-hop QA | HotpotQA | multi-hop transfer | partial |
 | Long | NarrativeQA | long narrative QA | NarrativeQA | summarizable-memory test | partial |
-| Long | BABILong QA1 | recurrent synthetic QA | HotpotQA | recurrence test | partial |
-| Long | BABILong QA2 | recurrent synthetic QA | HotpotQA | recurrence test | partial |
-| Long | BABILong QA3 | recurrent synthetic QA | HotpotQA | recurrence test | partial |
+| Long | BABILong QA1 | recurrent synthetic QA | HotpotQA | recurrence test | ⚠ COLLAPSE; labels unaffected |
+| Long | BABILong QA2 | recurrent synthetic QA | HotpotQA | recurrence test | ⚠ COLLAPSE; labels unaffected |
+| Long | BABILong QA3 | recurrent synthetic QA | HotpotQA | recurrence test | ⚠ COLLAPSE; labels unaffected |
 | Controlled | RULER NIAH 4k | exact retrieval | none | length boundary | pending |
 | Controlled | RULER NIAH 8k | exact retrieval | none | length boundary | pending |
 | Controlled | RULER NIAH 16k | exact retrieval | none | length boundary | pending |
@@ -80,14 +87,14 @@ Current stage totals:
 
 | stage | done | running | failed | pending | total |
 |---|---:|---:|---:|---:|---:|
-| Core main grid | 88 | 0 | 0 | 0 | 88 |
-| Transfer adapters | 41 | 0 | 2 | 0 | 43 |
-| Real long-context | 103 | 0 | 3 | 0 | 106 |
-| Seven-model generality | 12 | 3 | 0 | 27 | 42 |
-| Budget and length | 2 | 1 | 0 | 20 | 23 |
+| Core main grid | 60 valid | 0 | 28 invalid | 0 | 88 |
+| Transfer adapters | 27 valid | 0 | 16 invalid | 0 | 43 |
+| Real long-context | 81 unaffected | 0 | 22 invalid + 3 repair | 0 | 106 |
+| Seven-model generality | 13 valid + 13 invalid | 2 invalid QuALITY | 8 technical | 6 | 42 |
+| Budget and length | 0 valid done | 1 RULER window | 2 invalid QuALITY + 2 failed | 18 | 23 |
 | Mechanism ablation | 0 | 0 | 0 | 36 | 36 |
-| Reproducibility | 3 | 0 | 0 | 0 | 3 |
-| SFT reaudit | 6 | 0 | 0 | 0 | 6 |
+| Reproducibility | 0 valid | 0 | 3 invalid | 0 | 3 |
+| SFT reaudit | 0 valid | 0 | 6 invalid | 0 | 6 |
 | Official-baseline local cells | 0 | 0 | 0 | 52 | 52 |
 
 ## 4. Full baseline inventory

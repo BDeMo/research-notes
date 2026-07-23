@@ -1,23 +1,28 @@
 # Paper A experiment receipt
 
-> Snapshot: 2026-07-22 20:46 PT. This is the operational source of truth for what is configured, running,
+> Snapshot: 2026-07-23 10:59 PT. This is the operational source of truth for what is configured, running,
 > queued, blocked, or excluded. “Receipt” means exact recipe + evaluation contract + artifact path.
+
+> [!WARNING]
+> Scientific status differs from process status: 269/399 cells have terminated successfully, but only
+> 160 are currently usable. Eighty-eight completed cells are quarantined by the QuALITY label-index bug,
+> and 21 completed Hotpot→BABILong compressed-path cells show collapse.
 
 ## 1. Live status
 
 | stage | configured cells | done | running | failed / repair | state |
 |---|---:|---:|---:|---:|---|
 | E0 evidence audit | 2 tokenizer/model audits + overlap check | complete | 0 | 0 | locked |
-| E1 fair main grid | **88** | **88** | 0 | 0 | complete |
+| E1 fair main grid | **88** | 60 valid | 0 | 28 invalid QuALITY | rerun required |
 | E1Q output/truncation audit | 28 reloadable paths | 28 | 0 | 0 | complete |
-| E1R QuALITY SFT reaudit | 6 full retrains | 6 | 0 | 0 | complete |
+| E1R QuALITY SFT reaudit | 6 full retrains | 0 valid | 0 | 6 invalid | rerun required |
 | E1F feature-only rerun | 24 canonical GCM adapters | 24 | 0 | 0 | complete |
 | E2 gate/risk analysis | 24 groups × 20 splits | 24 | 0 | 0/24 formal certified | complete negative |
-| E3 reproducibility | 3 duplicate-seed GCM cells | 3 | 0 | 0 | complete |
-| E4A transfer-source adapters | **43** | 41 | 0 | 2 failed / 0 pending | complete except K32 repairs |
-| E4B real-long evaluation | **106** | 103 | 0 | 3 failed / 0 pending | complete except K32 repairs |
-| E5 fixed-config generality | **42** | 12 | 3 | 27 pending | running |
-| E6 budget/length | **23** | 2 | 1 | 20 pending | running |
+| E3 reproducibility | 3 duplicate-seed GCM cells | 0 valid | 0 | 3 invalid | rerun required |
+| E4A transfer-source adapters | **43** | 27 valid | 0 | 16 QuALITY invalid/failed | rerun required |
+| E4B real-long evaluation | **106** | 81 unaffected | 0 | 25 QuALITY-source invalid/failed | rerun required |
+| E5 fixed-config generality | **42** | 13 valid + 13 invalid | 2 invalid | 8 failed / 6 pending | running stale code |
+| E6 budget/length | **23** | 0 valid + 2 invalid | 1 window | 2 failed / 18 pending | running |
 | E7 mechanism ablation | **36** | 0 | 0 | 0 | queued |
 | E8 measured cost | up to 16 adapter profiles | 0 | 0 | 0 | finalization |
 | E9 official baselines | 52 local cells + native-base runs | 0 | 0 | 52 pending; LCLM/Semi-Dynamic cloned | separate envs |
@@ -26,10 +31,15 @@ The manuscript now contains fill-ready tables for E0--E9. Completed
 cells carry audited values, configured unfinished cells use `TBD`, and
 unsupported native method/task pairs use `—`.
 
-Current live workers: three Qwen3.5-4B generality jobs on primary GPUs 0--2 and one Qwen3-8B RULER budget
-job on secondary GPU 0. Primary GPU 3 is reserved outside Paper A, and secondary GPU 1 is unavailable.
+Current live workers: two xLAM QuALITY generality jobs on primary GPUs 0 and 2 use the stale,
+incorrect loader. One Qwen3-8B RULER 8,192-token raw-window job runs on secondary GPU 0.
+The compressor K128 and 512-token raw-window RULER jobs failed. Primary GPU 3 is reserved
+outside Paper A, and secondary GPU 1 is unavailable.
 
-The five failed cells are technical, not scientific negatives. GLM-4 K32 source training ran out of GPU
+Fifteen cells are currently marked failed. The five K32 failures remain technical. Eight
+generality seed-43 runs across GLM-4, Ministral, xLAM, and ToolACE exhausted memory because the
+selected device had only a few MiB free. The two RULER failures are compressor K128 and raw
+window-512. GLM-4 K32 source training ran out of GPU
 memory while another process occupied most of the device; Qwen3.5-9B K32 source training was killed during
 training; the Qwen3/Qwen3.5/GLM K32 InfiniteBench cells then lacked the required adapter on the evaluating
 pod. These cells require resource-isolated retraining or adapter transfer before rerun.
@@ -89,7 +99,7 @@ No memory, projection, or LoRA parameters are shared across these bases.
 
 | bench | train N | validation N | feasible raw | encoder access | median context | metric | max generation |
 |---|---:|---:|---:|---:|---:|---|---:|
-| QuALITY | 1,899 | 1,595 | 8,192 | 16,384 | 6,511 (Q3) | letter log-likelihood accuracy | 8 |
+| QuALITY | 2,000 corrected | 2,086 corrected | 8,192 | 16,384 | 6,511 (Q3) | letter log-likelihood accuracy | 8 |
 | BFCL-live-multiple | 736 after dedup | 316 | 4,096 | 4,096 | 167 | tool accuracy | 32 |
 | SQuAD-v2 | 2,000 cap | 5,928 | 4,096 | 4,096 | 168 | native token-F1 | 16 |
 | HotpotQA | 2,000 cap | 7,405 | 4,096 | 4,096 | 1,075 | native token-F1 | 16 |
