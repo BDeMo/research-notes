@@ -1,6 +1,6 @@
 # Paper A training and resource checklist
 
-> Operational runbook · updated 2026-07-22 15:43 PT. GPU-hour ranges are planning estimates, not measured costs.
+> Operational runbook · updated 2026-07-22 20:34 PT. GPU-hour ranges are planning estimates, not measured costs.
 > Every final table value must point to a status JSON, result JSON, per-item records, adapter when trained,
 > model/checkpoint ID, and scorer.
 
@@ -23,9 +23,9 @@ Current stage:
 - main: 88/88 complete;
 - output audit: 28/28 reloadable paths complete; SFT reaudit 6/6 complete;
 - feature rerun: 24/24 canonical adapters complete; corrected gate analysis complete;
-- source adapters: 46/48 complete; two K32 source adapters need technical repair;
-- long-context: 111/118 complete, one running, three failed, three pending;
-- generality: 12/48 complete; remaining six bases wait for long-context to finish;
+- source adapters: 41/43 complete; two K32 source adapters need technical repair;
+- long-context: 103/106 complete; three K32 evaluations need technical repair;
+- generality: 12/42 complete, three running, 27 pending;
 - budget/length: 2/23 complete, one RULER cell running; ablation: 0/36 queued;
 - official-baseline local cells: 0/52, not yet launched.
 
@@ -41,16 +41,16 @@ Current stage:
 | E2 | empirical gate | 24 groups ×20 splits | 0 | test compress-or-raw routing without test-selected threshold | empirical risk–coverage curves; gate demoted on strong-raw tasks | <4 CPU h | complete |
 | E2F | formal gate check | one fixed split/group | 0 | test cluster-valid nonzero coverage | 0/24 certified; all-raw | <2 CPU h | complete negative |
 | E3 | reproducibility | 3 | 3 | rerun Qwen3 QuALITY seeds with new run IDs | quantify hardware/kernel spread | 8–18 | complete |
-| E4A | transfer-source training | 48 | 48 | train each source adapter once, including K32 QuALITY | reusable adapter for each base/source/method/budget | 110–225 | 46 done; 2 failed K32 repairs |
-| E4B | real long-context eval | 118 | 0 | test source-trained transfer without target tuning | find length/task boundary; exact retrieval likely fails | 150–300 | 111 done; 1 running; 3 failed; 3 pending |
-| E5 | fixed-config generality | 48 | 48 | test K128 recipe on all eight bases | BFCL remains useful on most; QuALITY may vary | 180–350 | 12 done; 36 pending |
+| E4A | transfer-source training | 43 | 43 | train each source adapter once, including K32 QuALITY | reusable adapter for each base/source/method/budget | 100–200 | 41 done; 2 failed K32 repairs |
+| E4B | real long-context eval | 106 | 0 | test source-trained transfer without target tuning | find length/task boundary; exact retrieval likely fails | 135–270 | 103 done; 3 failed K32 repairs |
+| E5 | fixed-config generality | 42 | 42 | test K128 recipe on all seven bases | BFCL remains useful on most; QuALITY may vary | 160–310 | 12 done; 3 running; 27 pending |
 | E6 | budget/length | 23 | 11 | map memory/raw budgets and RULER length | Pareto curve; RULER exposes exact-retrieval limit | 40–90 | 2 done; 1 running; 20 pending |
 | E7 | mechanism ablation | 36 | 36 | test five method components and K | joint loss required; other effects small/task-dependent | 120–220 | pending |
 | E8 | measured cost | ≤16 profiles | 0 | measure encoder, memory read, raw read, fallback | honest end-to-end cost, not ratio alone | 10–25 | pending |
 | E9 | official baselines | variable | mostly 0 | compare author checkpoints on native bases/tasks | native-base retention and long-context frontier | 80–200 | preparation |
 
-Core planned trainable jobs: **206** = 54 main + 6 SFT reaudit + 3 replicate + 48 transfer-source +
-48 generality + 11 budget + 36 ablation. Official Cartridges training is optional and excluded from this count.
+Core planned trainable jobs: **195** = 54 main + 6 SFT reaudit + 3 replicate + 43 transfer-source +
+42 generality + 11 budget + 36 ablation. Official Cartridges training is optional and excluded from this count.
 
 ## 2. E1 — fair main table
 
@@ -131,8 +131,8 @@ Expected at current sample size: likely no nonzero certificate for ε=.02.
 
 ### GCM source adapters
 
-`8 bases × {QuALITY, SQuAD, HotpotQA, NarrativeQA} = 32`, plus
-`8 bases × QuALITY K32 = 8`.
+`7 bases × {QuALITY, SQuAD, HotpotQA, NarrativeQA} = 28`, plus
+`7 bases × QuALITY K32 = 7`.
 
 ### SFT source adapters
 
@@ -148,19 +148,19 @@ Every adapter:
 
 Purpose: prevent target-specific retraining from being mislabeled as transfer.
 
-Expected: all 40 adapters load and emit a source prediction. Source score is not a paper result for this stage.
+Expected: all 35 adapters load and emit a source prediction. Source score is not a paper result for this stage.
 
 ## 6. E4B — real long-context transfer
 
 | source | targets | models/methods | expected |
 |---|---|---|---|
-| QuALITY | LongBench-v2, InfiniteBench-choice | 8 GCM; 2 SFT | model-dependent MC transfer |
-| SQuAD | MultiFieldQA, Qasper | 8 GCM; 2 SFT | extractive transfer likely below raw |
-| Hotpot | LB-Hotpot, 2Wiki, MuSiQue, BABILong QA1–3 | 8 GCM; 2 SFT | multi-hop degradation; BABILong tests recurrence |
-| NarrativeQA | LB-NarrativeQA | 8 GCM; 2 SFT | summarizable long context may transfer |
-| QuALITY | InfiniteBench-choice K32 control | 8 GCM | bound growth of final memory length |
+| QuALITY | LongBench-v2, InfiniteBench-choice | 7 GCM; 2 SFT | model-dependent MC transfer |
+| SQuAD | MultiFieldQA, Qasper | 7 GCM; 2 SFT | extractive transfer likely below raw |
+| Hotpot | LB-Hotpot, 2Wiki, MuSiQue, BABILong QA1–3 | 7 GCM; 2 SFT | multi-hop degradation; BABILong tests recurrence |
+| NarrativeQA | LB-NarrativeQA | 7 GCM; 2 SFT | summarizable long context may transfer |
+| QuALITY | InfiniteBench-choice K32 control | 7 GCM | bound growth of final memory length |
 
-Total: 118 eval-only cells.
+Total: 106 eval-only cells.
 
 Required measurements:
 
@@ -175,11 +175,11 @@ Required measurements:
 
 | setting | value |
 |---|---|
-| bases | Qwen3-8B, Qwen3.5-9B/4B, Qwen2.5-7B, GLM-4-9B, Ministral-8B, xLAM-8B, ToolACE-8B |
+| bases | Qwen3-8B, Qwen3.5-9B/4B, GLM-4-9B, Ministral-8B, xLAM-8B, ToolACE-8B |
 | tasks | QuALITY, BFCL |
 | seeds | 42/43/44 |
 | configuration | K128/chunk, no model-specific tuning |
-| total | 48 training cells |
+| total | 42 training cells |
 
 Purpose: test the algorithm/configuration, not shared latent vectors.
 
@@ -283,7 +283,6 @@ Plus same-base no-context and raw references.
 | q3_8b | `/mnt/persist/checkpoints/Qwen3-8B` | main dense base |
 | q35_9b | `/mnt/persist/checkpoints/Qwen3.5-9B` | main hybrid base |
 | q35_4b | `/mnt/persist/checkpoints/Qwen3.5-4B` | small hybrid stress |
-| q25_7b | `/mnt/persist/checkpoints/Qwen2.5-7B-Instruct` | family generality |
 | glm4_9b | `/mnt/persist/checkpoints/GLM-4-9B-0414` | vendor generality |
 | ministral_8b | `/mnt/persist/checkpoints/Ministral-8B-Instruct-2410` | Mistral family |
 | xlam_8b | `/mnt/persist/checkpoints/Llama-xLAM-2-8b-fc-r` | tool-tuned Llama |
@@ -376,7 +375,7 @@ For every final row:
 5. E3 replicate;
 6. E4A source adapters;
 7. E4B long-context evaluation;
-8. E5 fixed-config eight-base validation;
+8. E5 fixed-config seven-base validation;
 9. E6 budget/length;
 10. E7 ablation;
 11. E8 cost and final harvest;

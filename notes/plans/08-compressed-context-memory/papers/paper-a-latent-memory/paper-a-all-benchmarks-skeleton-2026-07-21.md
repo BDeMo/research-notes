@@ -1,6 +1,6 @@
 # Paper A — all-benchmark manuscript tables (skeleton)
 
-> Snapshot 2026-07-22 15:43 PT. Research only (no CMG-RCA / OpenRCA — those are company work).
+> Snapshot 2026-07-22 20:34 PT. Research only (no CMG-RCA / OpenRCA — those are company work).
 > Rule: completed cells carry numbers; unfinished cells are `TBD` placeholders (fill when the run lands,
 > never estimate). Scores are native metrics ×100. Raw and SFT are **references**, not compressed-path
 > competitors. `GCM` names the full framework. `Compressor (w/o gate)` is the compressed path;
@@ -140,7 +140,7 @@ GCM memory budget K sweep and mechanism ablation (Qwen3-8B × {QuALITY, BFCL}, 3
 | table | benchmark(s) | produced by | current state |
 |---|---|---|---|
 | 1, 1b | QuALITY, BFCL, HotpotQA, SQuAD-v2 | Core main grid (E1) + gate analysis (E2) | ✅ complete (88/88) |
-| 2, 3 | LongBench-v2, ∞Bench-choice, BABILong, LongBench tasks | transfer adapters (E4A) → long-context eval (E4B) | 111/118 done; one ToolACE cell running, three normal cells pending, and three K32 evaluations need technical repair |
+| 2, 3 | LongBench-v2, ∞Bench-choice, BABILong, LongBench tasks | transfer adapters (E4A) → long-context eval (E4B) | 103/106 done; three K32 evaluations need technical repair |
 | 4 | RULER-NIAH 4k/8k/16k/32k | budget/length (E6) | 2/23 budget cells done; one RULER cell running |
 | 5 | K sweep + mechanism ablation | budget (E6) + ablation (E7) | budget 2/23 done, one running; ablation 0/36 queued |
 

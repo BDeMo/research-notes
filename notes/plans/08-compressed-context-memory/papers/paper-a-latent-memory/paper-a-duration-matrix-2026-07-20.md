@@ -1,25 +1,24 @@
 # Paper A model, baseline, evaluation, and training duration matrix
 
-> Updated 2026-07-22 15:43 PT. `Observed` values come from completed status JSONs and include both training and full
+> Updated 2026-07-22 20:34 PT. `Observed` values come from completed status JSONs and include both training and full
 > evaluation for a cell unless marked eval-only. `Estimated` values are planning ranges on one H100 NVL.
 > Four healthy experiment GPUs are available.
 
 ## 1. Base models
 
-There are **8 base models** in the GCM experiment package.
+There are **7 base models** in the GCM experiment package.
 
 | base | architecture / role | train cells | long eval cells | estimated remaining GPU hours | expected wall time in current schedule |
 |---|---|---:|---:|---:|---:|
 | Qwen3-8B | dense; main base | 98 total across all grids | 23 | 66–110 | 1–2 days, shared over 3 GPUs |
 | Qwen3.5-9B | hybrid GDN/full; main base | 42 | 23 | 117–180 | **5–7 days on secondary single GPU** |
 | Qwen3.5-4B | small hybrid | 11 | 12 | 38–75 | 12–24 h once primary grid starts |
-| Qwen2.5-7B-Instruct | dense Qwen family | 11 | 12 | 21–52 | 8–18 h |
 | GLM-4-9B-0414 | dense vendor base | 11 | 12 | 26–58 | 10–20 h |
 | Ministral-8B-Instruct | dense Mistral family | 11 | 12 | 21–52 | 8–18 h |
 | Llama-xLAM-2-8B | dense tool-tuned Llama | 11 | 12 | 21–52 | 8–18 h |
 | ToolACE-2-8B | dense tool-tuned Llama | 11 | 12 | 21–52 | 8–18 h |
 
-The six non-primary bases share three primary-pod GPUs. Qwen3.5-9B is the current bottleneck because it uses
+The five non-primary bases share three primary-pod GPUs. Qwen3.5-9B is the current bottleneck because it uses
 the only healthy secondary-pod GPU and the safe pure-PyTorch hybrid-attention path.
 
 ### Observed main-grid total
@@ -103,20 +102,20 @@ Method-side compression time can dominate LLMLingua and GCM eval, so the upper r
 
 | evaluation | cells/models | estimated time per model/method | purpose |
 |---|---|---:|---|
-| LongBench-v2 | all 8 bases | 0.5–2 h | hard long-context MC |
-| InfiniteBench-choice | all 8; GCM also K32 | 2–6 h | 100k-scale book MC |
-| MultiFieldQA | all 8 | 0.5–2 h | long extractive QA |
-| Qasper | all 8 | 0.5–2 h | paper QA |
-| LongBench HotpotQA | all 8 | 0.5–2 h | long multi-hop |
-| 2WikiMQA | all 8 | 0.5–2 h | long multi-hop |
-| MuSiQue | all 8 | 0.5–2 h | compositional QA |
-| NarrativeQA | all 8 | 1–3 h | long narrative QA |
-| BABILong QA1 | all 8 | 0.5–1.5 h | recurrent recall |
-| BABILong QA2 | all 8 | 0.5–1.5 h | recurrent recall |
-| BABILong QA3 | all 8 | 0.5–1.5 h | recurrent recall |
+| LongBench-v2 | all 7 bases | 0.5–2 h | hard long-context MC |
+| InfiniteBench-choice | all 7; GCM also K32 | 2–6 h | 100k-scale book MC |
+| MultiFieldQA | all 7 | 0.5–2 h | long extractive QA |
+| Qasper | all 7 | 0.5–2 h | paper QA |
+| LongBench HotpotQA | all 7 | 0.5–2 h | long multi-hop |
+| 2WikiMQA | all 7 | 0.5–2 h | long multi-hop |
+| MuSiQue | all 7 | 0.5–2 h | compositional QA |
+| NarrativeQA | all 7 | 1–3 h | long narrative QA |
+| BABILong QA1 | all 7 | 0.5–1.5 h | recurrent recall |
+| BABILong QA2 | all 7 | 0.5–1.5 h | recurrent recall |
+| BABILong QA3 | all 7 | 0.5–1.5 h | recurrent recall |
 | RULER 4k/8k/16k/32k | budget grid + official baselines | 2–6 h per method suite | exact-retrieval boundary |
 
-E4B contains **118 evaluation cells**. The estimated total is 150–300 GPU hours.
+E4B contains **106 evaluation cells**. The estimated total is 135–270 GPU hours.
 
 ### Additional evaluation passes
 
@@ -140,9 +139,9 @@ There are **6 training datasets/families** in the GCM grid.
 | NarrativeQA | 2,000 cap | source adapters | GCM source 0.78 h; SFT still running/observed soon | GCM 4–8 h; SFT 3–6 h |
 | RULER-NIAH | 500 generated training items | budget/length | estimated 1–3 h | not in current Qwen3.5 grid |
 
-The source-adapter stage has **48 training cells**:
+The source-adapter stage has **43 training cells**:
 
-- 40 GCM = 8 bases × (4 source tasks + QuALITY K32);
+- 35 GCM = 7 bases × (4 source tasks + QuALITY K32);
 - 8 SFT = 2 primary bases × 4 source tasks.
 
 ## 6. Training-cell totals by base
@@ -153,20 +152,19 @@ The source-adapter stage has **48 training cells**:
 | Qwen3.5-9B | 27 | 9 | 6 | 0 | 0 | 0 | **42** |
 | each other base | 0 | 5 | 6 | 0 | 0 | 0 | **11** |
 
-Total: **206 trainable cells**.
+Total: **195 trainable cells**.
 
 ## 7. Current wall-clock ETA
 
-Live snapshot: 268/422 manifest cells are complete. Two jobs are currently active: one xLAM long-context
-evaluation and one Qwen3-8B RULER budget cell. Four GPUs remain available to Paper A, but deterministic
-shard imbalance temporarily leaves two primary GPUs idle until the last long-context shard exits.
+Live snapshot: 255/399 manifest cells are complete. Four jobs are active: three Qwen3.5-4B generality
+cells and one Qwen3-8B RULER budget cell.
 
-| milestone | current state | ETA from 2026-07-22 15:43 PT |
+| milestone | current state | ETA from 2026-07-22 20:34 PT |
 |---|---|---:|
 | core main, audit, SFT reaudit, gate, reproducibility | complete | done |
-| source adapters | 46/48; two K32 technical repairs | 6–12 h after isolated rerun |
-| real long-context evaluation | 111/118; one running, three pending, three K32 repairs | 1–3 h for current tail; repairs separate |
-| eight-base fixed-config generality | 12/48 | 1–2 additional days |
+| source adapters | 41/43; two K32 technical repairs | 6–12 h after isolated rerun |
+| real long-context evaluation | 103/106; three K32 repairs | repairs separate |
+| seven-base fixed-config generality | 12/42; three running | 1–2 additional days |
 | budget and RULER length | 2/23; one running | 1–2 additional days |
 | mechanism ablation | 0/36 | 0.5–1 additional day |
 | official baselines | 0/52 local cells; separate environments | 2–4 days after launch |

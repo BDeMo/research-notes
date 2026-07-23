@@ -81,7 +81,7 @@ The compressor with the empirical gate remains 2.0--3.8 points below raw on the 
 - The corrected formal test certified 0/24 groups at \(\epsilon=.02,\delta=.10\); every formally tested gated policy is
   all-raw. Use **held-out empirical routing** only and report risk control as a negative result.
 - Source-adapter and long-context stages are underway. Replicate and feature reruns are complete.
-  Eight-model, budget, ablation, cost, and official-baseline stages remain pending.
+  Seven-model, budget, ablation, cost, and official-baseline stages remain pending.
 
 ## Technical-replicate audit
 

@@ -321,7 +321,7 @@
   \begin{block}{}\footnotesize \ghA{paper-a-all-benchmarks-skeleton-2026-07-21.md}{full long-context breakdown}\end{block}
 \end{frame}
 
-\begin{frame}{12. Paper A --- full execution status (Wed 2026-07-22 06:33 PT)}
+\begin{frame}{12. Paper A --- full execution status (Wed 2026-07-22 20:34 PT)}
   \begin{columns}[T]
   \begin{column}{0.52\textwidth}
     \centering\scriptsize
@@ -331,17 +331,17 @@
     \midrule
     core main & 88 & 0 & 0 & 0 \\
     replicate + SFT audit & 9 & 0 & 0 & 0 \\
-    transfer adapters & 46 & 0 & 2 & 0 \\
-    real long-context & 50 & 3 & 2 & 63 \\
-    8-model generality & 11 & 1 & 0 & 36 \\
-    budget / RULER & 0 & 0 & 0 & 23 \\
+    transfer adapters & 41 & 0 & 2 & 0 \\
+    real long-context & 103 & 0 & 3 & 0 \\
+    7-model generality & 12 & 3 & 0 & 27 \\
+    budget / RULER & 2 & 1 & 0 & 20 \\
     ablation & 0 & 0 & 0 & 36 \\
     official baselines & 0 & 0 & 0 & 52 \\
     \bottomrule
     \end{tabular}
     \vspace{0.45em}
     \begin{block}{Live workers}
-      \scriptsize Three Qwen3.5-4B long-context jobs + one Qwen3.5-9B generality job.
+      \scriptsize Three Qwen3.5-4B generality jobs + one Qwen3-8B RULER budget job.
       One GPU on the generality node is unavailable.
     \end{block}
   \end{column}
@@ -359,8 +359,8 @@
     \end{itemize}
     \textbf{Execution order}
     \begin{enumerate}\scriptsize
-      \item continue long-context across the remaining bases;
       \item complete generality;
+      \item repair three K32 transfer cells;
       \item budget/RULER $\to$ ablation/cost;
       \item official baselines.
     \end{enumerate}

@@ -1,6 +1,6 @@
 # Paper A — full benchmark and baseline table
 
-> Snapshot: 2026-07-22 15:43 PT
+> Snapshot: 2026-07-22 20:34 PT
 > Rule: completed values are reported numerically; incomplete experiments are labeled by status and are not
 > filled with estimated results. SQuAD-v2 is retained only as an exact-text diagnostic and is excluded from
 > the headline tables.
@@ -79,9 +79,9 @@ Current stage totals:
 | stage | done | running | failed | pending | total |
 |---|---:|---:|---:|---:|---:|
 | Core main grid | 88 | 0 | 0 | 0 | 88 |
-| Transfer adapters | 46 | 0 | 2 | 0 | 48 |
-| Real long-context | 111 | 1 | 3 | 3 | 118 |
-| Eight-model generality | 12 | 0 | 0 | 36 | 48 |
+| Transfer adapters | 41 | 0 | 2 | 0 | 43 |
+| Real long-context | 103 | 0 | 3 | 0 | 106 |
+| Seven-model generality | 12 | 3 | 0 | 27 | 42 |
 | Budget and length | 2 | 1 | 0 | 20 | 23 |
 | Mechanism ablation | 0 | 0 | 0 | 36 | 36 |
 | Reproducibility | 3 | 0 | 0 | 0 | 3 |

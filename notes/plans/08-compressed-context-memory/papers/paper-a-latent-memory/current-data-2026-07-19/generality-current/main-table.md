@@ -21,9 +21,9 @@ Qwen3.5 backends, smoke runs, and internal Gist replicas.
 
 ## Evidence status
 
-- Canonical manifest: 48 cells.
-- Current states: `{"done": 6, "pending": 41, "running": 1}`.
-- Canonical artifacts found: 6.
+- Canonical manifest: 42 cells.
+- Current states: `{"done": 12, "pending": 27, "running": 3}`.
+- Canonical artifacts found: 12.
 - Duplicate-tag conflicts requiring review: 0.
 - Completed cells excluded as invalid: 0.
 - Done cells without an artifact on either pod: 0.

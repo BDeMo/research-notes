@@ -404,12 +404,8 @@ Primary models:
 - Qwen3-8B (dense quadratic attention);
 - Qwen3.5-9B (hybrid GDN/full attention).
 
-Fixed-configuration generality:
-
-- Ministral-8B-Instruct;
-- Qwen3.5-4B.
-
-Existing BFCL pilots additionally cover ToolACE-2-8B, Llama-xLAM-2-8B, Qwen2.5-7B, and GLM-4-9B.
+Fixed-configuration generality additionally covers Qwen3.5-4B, GLM-4-9B, Ministral-8B-Instruct,
+Llama-xLAM-2-8B, and ToolACE-2-8B.
 All memory adapters are trained separately per base.
 
 ### 7.2 Benchmarks
@@ -440,7 +436,7 @@ a distinct **real long-context transfer track**:
 - RULER at controlled lengths as the exact-retrieval boundary.
 
 These are transfer evaluations rather than per-target tuning: the target LongBench/∞Bench validation data are
-never used to train the adapter. All eight bases run source-trained GCM, feasible raw, and no context; the two
+never used to train the adapter. All seven bases run source-trained GCM, feasible raw, and no context; the two
 primary bases additionally run source-trained full+SFT on every target. ∞Bench also tests a smaller K per
 chunk because a fixed per-chunk K otherwise grows to thousands of final memory tokens on 100k-token books.
 
@@ -502,7 +498,7 @@ The new main table adds both true raw and matched full+SFT controls.
 
 These values explain why the paper was started, but they are not used as final main-table evidence.
 On BFCL-live-multiple, compressed accuracy was 74% for Qwen3-8B and 71% for Qwen3.5-9B,
-compared with frozen raw references of 92% and 83%. Across eight bases and per-base K tuning, BFCL
+compared with frozen raw references of 92% and 83%. Across seven bases and per-base K tuning, BFCL
 compressed accuracy lies between approximately 65% and 75%.
 
 The pilot also showed the negative boundary on HotpotQA: Qwen3-8B obtains 36% with memory versus 56% with
@@ -550,13 +546,12 @@ With per-base K tuning, BFCL compressed accuracy is:
 | ToolACE-2-8B | 73.4% | 74.2% | 74.2% |
 | Llama-xLAM-2-8B | 72.7% | 71.9% | 71.9% |
 | Ministral-8B | 67.2% | 75.0% | 73.4% |
-| Qwen2.5-7B | 65.6% | 71.9% | 70.3% |
 | Qwen3-8B | 69.5% | 71.9% | 74.0% |
 | Qwen3.5-9B | 64.8% | 71.1% | 64.8% |
 | GLM-4-9B | -- | 67.2% | 64.8% |
 | Qwen3.5-4B | 64.8% | 66.4% | 67.2% |
 
-K=128 wins or ties on six of eight bases. Because the table tunes K per model and uses independently trained
+K=128 wins or ties on five of seven bases. Because the table tunes K per model and uses independently trained
 adapters, it is a generality pilot rather than evidence that one latent space transfers across models.
 
 ### 8.5 Full-Cost Adaptation and Raw-Window Boundaries
@@ -631,8 +626,8 @@ position recovery; an explicit absolute-position probe is future work.
 ### 9.4 Cross-Model Meaning
 
 The algorithm applies across architectures, but latent vectors are model-specific. ToolACE and xLAM have
-almost identical sampled input embeddings, while Qwen2.5/Qwen3 and Qwen3.5-9B/4B do not share directly
-compatible embedding dimensions or geometry. Cross-model claims refer to reproducibility after per-base
+almost identical sampled input embeddings, while Qwen3.5-9B/4B share a tokenizer but not the same embedding
+dimension. Cross-model claims refer to reproducibility after per-base
 training, not adapter transfer.
 
 ## 10. Related Work

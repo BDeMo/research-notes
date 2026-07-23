@@ -47,7 +47,7 @@
 - Do not write “full context” for an 8k/4k bounded path.
 - Do not use `GCM` and `Route` as contrasting method rows; write `Compressor (w/o gate)` and `Compressor (w/ gate)`.
 - Do not write “risk-controlled GCM” or “finite-sample guarantee” for the current result.
-- Do not write “model-agnostic” before the fixed-config eight-base grid finishes.
+- Do not write “model-agnostic” before the fixed-config seven-base grid finishes.
 - Do not write “lossless,” “safe,” or “never worse” without the exact measured condition.
 - Do not call internal replicas by the published method name.
 - Do not call a lower reader-token count an end-to-end speedup without encoder and fallback timing.

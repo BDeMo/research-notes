@@ -1,6 +1,6 @@
 # Paper A experiment receipt
 
-> Snapshot: 2026-07-22 15:43 PT. This is the operational source of truth for what is configured, running,
+> Snapshot: 2026-07-22 20:34 PT. This is the operational source of truth for what is configured, running,
 > queued, blocked, or excluded. “Receipt” means exact recipe + evaluation contract + artifact path.
 
 ## 1. Live status
@@ -14,18 +14,16 @@
 | E1F feature-only rerun | 24 canonical GCM adapters | 24 | 0 | 0 | complete |
 | E2 gate/risk analysis | 24 groups × 20 splits | 24 | 0 | 0/24 formal certified | complete negative |
 | E3 reproducibility | 3 duplicate-seed GCM cells | 3 | 0 | 0 | complete |
-| E4A transfer-source adapters | **48** | 46 | 0 | 2 failed / 0 pending | complete except K32 repairs |
-| E4B real-long evaluation | **118** | 111 | 1 | 3 failed / 3 pending | running |
-| E5 fixed-config generality | **48** | 12 | 0 | 36 pending | waiting for long-context stage |
+| E4A transfer-source adapters | **43** | 41 | 0 | 2 failed / 0 pending | complete except K32 repairs |
+| E4B real-long evaluation | **106** | 103 | 0 | 3 failed / 0 pending | complete except K32 repairs |
+| E5 fixed-config generality | **42** | 12 | 3 | 27 pending | running |
 | E6 budget/length | **23** | 2 | 1 | 20 pending | running |
 | E7 mechanism ablation | **36** | 0 | 0 | 0 | queued |
 | E8 measured cost | up to 16 adapter profiles | 0 | 0 | 0 | finalization |
 | E9 official baselines | 52 local cells + native-base runs | 0 | 0 | 52 pending; LCLM/Semi-Dynamic cloned | separate envs |
 
-Current live workers: one ToolACE InfiniteBench long-context job on primary GPU 1 and one Qwen3-8B RULER budget job on
-secondary GPU 0. Primary GPUs 0 and 2 are temporarily idle because their deterministic long-context shards
-finished before shard 1; the sequencer advances after the remaining shard exits. Primary GPU 3 is reserved
-outside Paper A, and secondary GPU 1 is unavailable.
+Current live workers: three Qwen3.5-4B generality jobs on primary GPUs 0--2 and one Qwen3-8B RULER budget
+job on secondary GPU 0. Primary GPU 3 is reserved outside Paper A, and secondary GPU 1 is unavailable.
 
 The five failed cells are technical, not scientific negatives. GLM-4 K32 source training ran out of GPU
 memory while another process occupied most of the device; Qwen3.5-9B K32 source training was killed during
@@ -33,7 +31,7 @@ training; the Qwen3/Qwen3.5/GLM K32 InfiniteBench cells then lacked the required
 pod. These cells require resource-isolated retraining or adapter transfer before rerun.
 
 The earlier `74/112` count was invalid: it summed duplicate cross-pod cells and stale tags. The corrected
-manifest removes the internal Gist smoke baseline. All old Qwen3.5 cells are archived and rerun because the
+manifest removes the internal Gist smoke baseline and uses the current seven-base model set. All old Qwen3.5 cells are archived and rerun because the
 training backend changed from a mixed FLA/Triton path to one tested pure-PyTorch path. All 88 main cells
 are complete. Eight duplicate tags are retained only as technical repeats and
 averaged within seed.
@@ -76,7 +74,6 @@ Trainable parameters for Qwen3-8B default: approximately 242.2M, including the b
 | q3_8b | Qwen3-8B | dense quadratic | 4096 | Qwen2-compatible BPE | primary |
 | q35_9b | Qwen3.5-9B | hybrid GDN/full | 4096 | Qwen3.5 248k BPE | primary linear/hybrid |
 | q35_4b | Qwen3.5-4B | hybrid GDN/full | 2560 | same Qwen3.5 tokenizer | small stress |
-| q25_7b | Qwen2.5-7B-Instruct | dense quadratic | 3584 | token IDs align with Qwen3 core | family |
 | glm4_9b | GLM-4-9B-0414 | dense quadratic | 4096 | GLM BPE | vendor |
 | ministral_8b | Ministral-8B-Instruct | dense quadratic | 4096 | Mistral BPE | vendor |
 | xlam_8b | Llama-xLAM-2-8B | dense quadratic | 4096 | Llama-3 BPE | tool-tuned |
@@ -136,7 +133,7 @@ The official integration below is the only Gist result allowed in paper claims.
 
 ## 7. Real long-context transfer
 
-All eight bases run GCM at discovery seed 42. Qwen3-8B and Qwen3.5-9B additionally run source-trained SFT.
+All seven bases run GCM at discovery seed 42. Qwen3-8B and Qwen3.5-9B additionally run source-trained SFT.
 E4A trains one adapter per `(base, source task, method)` and saves it before evaluation. Every E4B target
 loads that exact adapter; target rows never retrain a nominally identical source adapter.
 
@@ -158,7 +155,7 @@ Additional controls:
 
 | grid | exact scope |
 |---|---|
-| fixed-config generality | 8 bases × {QuALITY, BFCL} × 3 seeds = 48 |
+| fixed-config generality | 7 bases × {QuALITY, BFCL} × 3 seeds = 42 |
 | reproducibility | Qwen3-8B QuALITY × seeds 42/43/44 duplicate runs = 3 |
 | GCM budget | K∈{64,128,256,512} on QuALITY and RULER |
 | raw budget | 256/512/1024/2048/4096/8192 tokens |
@@ -183,7 +180,7 @@ Only authors' code/checkpoints count as paper baselines.
 | 500xCompressor | `ZongqianLi/500x@ff454a1` | Llama-3-8B, 500-token spans | SQuAD; truncated Hotpot if weights obtained | weights/data not public; blocked |
 | Cartridges | `HazyResearch/cartridges@ef34ba9` | public LongHealth cartridge on Llama-3.2-3B | corpus-conditioned long QA | other tasks require per-corpus self-study |
 | Cramming 1568 | `yurakuratov/hidden_capacity@c371c3f` | one optimized vector on Llama-3.1-8B | PG19 reconstruction | capacity appendix; not online compression |
-| LLMLingua family | `microsoft/LLMLingua@e0e9d99` | official compressor LMs | all 8 readers | integrated; faithful repair running |
+| LLMLingua family | `microsoft/LLMLingua@e0e9d99` | official compressor LMs | all 7 readers | integrated; faithful repair running |
 | mean pooling | exact local operation | each reader's embeddings | all bases | queued |
 
 If a method uses a different official base, report within-base retention:
