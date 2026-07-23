@@ -9,6 +9,34 @@
 
 ---
 
+## Table 0 — Complete experiment map
+
+| stage | experiment | configured evidence | current state |
+|---|---|---:|---|
+| E0 | data and model audit | lengths, overlap, scorer checks | complete |
+| E1 | matched main comparison | 88 cells | complete |
+| E1Q/E1R | output and SFT audit | 28 paths + 6 retrains | complete |
+| E1F/E2 | gate features and analysis | 24 groups | complete |
+| E3 | independent reproduction | 3 cells | complete |
+| E4A | source adapters | 43 cells | 41 complete; 2 repairs |
+| E4B | long-context transfer | 106 cells | 103 complete; 3 repairs |
+| E5 | fixed-config generality | 42 cells | 12 complete; 3 running |
+| E6 | budget and length | 23 cells | 2 complete; 1 running |
+| E7 | mechanism ablations | 36 cells | TBD |
+| E8 | measured cost | up to 16 profiles | TBD |
+| E9 | official baselines | 52 local + native runs | TBD |
+
+### Evidence/output audit
+
+| check | scope | audited outcome |
+|---|---|---|
+| QuALITY length | Qwen3 tokenizer | median 6,511; 1.9% above 8,192 |
+| train/eval overlap | BFCL | one duplicate removed |
+| output reload | 28 paths | 28/28 complete |
+| validation count | main grid | 88/88 complete |
+| SFT output reaudit | QuALITY | 6/6 complete |
+| silent fallback | LongLL variants | 10 cells excluded |
+
 ## Table 1 — Core (complete)
 
 Benchmarks = columns, methods = rows.
@@ -33,6 +61,16 @@ Benchmarks = columns, methods = rows.
 | **Compressor (w/o gate) · ours** | **51.5±1.7** | **72.0±0.8** | **30.5±0.3** | 26.9±0.6 |
 | **Compressor (w/ gate) · ours** | 51.4 | **80.5** | **51.7** | 64.7 |
 
+### Table 1a — QuALITY stability and adaptation references
+
+| path | evaluation | accuracy |
+|---|---|---:|
+| Compressor (w/o gate) | main grid | 54.4±0.2 |
+| Compressor (w/o gate) | fixed configuration | 44.2±11.2 |
+| Compressor (w/o gate) | independent repeat | 48.7±15.1 |
+| SFT · ref | bounded input | 64.5±27.5 |
+| SFT · ref | available input | 81.7±1.7 |
+
 ## Table 1b — Routing / reliability boundary (complete)
 
 `Gain` = with-gate − without-gate; `Δ raw` = with-gate − bounded raw; `FB AUC` = fallback ranking AUROC; `FB rate` = fraction routed to raw. Formal fixed-threshold test certifies **0/24** groups (→ all-raw); numbers below are **held-out empirical routing**.
@@ -50,9 +88,21 @@ Benchmarks = columns, methods = rows.
 
 ---
 
-## Table 2 — Real long-context transfer (source-trained adapter, zero-shot on target · seed 42)
+## Table 2 — Source-adapter readiness
 
-Filled from the E4B harvest (44/44 cells for the two main bases at s42; single seed → error bars pending).
+| base | four source tasks | QuALITY K32 | full-cost SFT |
+|---|---:|---:|---:|
+| Qwen3-8B | 4/4 complete | complete | 4/4 complete |
+| Qwen3.5-9B | 4/4 complete | repair | 4/4 complete |
+| Qwen3.5-4B | 4/4 complete | complete | — |
+| GLM-4-9B | 4/4 complete | repair | — |
+| Ministral-8B | 4/4 complete | complete | — |
+| xLAM-8B | 4/4 complete | complete | — |
+| ToolACE-8B | 4/4 complete | complete | — |
+
+## Table 3 — Real long-context transfer (source-trained adapter, zero-shot on target)
+
+Filled from the E4B harvest for the two main bases; repeated-run intervals are pending.
 Window / LLMLingua-2 transfer rows were not run in E4B (n/a). BABILong = mean of QA1/QA2/QA3 @16k.
 
 ### Qwen3-8B
@@ -76,9 +126,9 @@ Window / LLMLingua-2 transfer rows were not run in E4B (n/a). BABILong = mean of
 
 ---
 
-## Table 3 — LongBench breakdown (source-trained adapter, zero-shot · seed 42)
+## Table 4 — LongBench breakdown (source-trained adapter, zero-shot)
 
-Per-task detail (source adapter in parentheses). Single seed; error bars pending. F1/ROUGE ×100.
+Per-task detail (source adapter in parentheses). Repeated-run intervals are pending. F1/ROUGE ×100.
 
 ### Qwen3-8B
 | method | MultiFieldQA (SQuAD) | Qasper (SQuAD) | HotpotQA (Hotpot) | 2WikiMQA (Hotpot) | MuSiQue (Hotpot) | NarrativeQA (Narr.) |
@@ -96,42 +146,109 @@ Per-task detail (source adapter in parentheses). Single seed; error bars pending
 | **Compressor (w/o gate) · ours** | 16.7 | 14.3 | **26.6** | **27.6** | **11.9** | 13.6 |
 | **Compressor (w/ gate) · ours** | 41.5 | 17.0 | **31.0** | **28.0** | **13.5** | 16.6 |
 
-> **Finding (real, s42):** on **multi-hop** long-context transfer (HotpotQA/2WikiMQA/MuSiQue) the compressor without the gate **beats bounded
+> **Finding:** on **multi-hop** long-context transfer (HotpotQA/2WikiMQA/MuSiQue) the compressor without the gate **beats bounded
 > raw** (raw is truncated), and routing adds more (e.g. q3_8b HotpotQA raw 19.1 → w/o gate 30.5 → w/ gate 36.0;
 > q35_9b HotpotQA raw 3.9 → w/o gate 26.6 → w/ gate 31.0). On **single-doc/extractive** (MultiFieldQA/Qasper/
 > NarrativeQA) raw wins and the gated variant **falls back to raw** (do-no-harm). Net: **Compressor (w/ gate) ≥ Raw on every cell.**
 
 ---
 
-## Table 4 — Controlled length boundary: RULER-NIAH (RUNNING)
+## Table 5 — Seven-base long-context transfer
+
+Each numeric cell is `bounded raw / Compressor (w/o gate)`. Multi-hop averages LongBench HotpotQA,
+2WikiMQA, and MuSiQue. BABILong averages QA1–QA3.
+
+| base | LongBench-v2 | InfiniteBench | InfiniteBench K32 | BABILong | multi-hop |
+|---|---:|---:|---:|---:|---:|
+| Qwen3-8B | 31.2 / 20.1 | 52.8 / 21.4 | TBD | 18.1 / 0.9 | 13.8 / 23.7 |
+| Qwen3.5-9B | 33.0 / 22.5 | 52.4 / 31.9 | TBD | 10.4 / 2.2 | 2.6 / 22.0 |
+| Qwen3.5-4B | 34.0 / 19.7 | 51.1 / 26.2 | 24.0 | 14.5 / 2.0 | 10.7 / 19.7 |
+| GLM-4-9B | 31.0 / 24.5 | 41.9 / 26.2 | TBD | 5.9 / 0.0 | 24.4 / 21.6 |
+| Ministral-8B | 27.2 / 19.9 | 49.3 / 24.5 | 25.8 | 18.8 / 2.7 | 22.3 / 19.4 |
+| xLAM-8B | 29.2 / 24.7 | 48.5 / 26.2 | 29.7 | 15.5 / 0.5 | 14.1 / 25.7 |
+| ToolACE-8B | 27.8 / 19.1 | 48.9 / 25.3 | 23.1 | 13.9 / 0.7 | 14.0 / 25.5 |
+
+## Table 6 — Controlled length boundary: RULER-NIAH
 
 Exact-retrieval length sweep (fixed K128 recipe, no source adapter). The budget stage is 2/23 complete;
-the RULER K128 cell is currently running. Numerical values remain `TBD` until harvesting.
+the RULER K128 cell is under technical repair. Numerical values remain `TBD` until harvesting.
 
-| base / method | 4k | 8k | 16k | 32k |
+| method | 4k | 8k | 16k | 32k |
 |---|---:|---:|---:|---:|
-| Qwen3-8B · Raw (bounded) | TBD | TBD | TBD | TBD |
-| Qwen3-8B · **Compressor (w/o gate; ours)** | TBD | TBD | TBD | TBD |
-| Qwen3.5-9B · Raw (bounded) | TBD | TBD | TBD | TBD |
-| Qwen3.5-9B · **Compressor (w/o gate; ours)** | TBD | TBD | TBD | TBD |
+| Raw (bounded) · ref | TBD | TBD | TBD | TBD |
+| **Compressor (w/o gate; ours)** | TBD | TBD | TBD | TBD |
 
 ---
 
-## Table 5 — Budget / capacity ablations (RUNNING / QUEUED)
+## Table 7 — Budget and capacity
 
-GCM memory budget K sweep and mechanism ablation (Qwen3-8B × {QuALITY, BFCL}, 3 seeds). Budget/length is
-2/23 complete with one running; mechanism ablation is 0/36 and queued.
+| path | state tokens | QuALITY | RULER |
+|---|---:|---:|---:|
+| Compressor (ours) | 64 | TBD | TBD |
+| Compressor (ours) | 128 | TBD | TBD |
+| Compressor (ours) | 256 | TBD | TBD |
+| Compressor (ours) | 512 | 53.0 | TBD |
+| Raw window | 256 | TBD | TBD |
+| Raw window | 512 | TBD | TBD |
+| Raw window | 1,024 | TBD | TBD |
+| Raw window | 2,048 | 9.7 | TBD |
+| Raw window | 4,096 | TBD | TBD |
+| Raw window | 8,192 | TBD | TBD |
 
-| axis | variant | QuALITY | BFCL |
+## Table 8 — Fixed-configuration generality
+
+| base | path | QuALITY | BFCL |
 |---|---|---:|---:|
-| K budget | K=64 | TBD | TBD |
-| K budget | K=128 (main) | TBD | TBD |
-| K budget | K=256 | TBD | TBD |
-| K budget | K=512 | TBD | TBD |
-| mechanism | joint0 (detach answer loss) | TBD | TBD |
-| mechanism | distill0 (no teacher KL) | TBD | TBD |
-| mechanism | recon0 (no slot recon) | TBD | TBD |
-| mechanism | recur0 (independent chunks) | TBD | TBD |
+| Qwen3-8B | Raw · ref | 7.2 | 92.1 |
+|  | Compressor (w/o gate) | 44.2±11.2 | 71.2±1.1 |
+| Qwen3.5-9B | Raw · ref | 7.1 | 84.5 |
+|  | Compressor (w/o gate) | 46.3±11.4 | 71.4±1.9 |
+| Qwen3.5-4B | Raw · ref | TBD | TBD |
+|  | Compressor (w/o gate) | TBD | TBD |
+| GLM-4-9B | Raw · ref | TBD | TBD |
+|  | Compressor (w/o gate) | TBD | TBD |
+| Ministral-8B | Raw · ref | TBD | TBD |
+|  | Compressor (w/o gate) | TBD | TBD |
+| xLAM-8B | Raw · ref | TBD | TBD |
+|  | Compressor (w/o gate) | TBD | TBD |
+| ToolACE-8B | Raw · ref | TBD | TBD |
+|  | Compressor (w/o gate) | TBD | TBD |
+
+## Table 9 — Mechanism ablations
+
+| variant | change | QuALITY | BFCL |
+|---|---|---:|---:|
+| main (ours) | K=128, all objectives | 54.4±0.2 | 72.3±0.5 |
+| joint0 | detach answer loss | TBD | TBD |
+| distill0 | remove teacher KL | TBD | TBD |
+| recon0 | remove reconstruction | TBD | TBD |
+| recur0 | independent chunks | TBD | TBD |
+| K=64 | smaller memory | TBD | TBD |
+| K=256 | larger memory | TBD | TBD |
+
+## Table 10 — Measured cost
+
+| base | task | source tokens | state tokens | encode ms | read ms | peak GiB |
+|---|---|---:|---:|---:|---:|---:|
+| Qwen3-8B | QuALITY | TBD | TBD | TBD | TBD | TBD |
+| Qwen3-8B | BFCL | TBD | TBD | TBD | TBD | TBD |
+| Qwen3.5-9B | QuALITY | TBD | TBD | TBD | TBD | TBD |
+| Qwen3.5-9B | BFCL | TBD | TBD | TBD | TBD | TBD |
+
+## Table 11 — Official/native-base baselines
+
+| method | released base | QuALITY | SQuAD | Hotpot | LongBench | InfiniteBench | RULER |
+|---|---|---:|---:|---:|---:|---:|---:|
+| LCLM | Qwen3 | — | — | — | TBD | — | TBD |
+| Semi-Dynamic | Qwen3 | — | TBD | TBD | — | — | — |
+| AutoCompressor | Llama-2/OPT | TBD | TBD | TBD | TBD | — | — |
+| ICAE | Mistral-7B | TBD | TBD | TBD | — | — | — |
+| CCM | Llama-2/Mistral | — | — | TBD | TBD | — | — |
+| Activation Beacon | Qwen2-7B | — | — | — | TBD | TBD | TBD |
+| xRAG | Mistral/Mixtral | — | TBD | TBD | TBD | — | — |
+| Cartridges | Llama-3.2-3B | — | — | — | TBD | — | — |
+| Gist Tokens | LLaMA/FLAN-T5 | — | TBD | — | — | — | — |
+| 500xCompressor | Llama-3-8B | — | TBD | TBD | — | — | — |
 
 ---
 
@@ -139,9 +256,13 @@ GCM memory budget K sweep and mechanism ablation (Qwen3-8B × {QuALITY, BFCL}, 3
 
 | table | benchmark(s) | produced by | current state |
 |---|---|---|---|
-| 1, 1b | QuALITY, BFCL, HotpotQA, SQuAD-v2 | Core main grid (E1) + gate analysis (E2) | ✅ complete (88/88) |
-| 2, 3 | LongBench-v2, ∞Bench-choice, BABILong, LongBench tasks | transfer adapters (E4A) → long-context eval (E4B) | 103/106 done; three K32 evaluations need technical repair |
-| 4 | RULER-NIAH 4k/8k/16k/32k | budget/length (E6) | 2/23 budget cells done; one RULER cell running |
-| 5 | K sweep + mechanism ablation | budget (E6) + ablation (E7) | budget 2/23 done, one running; ablation 0/36 queued |
+| 0, 1, 1a, 1b | audit, core, reproduction, gate | E0–E3 | complete |
+| 2 | source adapters | E4A | 41/43 done; two K32 repairs |
+| 3–5 | LongBench-v2, ∞Bench, BABILong, LongBench tasks | E4B | 103/106 done; three K32 repairs |
+| 6–7 | RULER and budget sweep | E6 | 2/23 done; one technical repair |
+| 8 | fixed-config generality | E5 | 12/42 done; three running |
+| 9 | mechanism ablations | E7 | 0/36; TBD placeholders |
+| 10 | measured cost | E8 | not started; TBD placeholders |
+| 11 | official/native-base baselines | E9 | not started; TBD placeholders |
 
 **Blocked / not in tables:** NoLiMa (data access), HELMET, LongMemEval (loaders not implemented).

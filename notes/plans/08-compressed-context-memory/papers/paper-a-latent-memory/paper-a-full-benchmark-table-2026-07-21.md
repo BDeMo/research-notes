@@ -1,6 +1,6 @@
 # Paper A — full benchmark and baseline table
 
-> Snapshot: 2026-07-22 20:34 PT
+> Snapshot: 2026-07-22 20:46 PT
 > Rule: completed values are reported numerically; incomplete experiments are labeled by status and are not
 > filled with estimated results. SQuAD-v2 is retained only as an exact-text diagnostic and is excluded from
 > the headline tables.
@@ -93,7 +93,7 @@ Current stage totals:
 | method | type | official base | benchmark scope | comparison rule | current state |
 |---|---|---|---|---|---|
 | Raw | full-token reference | each reader base | all compatible tasks | reference only | complete on core |
-| SFT-LoRA | full-cost adaptation reference | each reader base | core + selected long targets | reference only | core complete |
+| SFT-LoRA | full-cost adaptation reference | each reader base | core + configured long targets | reference only | core complete |
 | Window | hard token window | each reader base | core + RULER | matched reader budget | core complete |
 | LLMLingua-2 | hard token compression | each reader base | core | matched reader budget | core complete |
 | LongLLMLingua | question-aware hard compression | each reader base | core | matched reader budget | incompatible-cache rerun needed |
@@ -111,12 +111,21 @@ Current stage totals:
 | Cramming 1568 | optimized input vector | Llama-3.1-8B | reconstruction | capacity control only | appendix |
 | 500xCompressor | layerwise KV slots | Llama-3-8B | short spans | unavailable row | weights blocked |
 
-## 5. Intended manuscript tables
+## 5. Manuscript table inventory
 
-1. **Core table:** QuALITY, BFCL, and HotpotQA as columns; same-base methods as rows.
-2. **Real long-context table:** LongBench-v2, InfiniteBench-choice, RULER, and BABILong as columns.
-3. **LongBench breakdown:** MultiFieldQA, Qasper, HotpotQA, 2WikiMQA, MuSiQue, and NarrativeQA as columns.
-4. **Native-base baseline table:** LCLM, Semi-Dynamic, Activation Beacon, AutoCompressor, ICAE, CCM, xRAG,
-   and GCM, reported by within-base retention rather than incomparable absolute scores.
+Every configured experiment now has a manuscript table. Missing values are explicit `TBD` placeholders;
+unsupported native interfaces use `—`.
 
-The last three numerical tables remain incomplete until E4B, E6, and the official baseline stage finish.
+1. **Experiment map and audit:** E0–E9 coverage, data checks, output checks, and invalid-cell exclusions.
+2. **Core and routing:** matched main comparison, independent reproduction, and held-out gate results.
+3. **Source readiness:** per-base source adapters and K32 repair state.
+4. **Long-context transfer:** two-main-base gated result, six-task LongBench breakdown, and seven-base transfer.
+5. **Generality:** fixed K across all seven bases, with unfinished rows left as `TBD`.
+6. **Budget and length:** memory/raw budget sweep and RULER 4k–32k boundary.
+7. **Mechanism:** joint loss, distillation, reconstruction, recurrence, and memory-size ablations.
+8. **Measured cost:** source/state tokens, encoder/read/fallback time, expected route cost, and peak memory.
+9. **Official baselines:** native-base benchmark matrix with within-base references.
+10. **SQuAD-v2 diagnostic:** full completed short-passage results in the appendix, outside headline claims.
+
+The exact fill-ready values and placeholders are maintained in
+[`paper-a-all-benchmarks-skeleton-2026-07-21.md`](paper-a-all-benchmarks-skeleton-2026-07-21.md).

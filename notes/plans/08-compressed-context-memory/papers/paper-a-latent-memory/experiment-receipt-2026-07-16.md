@@ -1,6 +1,6 @@
 # Paper A experiment receipt
 
-> Snapshot: 2026-07-22 20:34 PT. This is the operational source of truth for what is configured, running,
+> Snapshot: 2026-07-22 20:46 PT. This is the operational source of truth for what is configured, running,
 > queued, blocked, or excluded. “Receipt” means exact recipe + evaluation contract + artifact path.
 
 ## 1. Live status
@@ -21,6 +21,10 @@
 | E7 mechanism ablation | **36** | 0 | 0 | 0 | queued |
 | E8 measured cost | up to 16 adapter profiles | 0 | 0 | 0 | finalization |
 | E9 official baselines | 52 local cells + native-base runs | 0 | 0 | 52 pending; LCLM/Semi-Dynamic cloned | separate envs |
+
+The manuscript now contains fill-ready tables for E0--E9. Completed
+cells carry audited values, configured unfinished cells use `TBD`, and
+unsupported native method/task pairs use `—`.
 
 Current live workers: three Qwen3.5-4B generality jobs on primary GPUs 0--2 and one Qwen3-8B RULER budget
 job on secondary GPU 0. Primary GPU 3 is reserved outside Paper A, and secondary GPU 1 is unavailable.
