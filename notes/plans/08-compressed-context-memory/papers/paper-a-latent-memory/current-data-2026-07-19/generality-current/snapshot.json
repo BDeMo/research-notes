@@ -1,0 +1,1446 @@
+{
+  "manifest_total": 42,
+  "status_counts": {
+    "done": 26,
+    "failed": 8,
+    "running": 2,
+    "pending": 6
+  },
+  "canonical_cells": [
+    {
+      "tag": "pa_generality_glm4_9b_bfcl_live_multiple_ours_default_s42",
+      "job": {
+        "stage": "generality",
+        "model": "glm4_9b",
+        "bench": "bfcl_live_multiple",
+        "seed": 42,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 316,
+      "no_ctx": 0.012658227848101266,
+      "feasible_raw": 0.8481012658227848,
+      "score": 0.7341772151898734,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 4096,
+        "enc_maxctx": 4096,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 735,
+        "n_val": 316,
+        "trainable_params": 177422336
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_glm4_9b_bfcl_live_multiple_ours_default_s42/pa_generality_glm4_9b_bfcl_live_multiple_ours_default_s42.json",
+      "mtime": 1784828849.2824712,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_glm4_9b_bfcl_live_multiple_ours_default_s42/pa_generality_glm4_9b_bfcl_live_multiple_ours_default_s42.json",
+          "score": 0.7341772151898734
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_glm4_9b_bfcl_live_multiple_ours_default_s44",
+      "job": {
+        "stage": "generality",
+        "model": "glm4_9b",
+        "bench": "bfcl_live_multiple",
+        "seed": 44,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 316,
+      "no_ctx": 0.012658227848101266,
+      "feasible_raw": 0.8481012658227848,
+      "score": 0.7246835443037974,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 4096,
+        "enc_maxctx": 4096,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 735,
+        "n_val": 316,
+        "trainable_params": 177422336
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_glm4_9b_bfcl_live_multiple_ours_default_s44/pa_generality_glm4_9b_bfcl_live_multiple_ours_default_s44.json",
+      "mtime": 1784828763.4565585,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_glm4_9b_bfcl_live_multiple_ours_default_s44/pa_generality_glm4_9b_bfcl_live_multiple_ours_default_s44.json",
+          "score": 0.7246835443037974
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_glm4_9b_quality_ours_default_s42",
+      "job": {
+        "stage": "generality",
+        "model": "glm4_9b",
+        "bench": "quality",
+        "seed": 42,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 1595,
+      "no_ctx": 0.1993730407523511,
+      "feasible_raw": 0.09843260188087774,
+      "score": 0.4789968652037618,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 8192,
+        "enc_maxctx": 16384,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 1899,
+        "n_val": 1595,
+        "trainable_params": 177422336
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_glm4_9b_quality_ours_default_s42/pa_generality_glm4_9b_quality_ours_default_s42.json",
+      "mtime": 1784826566.6392758,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_glm4_9b_quality_ours_default_s42/pa_generality_glm4_9b_quality_ours_default_s42.json",
+          "score": 0.4789968652037618
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_glm4_9b_quality_ours_default_s44",
+      "job": {
+        "stage": "generality",
+        "model": "glm4_9b",
+        "bench": "quality",
+        "seed": 44,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 1595,
+      "no_ctx": 0.1993730407523511,
+      "feasible_raw": 0.09843260188087774,
+      "score": 0.542319749216301,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 8192,
+        "enc_maxctx": 16384,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 1899,
+        "n_val": 1595,
+        "trainable_params": 177422336
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_glm4_9b_quality_ours_default_s44/pa_generality_glm4_9b_quality_ours_default_s44.json",
+      "mtime": 1784826560.411136,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_glm4_9b_quality_ours_default_s44/pa_generality_glm4_9b_quality_ours_default_s44.json",
+          "score": 0.542319749216301
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_ministral_8b_bfcl_live_multiple_ours_default_s42",
+      "job": {
+        "stage": "generality",
+        "model": "ministral_8b",
+        "bench": "bfcl_live_multiple",
+        "seed": 42,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 316,
+      "no_ctx": 0.012658227848101266,
+      "feasible_raw": 0.870253164556962,
+      "score": 0.7246835443037974,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 4096,
+        "enc_maxctx": 4096,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 735,
+        "n_val": 316,
+        "trainable_params": 242237440
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_ministral_8b_bfcl_live_multiple_ours_default_s42/pa_generality_ministral_8b_bfcl_live_multiple_ours_default_s42.json",
+      "mtime": 1784821378.8829613,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_ministral_8b_bfcl_live_multiple_ours_default_s42/pa_generality_ministral_8b_bfcl_live_multiple_ours_default_s42.json",
+          "score": 0.7246835443037974
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_ministral_8b_bfcl_live_multiple_ours_default_s44",
+      "job": {
+        "stage": "generality",
+        "model": "ministral_8b",
+        "bench": "bfcl_live_multiple",
+        "seed": 44,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 316,
+      "no_ctx": 0.012658227848101266,
+      "feasible_raw": 0.870253164556962,
+      "score": 0.7151898734177216,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 4096,
+        "enc_maxctx": 4096,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 735,
+        "n_val": 316,
+        "trainable_params": 242237440
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_ministral_8b_bfcl_live_multiple_ours_default_s44/pa_generality_ministral_8b_bfcl_live_multiple_ours_default_s44.json",
+      "mtime": 1784821335.273976,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_ministral_8b_bfcl_live_multiple_ours_default_s44/pa_generality_ministral_8b_bfcl_live_multiple_ours_default_s44.json",
+          "score": 0.7151898734177216
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_ministral_8b_quality_ours_default_s42",
+      "job": {
+        "stage": "generality",
+        "model": "ministral_8b",
+        "bench": "quality",
+        "seed": 42,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 1595,
+      "no_ctx": 0.20501567398119122,
+      "feasible_raw": 0.09153605015673981,
+      "score": 0.33793103448275863,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 8192,
+        "enc_maxctx": 16384,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 1899,
+        "n_val": 1595,
+        "trainable_params": 242237440
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_ministral_8b_quality_ours_default_s42/pa_generality_ministral_8b_quality_ours_default_s42.json",
+      "mtime": 1784819256.6789603,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_ministral_8b_quality_ours_default_s42/pa_generality_ministral_8b_quality_ours_default_s42.json",
+          "score": 0.33793103448275863
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_ministral_8b_quality_ours_default_s44",
+      "job": {
+        "stage": "generality",
+        "model": "ministral_8b",
+        "bench": "quality",
+        "seed": 44,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 1595,
+      "no_ctx": 0.20501567398119122,
+      "feasible_raw": 0.09153605015673981,
+      "score": 0.33793103448275863,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 8192,
+        "enc_maxctx": 16384,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 1899,
+        "n_val": 1595,
+        "trainable_params": 242237440
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_ministral_8b_quality_ours_default_s44/pa_generality_ministral_8b_quality_ours_default_s44.json",
+      "mtime": 1784819455.7074537,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_ministral_8b_quality_ours_default_s44/pa_generality_ministral_8b_quality_ours_default_s44.json",
+          "score": 0.33793103448275863
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q35_4b_bfcl_live_multiple_ours_default_s42",
+      "job": {
+        "stage": "generality",
+        "model": "q35_4b",
+        "bench": "bfcl_live_multiple",
+        "seed": 42,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 316,
+      "no_ctx": 0.0031645569620253164,
+      "feasible_raw": 0.11075949367088607,
+      "score": 0.7215189873417721,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 4096,
+        "enc_maxctx": 4096,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 735,
+        "n_val": 316,
+        "trainable_params": 138225664
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_4b_bfcl_live_multiple_ours_default_s42/pa_generality_q35_4b_bfcl_live_multiple_ours_default_s42.json",
+      "mtime": 1784814934.7535558,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_4b_bfcl_live_multiple_ours_default_s42/pa_generality_q35_4b_bfcl_live_multiple_ours_default_s42.json",
+          "score": 0.7215189873417721
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q35_4b_bfcl_live_multiple_ours_default_s43",
+      "job": {
+        "stage": "generality",
+        "model": "q35_4b",
+        "bench": "bfcl_live_multiple",
+        "seed": 43,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 316,
+      "no_ctx": 0.0031645569620253164,
+      "feasible_raw": 0.11075949367088607,
+      "score": 0.6962025316455697,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 4096,
+        "enc_maxctx": 4096,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 735,
+        "n_val": 316,
+        "trainable_params": 138225664
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_4b_bfcl_live_multiple_ours_default_s43/pa_generality_q35_4b_bfcl_live_multiple_ours_default_s43.json",
+      "mtime": 1784816062.635055,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_4b_bfcl_live_multiple_ours_default_s43/pa_generality_q35_4b_bfcl_live_multiple_ours_default_s43.json",
+          "score": 0.6962025316455697
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q35_4b_bfcl_live_multiple_ours_default_s44",
+      "job": {
+        "stage": "generality",
+        "model": "q35_4b",
+        "bench": "bfcl_live_multiple",
+        "seed": 44,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 316,
+      "no_ctx": 0.0031645569620253164,
+      "feasible_raw": 0.11075949367088607,
+      "score": 0.7278481012658228,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 4096,
+        "enc_maxctx": 4096,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 735,
+        "n_val": 316,
+        "trainable_params": 138225664
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_4b_bfcl_live_multiple_ours_default_s44/pa_generality_q35_4b_bfcl_live_multiple_ours_default_s44.json",
+      "mtime": 1784815178.7390969,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_4b_bfcl_live_multiple_ours_default_s44/pa_generality_q35_4b_bfcl_live_multiple_ours_default_s44.json",
+          "score": 0.7278481012658228
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q35_4b_quality_ours_default_s42",
+      "job": {
+        "stage": "generality",
+        "model": "q35_4b",
+        "bench": "quality",
+        "seed": 42,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 1595,
+      "no_ctx": 0.18683385579937303,
+      "feasible_raw": 0.06833855799373041,
+      "score": 0.3780564263322884,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 8192,
+        "enc_maxctx": 16384,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 1899,
+        "n_val": 1595,
+        "trainable_params": 138225664
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_4b_quality_ours_default_s42/pa_generality_q35_4b_quality_ours_default_s42.json",
+      "mtime": 1784797734.9443736,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_4b_quality_ours_default_s42/pa_generality_q35_4b_quality_ours_default_s42.json",
+          "score": 0.3780564263322884
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q35_4b_quality_ours_default_s43",
+      "job": {
+        "stage": "generality",
+        "model": "q35_4b",
+        "bench": "quality",
+        "seed": 43,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 1595,
+      "no_ctx": 0.18683385579937303,
+      "feasible_raw": 0.06833855799373041,
+      "score": 0.45015673981191223,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 8192,
+        "enc_maxctx": 16384,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 1899,
+        "n_val": 1595,
+        "trainable_params": 138225664
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_4b_quality_ours_default_s43/pa_generality_q35_4b_quality_ours_default_s43.json",
+      "mtime": 1784798633.4042327,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_4b_quality_ours_default_s43/pa_generality_q35_4b_quality_ours_default_s43.json",
+          "score": 0.45015673981191223
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q35_4b_quality_ours_default_s44",
+      "job": {
+        "stage": "generality",
+        "model": "q35_4b",
+        "bench": "quality",
+        "seed": 44,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 1595,
+      "no_ctx": 0.18683385579937303,
+      "feasible_raw": 0.06833855799373041,
+      "score": 0.34608150470219434,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 8192,
+        "enc_maxctx": 16384,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 1899,
+        "n_val": 1595,
+        "trainable_params": 138225664
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_4b_quality_ours_default_s44/pa_generality_q35_4b_quality_ours_default_s44.json",
+      "mtime": 1784798210.8988318,
+      "pod": "sam-dev-d1525-gpu4",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1525-gpu4",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_4b_quality_ours_default_s44/pa_generality_q35_4b_quality_ours_default_s44.json",
+          "score": 0.34608150470219434
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q35_9b_bfcl_live_multiple_ours_default_s42",
+      "job": {
+        "stage": "generality",
+        "model": "q35_9b",
+        "bench": "bfcl_live_multiple",
+        "seed": 42,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 316,
+      "no_ctx": 0.012658227848101266,
+      "feasible_raw": 0.8449367088607594,
+      "score": 0.7183544303797469,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 4096,
+        "enc_maxctx": 4096,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 735,
+        "n_val": 316,
+        "trainable_params": 215498752
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_9b_bfcl_live_multiple_ours_default_s42/pa_generality_q35_9b_bfcl_live_multiple_ours_default_s42.json",
+      "mtime": 1784719576.4455297,
+      "pod": "sam-dev-d1530-gpu2",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1530-gpu2",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_9b_bfcl_live_multiple_ours_default_s42/pa_generality_q35_9b_bfcl_live_multiple_ours_default_s42.json",
+          "score": 0.7183544303797469
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q35_9b_bfcl_live_multiple_ours_default_s43",
+      "job": {
+        "stage": "generality",
+        "model": "q35_9b",
+        "bench": "bfcl_live_multiple",
+        "seed": 43,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 316,
+      "no_ctx": 0.012658227848101266,
+      "feasible_raw": 0.8449367088607594,
+      "score": 0.7310126582278481,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 4096,
+        "enc_maxctx": 4096,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 735,
+        "n_val": 316,
+        "trainable_params": 215498752
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_9b_bfcl_live_multiple_ours_default_s43/pa_generality_q35_9b_bfcl_live_multiple_ours_default_s43.json",
+      "mtime": 1784726402.9043574,
+      "pod": "sam-dev-d1530-gpu2",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1530-gpu2",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_9b_bfcl_live_multiple_ours_default_s43/pa_generality_q35_9b_bfcl_live_multiple_ours_default_s43.json",
+          "score": 0.7310126582278481
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q35_9b_bfcl_live_multiple_ours_default_s44",
+      "job": {
+        "stage": "generality",
+        "model": "q35_9b",
+        "bench": "bfcl_live_multiple",
+        "seed": 44,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 316,
+      "no_ctx": 0.012658227848101266,
+      "feasible_raw": 0.8449367088607594,
+      "score": 0.6930379746835443,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 4096,
+        "enc_maxctx": 4096,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 735,
+        "n_val": 316,
+        "trainable_params": 215498752
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_9b_bfcl_live_multiple_ours_default_s44/pa_generality_q35_9b_bfcl_live_multiple_ours_default_s44.json",
+      "mtime": 1784733254.707366,
+      "pod": "sam-dev-d1530-gpu2",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1530-gpu2",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_9b_bfcl_live_multiple_ours_default_s44/pa_generality_q35_9b_bfcl_live_multiple_ours_default_s44.json",
+          "score": 0.6930379746835443
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q35_9b_quality_ours_default_s42",
+      "job": {
+        "stage": "generality",
+        "model": "q35_9b",
+        "bench": "quality",
+        "seed": 42,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 1595,
+      "no_ctx": 0.22006269592476488,
+      "feasible_raw": 0.07084639498432602,
+      "score": 0.33166144200626957,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 8192,
+        "enc_maxctx": 16384,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 1899,
+        "n_val": 1595,
+        "trainable_params": 215498752
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_9b_quality_ours_default_s42/pa_generality_q35_9b_quality_ours_default_s42.json",
+      "mtime": 1784681640.1595597,
+      "pod": "sam-dev-d1530-gpu2",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1530-gpu2",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_9b_quality_ours_default_s42/pa_generality_q35_9b_quality_ours_default_s42.json",
+          "score": 0.33166144200626957
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q35_9b_quality_ours_default_s43",
+      "job": {
+        "stage": "generality",
+        "model": "q35_9b",
+        "bench": "quality",
+        "seed": 43,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 1595,
+      "no_ctx": 0.22006269592476488,
+      "feasible_raw": 0.07084639498432602,
+      "score": 0.5410658307210031,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 8192,
+        "enc_maxctx": 16384,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 1899,
+        "n_val": 1595,
+        "trainable_params": 215498752
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_9b_quality_ours_default_s43/pa_generality_q35_9b_quality_ours_default_s43.json",
+      "mtime": 1784697212.1071606,
+      "pod": "sam-dev-d1530-gpu2",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1530-gpu2",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_9b_quality_ours_default_s43/pa_generality_q35_9b_quality_ours_default_s43.json",
+          "score": 0.5410658307210031
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q35_9b_quality_ours_default_s44",
+      "job": {
+        "stage": "generality",
+        "model": "q35_9b",
+        "bench": "quality",
+        "seed": 44,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 1595,
+      "no_ctx": 0.22006269592476488,
+      "feasible_raw": 0.07084639498432602,
+      "score": 0.516614420062696,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 8192,
+        "enc_maxctx": 16384,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 1899,
+        "n_val": 1595,
+        "trainable_params": 215498752
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_9b_quality_ours_default_s44/pa_generality_q35_9b_quality_ours_default_s44.json",
+      "mtime": 1784712838.2727158,
+      "pod": "sam-dev-d1530-gpu2",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1530-gpu2",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q35_9b_quality_ours_default_s44/pa_generality_q35_9b_quality_ours_default_s44.json",
+          "score": 0.516614420062696
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q3_8b_bfcl_live_multiple_ours_default_s42",
+      "job": {
+        "stage": "generality",
+        "model": "q3_8b",
+        "bench": "bfcl_live_multiple",
+        "seed": 42,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 316,
+      "no_ctx": 0.012658227848101266,
+      "feasible_raw": 0.9208860759493671,
+      "score": 0.7088607594936709,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 4096,
+        "enc_maxctx": 4096,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 735,
+        "n_val": 316,
+        "trainable_params": 242237440
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q3_8b_bfcl_live_multiple_ours_default_s42/pa_generality_q3_8b_bfcl_live_multiple_ours_default_s42.json",
+      "mtime": 1784664546.0151381,
+      "pod": "sam-dev-d1530-gpu2",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1530-gpu2",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q3_8b_bfcl_live_multiple_ours_default_s42/pa_generality_q3_8b_bfcl_live_multiple_ours_default_s42.json",
+          "score": 0.7088607594936709
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q3_8b_bfcl_live_multiple_ours_default_s43",
+      "job": {
+        "stage": "generality",
+        "model": "q3_8b",
+        "bench": "bfcl_live_multiple",
+        "seed": 43,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 316,
+      "no_ctx": 0.012658227848101266,
+      "feasible_raw": 0.9208860759493671,
+      "score": 0.7246835443037974,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 4096,
+        "enc_maxctx": 4096,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 735,
+        "n_val": 316,
+        "trainable_params": 242237440
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q3_8b_bfcl_live_multiple_ours_default_s43/pa_generality_q3_8b_bfcl_live_multiple_ours_default_s43.json",
+      "mtime": 1784665260.0263877,
+      "pod": "sam-dev-d1530-gpu2",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1530-gpu2",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q3_8b_bfcl_live_multiple_ours_default_s43/pa_generality_q3_8b_bfcl_live_multiple_ours_default_s43.json",
+          "score": 0.7246835443037974
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q3_8b_bfcl_live_multiple_ours_default_s44",
+      "job": {
+        "stage": "generality",
+        "model": "q3_8b",
+        "bench": "bfcl_live_multiple",
+        "seed": 44,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 316,
+      "no_ctx": 0.012658227848101266,
+      "feasible_raw": 0.9208860759493671,
+      "score": 0.7025316455696202,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 4096,
+        "enc_maxctx": 4096,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 735,
+        "n_val": 316,
+        "trainable_params": 242237440
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q3_8b_bfcl_live_multiple_ours_default_s44/pa_generality_q3_8b_bfcl_live_multiple_ours_default_s44.json",
+      "mtime": 1784666045.9828138,
+      "pod": "sam-dev-d1530-gpu2",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1530-gpu2",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q3_8b_bfcl_live_multiple_ours_default_s44/pa_generality_q3_8b_bfcl_live_multiple_ours_default_s44.json",
+          "score": 0.7025316455696202
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q3_8b_quality_ours_default_s42",
+      "job": {
+        "stage": "generality",
+        "model": "q3_8b",
+        "bench": "quality",
+        "seed": 42,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 1595,
+      "no_ctx": 0.1780564263322884,
+      "feasible_raw": 0.07210031347962383,
+      "score": 0.45203761755485894,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 8192,
+        "enc_maxctx": 16384,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 1899,
+        "n_val": 1595,
+        "trainable_params": 242237440
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q3_8b_quality_ours_default_s42/pa_generality_q3_8b_quality_ours_default_s42.json",
+      "mtime": 1784657158.266589,
+      "pod": "sam-dev-d1530-gpu2",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1530-gpu2",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q3_8b_quality_ours_default_s42/pa_generality_q3_8b_quality_ours_default_s42.json",
+          "score": 0.45203761755485894
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q3_8b_quality_ours_default_s43",
+      "job": {
+        "stage": "generality",
+        "model": "q3_8b",
+        "bench": "quality",
+        "seed": 43,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 1595,
+      "no_ctx": 0.1780564263322884,
+      "feasible_raw": 0.07210031347962383,
+      "score": 0.5479623824451411,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 8192,
+        "enc_maxctx": 16384,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 1899,
+        "n_val": 1595,
+        "trainable_params": 242237440
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q3_8b_quality_ours_default_s43/pa_generality_q3_8b_quality_ours_default_s43.json",
+      "mtime": 1784660516.6874218,
+      "pod": "sam-dev-d1530-gpu2",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1530-gpu2",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q3_8b_quality_ours_default_s43/pa_generality_q3_8b_quality_ours_default_s43.json",
+          "score": 0.5479623824451411
+        }
+      ]
+    },
+    {
+      "tag": "pa_generality_q3_8b_quality_ours_default_s44",
+      "job": {
+        "stage": "generality",
+        "model": "q3_8b",
+        "bench": "quality",
+        "seed": 44,
+        "method": "ours",
+        "variant": "default"
+      },
+      "n": 1595,
+      "no_ctx": 0.1780564263322884,
+      "feasible_raw": 0.07210031347962383,
+      "score": 0.32539184952978056,
+      "paper_valid": true,
+      "invalid_reason": null,
+      "compress_failed": 0,
+      "config": {
+        "K": 128,
+        "maxctx": 8192,
+        "enc_maxctx": 16384,
+        "depth": "half",
+        "lora": 64,
+        "distill": 0.5,
+        "recon": 0.5,
+        "joint": true,
+        "chunk": 4096,
+        "recur": true,
+        "n_train": 1899,
+        "n_val": 1595,
+        "trainable_params": 242237440
+      },
+      "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q3_8b_quality_ours_default_s44/pa_generality_q3_8b_quality_ours_default_s44.json",
+      "mtime": 1784663825.3356674,
+      "pod": "sam-dev-d1530-gpu2",
+      "technical_replicates": 1,
+      "technical_replicate_range": 0.0,
+      "artifact_sources": [
+        {
+          "pod": "sam-dev-d1530-gpu2",
+          "artifact": "/mnt/persist/paper_a/artifacts/pa_generality_q3_8b_quality_ours_default_s44/pa_generality_q3_8b_quality_ours_default_s44.json",
+          "score": 0.32539184952978056
+        }
+      ]
+    }
+  ],
+  "aggregates": [
+    {
+      "model": "glm4_9b",
+      "bench": "bfcl_live_multiple",
+      "method": "ours",
+      "variant": "default",
+      "seeds": [
+        42,
+        44
+      ],
+      "seed_count": 2,
+      "n_per_seed": [
+        316
+      ],
+      "expected_n": 316,
+      "full_split": true,
+      "technical_conflict_tags": [],
+      "max_technical_replicate_range": 0.0,
+      "invalid_tags": [],
+      "score_mean": 0.7294303797468354,
+      "score_std": 0.0067130390618976386,
+      "no_ctx_mean": 0.012658227848101266,
+      "feasible_raw_mean": 0.8481012658227848,
+      "delta_vs_feasible_raw": -0.11867088607594933
+    },
+    {
+      "model": "glm4_9b",
+      "bench": "quality",
+      "method": "ours",
+      "variant": "default",
+      "seeds": [
+        42,
+        44
+      ],
+      "seed_count": 2,
+      "n_per_seed": [
+        1595
+      ],
+      "expected_n": 1595,
+      "full_split": true,
+      "technical_conflict_tags": [],
+      "max_technical_replicate_range": 0.0,
+      "invalid_tags": [],
+      "score_mean": 0.5106583072100314,
+      "score_std": 0.04477604068955569,
+      "no_ctx_mean": 0.1993730407523511,
+      "feasible_raw_mean": 0.09843260188087774,
+      "delta_vs_feasible_raw": 0.4122257053291536
+    },
+    {
+      "model": "ministral_8b",
+      "bench": "bfcl_live_multiple",
+      "method": "ours",
+      "variant": "default",
+      "seeds": [
+        42,
+        44
+      ],
+      "seed_count": 2,
+      "n_per_seed": [
+        316
+      ],
+      "expected_n": 316,
+      "full_split": true,
+      "technical_conflict_tags": [],
+      "max_technical_replicate_range": 0.0,
+      "invalid_tags": [],
+      "score_mean": 0.7199367088607596,
+      "score_std": 0.0067130390618975605,
+      "no_ctx_mean": 0.012658227848101266,
+      "feasible_raw_mean": 0.870253164556962,
+      "delta_vs_feasible_raw": -0.15031645569620244
+    },
+    {
+      "model": "ministral_8b",
+      "bench": "quality",
+      "method": "ours",
+      "variant": "default",
+      "seeds": [
+        42,
+        44
+      ],
+      "seed_count": 2,
+      "n_per_seed": [
+        1595
+      ],
+      "expected_n": 1595,
+      "full_split": true,
+      "technical_conflict_tags": [],
+      "max_technical_replicate_range": 0.0,
+      "invalid_tags": [],
+      "score_mean": 0.33793103448275863,
+      "score_std": 0.0,
+      "no_ctx_mean": 0.20501567398119122,
+      "feasible_raw_mean": 0.09153605015673981,
+      "delta_vs_feasible_raw": 0.2463949843260188
+    },
+    {
+      "model": "q35_4b",
+      "bench": "bfcl_live_multiple",
+      "method": "ours",
+      "variant": "default",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "seed_count": 3,
+      "n_per_seed": [
+        316
+      ],
+      "expected_n": 316,
+      "full_split": true,
+      "technical_conflict_tags": [],
+      "max_technical_replicate_range": 0.0,
+      "invalid_tags": [],
+      "score_mean": 0.7151898734177214,
+      "score_std": 0.01674526146243408,
+      "no_ctx_mean": 0.0031645569620253164,
+      "feasible_raw_mean": 0.11075949367088607,
+      "delta_vs_feasible_raw": 0.6044303797468353
+    },
+    {
+      "model": "q35_4b",
+      "bench": "quality",
+      "method": "ours",
+      "variant": "default",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "seed_count": 3,
+      "n_per_seed": [
+        1595
+      ],
+      "expected_n": 1595,
+      "full_split": true,
+      "technical_conflict_tags": [],
+      "max_technical_replicate_range": 0.0,
+      "invalid_tags": [],
+      "score_mean": 0.39143155694879833,
+      "score_std": 0.05331120173136495,
+      "no_ctx_mean": 0.18683385579937303,
+      "feasible_raw_mean": 0.06833855799373041,
+      "delta_vs_feasible_raw": 0.32309299895506793
+    },
+    {
+      "model": "q35_9b",
+      "bench": "bfcl_live_multiple",
+      "method": "ours",
+      "variant": "default",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "seed_count": 3,
+      "n_per_seed": [
+        316
+      ],
+      "expected_n": 316,
+      "full_split": true,
+      "technical_conflict_tags": [],
+      "max_technical_replicate_range": 0.0,
+      "invalid_tags": [],
+      "score_mean": 0.7141350210970465,
+      "score_std": 0.019335762425974002,
+      "no_ctx_mean": 0.012658227848101266,
+      "feasible_raw_mean": 0.8449367088607594,
+      "delta_vs_feasible_raw": -0.13080168776371293
+    },
+    {
+      "model": "q35_9b",
+      "bench": "quality",
+      "method": "ours",
+      "variant": "default",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "seed_count": 3,
+      "n_per_seed": [
+        1595
+      ],
+      "expected_n": 1595,
+      "full_split": true,
+      "technical_conflict_tags": [],
+      "max_technical_replicate_range": 0.0,
+      "invalid_tags": [],
+      "score_mean": 0.4631138975966562,
+      "score_std": 0.11449575944703029,
+      "no_ctx_mean": 0.22006269592476488,
+      "feasible_raw_mean": 0.07084639498432602,
+      "delta_vs_feasible_raw": 0.39226750261233023
+    },
+    {
+      "model": "q3_8b",
+      "bench": "bfcl_live_multiple",
+      "method": "ours",
+      "variant": "default",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "seed_count": 3,
+      "n_per_seed": [
+        316
+      ],
+      "expected_n": 316,
+      "full_split": true,
+      "technical_conflict_tags": [],
+      "max_technical_replicate_range": 0.0,
+      "invalid_tags": [],
+      "score_mean": 0.7120253164556961,
+      "score_std": 0.011409972390708826,
+      "no_ctx_mean": 0.012658227848101266,
+      "feasible_raw_mean": 0.9208860759493671,
+      "delta_vs_feasible_raw": -0.208860759493671
+    },
+    {
+      "model": "q3_8b",
+      "bench": "quality",
+      "method": "ours",
+      "variant": "default",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "seed_count": 3,
+      "n_per_seed": [
+        1595
+      ],
+      "expected_n": 1595,
+      "full_split": true,
+      "technical_conflict_tags": [],
+      "max_technical_replicate_range": 0.0,
+      "invalid_tags": [],
+      "score_mean": 0.4417972831765935,
+      "score_std": 0.11163807086603972,
+      "no_ctx_mean": 0.17805642633228844,
+      "feasible_raw_mean": 0.07210031347962383,
+      "delta_vs_feasible_raw": 0.3696969696969697
+    }
+  ],
+  "conflicts": [],
+  "invalid_cells": [],
+  "done_without_local_artifact": {},
+  "running": [
+    "pa_generality_xlam_8b_quality_ours_default_s42",
+    "pa_generality_xlam_8b_quality_ours_default_s44"
+  ],
+  "failed": [
+    "pa_generality_glm4_9b_bfcl_live_multiple_ours_default_s43",
+    "pa_generality_glm4_9b_quality_ours_default_s43",
+    "pa_generality_ministral_8b_bfcl_live_multiple_ours_default_s43",
+    "pa_generality_ministral_8b_quality_ours_default_s43",
+    "pa_generality_toolace_8b_bfcl_live_multiple_ours_default_s43",
+    "pa_generality_toolace_8b_quality_ours_default_s43",
+    "pa_generality_xlam_8b_bfcl_live_multiple_ours_default_s43",
+    "pa_generality_xlam_8b_quality_ours_default_s43"
+  ]
+}
