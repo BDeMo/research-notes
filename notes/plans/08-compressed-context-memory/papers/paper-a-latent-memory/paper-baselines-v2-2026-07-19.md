@@ -91,7 +91,7 @@ These methods run on our Qwen3-8B and Qwen3.5-9B bases.
 | BM25 retrieve-then-read | lexical retrieval control | matched reader-token budget | 6 cells configured |
 | [LLMLingua-2](https://github.com/microsoft/LLMLingua) | hard token compression | matched tokens | complete |
 | [LongLLMLingua](https://github.com/microsoft/LLMLingua) | question-aware compression | matched tokens | 6 isolated corrected cells configured |
-| original [LLMLingua](https://github.com/microsoft/LLMLingua) | perplexity compression | matched tokens | current rows invalid; isolated-env rerun |
+| original [LLMLingua](https://github.com/microsoft/LLMLingua) | perplexity compression | matched tokens | 6 isolated corrected cells configured |
 | exact mean pooling | simple latent control | same base/state budget | 6 cells configured |
 | Compressor (w/o gate) | proposed method | K128/chunk | one final cell |
 
@@ -114,7 +114,7 @@ These methods run on our Qwen3-8B and Qwen3.5-9B bases.
 
 | rows | columns |
 |---|---|
-| QuALITY, BFCL, Hotpot × two main bases | no-context, bounded raw, true raw, SFT, window, BM25, LL2, LongLL, mean pooling, Compressor (w/o gate), Compressor (w/ gate) |
+| QuALITY, BFCL, Hotpot × two main bases | no-context, bounded raw, true raw, SFT, window, BM25, LL2, LongLL, original LL, mean pooling, Compressor (w/o gate), Compressor (w/ gate) |
 
 Only directly comparable Qwen rows appear here.
 

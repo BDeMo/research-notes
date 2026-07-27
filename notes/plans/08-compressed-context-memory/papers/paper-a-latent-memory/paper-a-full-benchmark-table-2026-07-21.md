@@ -1,6 +1,6 @@
 # Paper A — full benchmark and baseline table
 
-> Snapshot: 2026-07-25 01:32 PT
+> Snapshot: 2026-07-26 17:05 PT
 > Rule: completed values are reported numerically; incomplete experiments are labeled by status and are not
 > filled with estimated results. SQuAD-v2 is retained only as an exact-text diagnostic and is excluded from
 > the headline tables.
@@ -26,23 +26,25 @@ Bold marks the best completed compressed path.
 | Qwen3-8B | Raw | reference | 73.2% corrected | 92.4% | 53.7% |
 |  | SFT | reference | 79.1 ± 1.1% corrected | 95.4 ± 0.3% | 68.8 ± 0.6% |
 |  | Window | control | 48.5% corrected | 55.7% | 26.2% |
-|  | BM25 retrieval | baseline | TBD | TBD | TBD |
-|  | LLMLingua-2 | baseline | 45.4% corrected | 70.3% | 22.1% |
+|  | BM25 retrieval | baseline | **54.7%** | 78.8% | **37.3%** |
+|  | LLMLingua-2 | baseline | 45.3% | **82.6%** | 26.3% |
 |  | LongLLMLingua | baseline | TBD | TBD | TBD |
-|  | mean pooling | latent control | TBD | TBD | TBD |
-|  | Compressor (w/o gate) | ours | 48.1 ± 1.5% corrected | **72.3 ± 0.5%** | **28.9 ± 0.2%** |
-| Qwen3.5-9B | no context | reference | ~~22.0%~~ ⚠ INVALID | 1.3% | 26.7% |
-| Qwen3.5-9B | Raw | reference | ~~7.1%~~ ⚠ INVALID | 84.5% | 53.9% |
-|  | SFT | reference | ~~85.0 ± 0.4%~~ ⚠ INVALID | 94.9 ± 1.0% | 71.7 ± 0.6% |
-|  | Window | control | ~~16.7%~~ ⚠ INVALID | 52.8% | 24.8% |
-|  | BM25 retrieval | baseline | TBD | TBD | TBD |
-|  | LLMLingua-2 | baseline | ~~20.3%~~ ⚠ INVALID | 60.8% | 28.9% |
+|  | original LLMLingua | baseline | 45.7% | 60.1% | TBD |
+|  | mean pooling | latent control | 32.4% | 36.1% | 14.0% |
+|  | Compressor (w/o gate) | ours | 48.1 ± 1.5% corrected | 72.3 ± 0.5% | 28.9 ± 0.2% |
+| Qwen3.5-9B | no context | reference | 44.4% corrected | 1.3% | 26.7% |
+| Qwen3.5-9B | Raw | reference | 81.5% corrected | 84.5% | 53.9% |
+|  | SFT | reference | 82.5 ± 0.7% corrected | 94.9 ± 1.0% | 71.7 ± 0.6% |
+|  | Window | control | 50.6% corrected | 52.8% | 24.8% |
+|  | BM25 retrieval | baseline | **56.6%** | **76.9%** | TBD |
+|  | LLMLingua-2 | baseline | 45.9% | 73.4% | TBD |
 |  | LongLLMLingua | baseline | TBD | TBD | TBD |
-|  | mean pooling | latent control | TBD | TBD | TBD |
-|  | Compressor (w/o gate) | ours | ~~51.5 ± 1.7%~~ ⚠ INVALID | **72.0 ± 0.8%** | **30.5 ± 0.3%** |
+|  | original LLMLingua | baseline | TBD | TBD | TBD |
+|  | mean pooling | latent control | 44.5% | 33.9% | 22.8% |
+|  | Compressor (w/o gate) | ours | 45.8 ± 2.3% corrected | 72.0 ± 0.8% | **30.5 ± 0.3%** |
 
-`Window` is a budget-matched control. The expanded same-base table adds BM25 retrieval,
-LongLLMLingua, and mean pooling; unfinished cells remain `TBD`. Official soft-memory methods use different released backbones and therefore
+`Window` is a budget-matched control. The corrected same-base stage contains 30 cells:
+LLMLingua-2, LongLLMLingua, original LLMLingua, BM25 retrieval, and mean pooling on both bases and all three headline tasks. Eighteen cells are complete, three are running, and nine are queued under the source-and-budget-v2 contract. Unfinished cells remain `TBD`. Official soft-memory methods use different released backbones and therefore
 belong in the native-base table below.
 
 ## 2. Shared-backbone routing

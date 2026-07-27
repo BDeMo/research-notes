@@ -1,6 +1,6 @@
 # Paper A experiment receipt
 
-> Snapshot: 2026-07-25 01:32 PT. This is the operational source of truth for what is configured, running,
+> Snapshot: 2026-07-26 17:05 PT. This is the operational source of truth for what is configured, running,
 > queued, blocked, or excluded. “Receipt” means exact recipe + evaluation contract + artifact path.
 > Maintenance state, invalidation history, task queues, and repair notes stay in this Markdown tree. They
 > are not manuscript content and must not be copied into the Overleaf repository.
@@ -14,7 +14,8 @@
 | stage | configured cells | done | running | failed / repair | state |
 |---|---:|---:|---:|---:|---|
 | E0 evidence audit | 2 tokenizer/model audits + overlap check | complete | 0 | 0 | locked |
-| E1 fair main grid | 88 + 24 corrected | 60 unaffected + 12 corrected | 3 corrected | 28 old invalid / 9 queued | corrected rerun active |
+| E1 fair main grid | 88 + 24 corrected | corrected QuALITY 24/24 | 0 | 28 old invalid | corrected rerun complete |
+| E1B matched baselines v2 | 30 | 18 | 3 | 9 queued | source/budget repair active |
 | E1Q output/truncation audit | 28 reloadable paths | 28 | 0 | 0 | complete |
 | E1R QuALITY SFT reaudit | 6 full retrains | 0 valid | 0 | 6 invalid | rerun required |
 | E1F feature-only rerun | 24 canonical GCM adapters | 24 | 0 | 0 | complete |
@@ -33,10 +34,11 @@ Completed cells carry audited values, configured unfinished cells use
 `TBD`, and unsupported native method/task pairs use `—`. The manuscript
 contains neither operational tables nor incomplete cells.
 
-Current live workers: three corrected QuALITY main-grid workers; 12 of
-24 corrected cells are complete and 9 remain queued. The
-corrected loader, full 2,086-example validation split, and pure-PyTorch
-model path are active. No current worker is in an OOM loop.
+Current live workers: three matched-baseline protocol-v2 workers. Corrected
+QuALITY is complete at 24/24. The baseline repair fixes the LLMLingua
+cache interface, uses the same bounded source context for every compressor,
+and matches BM25's reader-token budget to the other compressed baselines.
+No current worker is in an OOM loop.
 
 The earlier `74/112` count was invalid: it summed duplicate cross-pod cells and stale tags. The corrected
 manifest removes the internal Gist smoke baseline and uses the current seven-base model set. All old Qwen3.5 cells are archived and rerun because the
@@ -111,8 +113,8 @@ tags are technical replicates, not separate methods.
 | full+SFT | rank-64 LoRA, matched data/steps/seeds | raw path | B / true-raw variant | main complete; Q3 QuALITY reaudit complete |
 | raw window | none | sink + recent tail | matched realized memory | complete |
 | LLMLingua-2 | official `llmlingua==0.2.2` | full source → token classifier | explicit target token | complete |
-| LongLLMLingua | official Llama-2 compressor LM | list of source chunks + raw question | explicit target token | current rows invalid; isolated-env rerun |
-| original LLMLingua | official Llama-2 compressor LM | list of source chunks | explicit target token | current rows invalid; isolated-env rerun |
+| LongLLMLingua | official Llama-2 compressor LM | bounded source + raw question | explicit target token | cache repair validated; corrected cells running |
+| original LLMLingua | official Llama-2 compressor LM | bounded source | explicit target token | 2/6 corrected cells complete |
 | Compressor (w/o gate) | per-model recipe above | up to encoder cap | actual S×K | complete |
 | Compressor (w/ empirical gate) | no new model training | compressed memory or feasible raw | variable | complete; held-out empirical result |
 | Compressor (w/ formal gate) | calibration only | compressed memory or feasible raw | variable / all-raw | complete negative; 0/24 certified |
@@ -189,7 +191,7 @@ Only authors' code/checkpoints count as paper baselines.
 | Cartridges | `HazyResearch/cartridges@ef34ba9` | public LongHealth cartridge on Llama-3.2-3B | corpus-conditioned long QA | other tasks require per-corpus self-study |
 | Cramming 1568 | `yurakuratov/hidden_capacity@c371c3f` | one optimized vector on Llama-3.1-8B | PG19 reconstruction | capacity appendix; not online compression |
 | LLMLingua family | `microsoft/LLMLingua@e0e9d99` | official compressor LMs | all 7 readers | integrated; faithful repair running |
-| mean pooling | exact local operation | each reader's embeddings | all bases | queued |
+| mean pooling | exact local operation | each reader's embeddings | all bases | 6/6 complete |
 
 If a method uses a different official base, report within-base retention:
 

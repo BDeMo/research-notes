@@ -1,6 +1,6 @@
 # Paper A — all-benchmark operations tables
 
-> Snapshot 2026-07-25 01:32 PT. Research only (no CMG-RCA / OpenRCA — those are company work).
+> Snapshot 2026-07-26 17:05 PT. Research only (no CMG-RCA / OpenRCA — those are company work).
 > Rule: completed cells carry numbers; unfinished cells are `TBD` placeholders (fill when the run lands,
 > never estimate). Scores are native metrics ×100. Raw and SFT are **references**, not compressed-path
 > competitors. `GCM` names the full framework. `Compressor (w/o gate)` is the compressed path;
@@ -28,8 +28,8 @@
 | stage | experiment | configured evidence | current state |
 |---|---|---:|---|
 | E0 | data and model audit | lengths, overlap, scorer checks | complete |
-| E1 | matched main comparison | 88 original + 24 corrected QuALITY cells | 60 unaffected; 12 corrected done; 3 running; 9 queued |
-| E1B | expanded matched-base baselines | 18 cells | configured: BM25, LongLLMLingua, mean pooling |
+| E1 | matched main comparison | 88 original + 24 corrected QuALITY cells | corrected QuALITY 24/24 complete |
+| E1B | expanded matched-base baselines | 30 cells | 18 complete; 3 running; 9 queued |
 | E1Q/E1R | output and SFT audit | 28 paths + optional SFT retrains | output audit complete; SFT reruns do not block the paper |
 | E1F/E2 | gate features and analysis | 24 groups | 18 valid; 6 QuALITY groups invalid |
 | E3 | independent reproduction | optional diagnostic | removed from the paper-critical path |
@@ -63,25 +63,27 @@ Benchmarks = columns, methods = rows.
 | Raw (bounded) · ref | 73.2 corrected | 92.4 | 53.7 | 65.5 |
 | SFT · ref | 79.1±1.1 corrected | 95.4±0.3 | 68.8±0.6 | 93.1±0.3 |
 | Window · control | 48.5 corrected | 55.7 | 26.2 | 49.6 |
-| BM25 retrieval · baseline | TBD | TBD | TBD | — |
-| LLMLingua-2 · baseline | 45.4 corrected | 70.3 | 22.1 | 53.4 |
+| BM25 retrieval · baseline | **54.7** | 78.8 | **37.3** | — |
+| LLMLingua-2 · baseline | 45.3 | **82.6** | 26.3 | 53.4 |
 | LongLLMLingua · baseline | TBD | TBD | TBD | — |
-| mean pooling · control | TBD | TBD | TBD | — |
-| **Compressor (w/o gate) · ours** | 48.1±1.5 corrected | **72.3±0.5** | 28.9±0.2 | 26.5±0.4 |
+| original LLMLingua · baseline | 45.7 | 60.1 | TBD | — |
+| mean pooling · control | 32.4 | 36.1 | 14.0 | — |
+| **Compressor (w/o gate) · ours** | 48.1±1.5 corrected | 72.3±0.5 | 28.9±0.2 | 26.5±0.4 |
 | **Compressor (w/ gate) · ours** | TBD corrected | **88.5** | **50.9** | 62.8 |
 
 ### Qwen3.5-9B
 | method | QuALITY | BFCL | HotpotQA | SQuAD-v2 (diag) |
 |---|---:|---:|---:|---:|
-| no context · ref | ~~22.0~~ ⚠ INVALID | 1.3 | 26.7 | 20.7 |
-| Raw (bounded) · ref | ~~7.1~~ ⚠ INVALID | 84.5 | 53.9 | 66.8 |
-| SFT · ref | ~~85.0±0.4~~ ⚠ INVALID | 94.9±1.0 | 71.7±0.6 | 93.8±0.3 |
-| Window · control | ~~16.7~~ ⚠ INVALID | 52.8 | 24.8 | 49.6 |
-| BM25 retrieval · baseline | TBD | TBD | TBD | — |
-| LLMLingua-2 · baseline | ~~20.3~~ ⚠ INVALID | 60.8 | 28.9 | 58.8 |
+| no context · ref | 44.4 corrected | 1.3 | 26.7 | 20.7 |
+| Raw (bounded) · ref | 81.5 corrected | 84.5 | 53.9 | 66.8 |
+| SFT · ref | 82.5±0.7 corrected | 94.9±1.0 | 71.7±0.6 | 93.8±0.3 |
+| Window · control | 50.6 corrected | 52.8 | 24.8 | 49.6 |
+| BM25 retrieval · baseline | **56.6** | **76.9** | TBD | — |
+| LLMLingua-2 · baseline | 45.9 | 73.4 | TBD | 58.8 |
 | LongLLMLingua · baseline | TBD | TBD | TBD | — |
-| mean pooling · control | TBD | TBD | TBD | — |
-| **Compressor (w/o gate) · ours** | ~~51.5±1.7~~ ⚠ INVALID | **72.0±0.8** | **30.5±0.3** | 26.9±0.6 |
+| original LLMLingua · baseline | TBD | TBD | TBD | — |
+| mean pooling · control | 44.5 | 33.9 | 22.8 | — |
+| **Compressor (w/o gate) · ours** | 45.8±2.3 corrected | 72.0±0.8 | **30.5±0.3** | 26.9±0.6 |
 | **Compressor (w/ gate) · ours** | ~~51.4~~ ⚠ INVALID | **80.5** | **51.7** | 64.7 |
 
 ### Table 1a — QuALITY stability and adaptation references
